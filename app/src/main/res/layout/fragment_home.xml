@@ -27,7 +27,7 @@
                     android:id="@+id/toolbar_home"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
-                    android:background="@android:color/transparent"
+                    android:background="@color/sky_blue_F1F5FF"
                     app:navigationIcon="@drawable/ic_hamburger" />
 
             </com.google.android.material.appbar.AppBarLayout>
