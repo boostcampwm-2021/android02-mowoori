@@ -10,7 +10,11 @@
         android:id="@+id/homeFragment"
         android:name="com.ariari.mowoori.ui.home.HomeFragment"
         android:label="HomeFragment"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_inviteCheckFragment"
+            app:destination="@id/inviteCheckFragment" />
+    </fragment>
     <fragment
         android:id="@+id/membersFragment"
         android:name="com.ariari.mowoori.ui.members.MembersFragment"
@@ -21,5 +25,10 @@
         android:name="com.ariari.mowoori.ui.missions.MissionsFragment"
         android:label="MissionsFragment"
         tools:layout="@layout/fragment_missions" />
+    <fragment
+        android:id="@+id/inviteCheckFragment"
+        android:name="com.ariari.mowoori.ui.group.InviteCheckFragment"
+        android:label="InviteCheckFragment"
+        tools:layout="@layout/fragment_invite_check" />
 
 </navigation>
