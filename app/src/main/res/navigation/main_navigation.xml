@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_navigation"
+    app:startDestination="@id/homeFragment">
+
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.ariari.mowoori.ui.home.HomeFragment"
+        android:label="HomeFragment"
+        tools:layout="@layout/fragment_home" />
+    <fragment
+        android:id="@+id/membersFragment"
+        android:name="com.ariari.mowoori.ui.members.MembersFragment"
+        android:label="MembersFragment"
+        tools:layout="@layout/fragment_members" />
+    <fragment
+        android:id="@+id/missionsFragment"
+        android:name="com.ariari.mowoori.ui.missions.MissionsFragment"
+        android:label="MissionsFragment"
+        tools:layout="@layout/fragment_missions" />
+
+</navigation>
