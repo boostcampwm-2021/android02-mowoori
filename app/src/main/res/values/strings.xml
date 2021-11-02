@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MoWoori</string>
+
+    <string name="default_web_client_id">537612252343-60e4gr390pg6eb02ehvae3j8oc2d3roh.apps.googleusercontent.com</string>
 </resources>
