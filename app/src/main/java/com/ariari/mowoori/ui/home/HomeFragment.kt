@@ -16,7 +16,7 @@ class HomeFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
@@ -25,6 +25,13 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
+        setDrawerOpenListener()
+    }
+
+    private fun setDrawerOpenListener() {
+        binding.toolbarHome.setNavigationOnClickListener {
+            binding.drawerHome.open()
+        }
     }
 
     override fun onDestroyView() {
