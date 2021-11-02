@@ -12,6 +12,7 @@
         android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/container_home"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/sky_blue_F2F6FF">
@@ -53,6 +54,5 @@
                 android:layout_height="match_parent" />
 
         </com.google.android.material.navigation.NavigationView>
-
     </androidx.drawerlayout.widget.DrawerLayout>
 </layout>

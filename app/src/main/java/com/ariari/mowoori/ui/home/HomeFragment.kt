@@ -10,21 +10,15 @@ import android.os.Message
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-<<<<<<< HEAD
-import android.widget.TextView
-=======
 import android.view.animation.AccelerateInterpolator
 import android.widget.ImageView
->>>>>>> #6 feat: Home Fragment에 눈내리는 애니메이션 추가
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.FragmentHomeBinding
-<<<<<<< HEAD
 import com.google.android.material.bottomnavigation.BottomNavigationView
-=======
 import kotlin.random.Random
->>>>>>> #6 feat: Home Fragment에 눈내리는 애니메이션 추가
 
 
 class HomeFragment : Fragment(), Handler.Callback {
@@ -48,10 +42,10 @@ class HomeFragment : Fragment(), Handler.Callback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
-<<<<<<< HEAD
         showBottomNavigation()
         setDrawerOpenListener()
         setGroupAddClickListener()
+        delayedSnowing.sendEmptyMessageDelayed(SNOWING_MESSAGE_ID, 100)
     }
 
     private fun showBottomNavigation() {
@@ -70,9 +64,6 @@ class HomeFragment : Fragment(), Handler.Callback {
             .setOnClickListener {
                 it.findNavController().navigate(R.id.action_homeFragment_to_inviteCheckFragment)
             }
-=======
-        delayedSnowing.sendEmptyMessageDelayed(SNOWING_MESSAGE_ID, 100)
->>>>>>> #6 feat: Home Fragment에 눈내리는 애니메이션 추가
     }
 
     override fun onDestroyView() {
@@ -87,7 +78,6 @@ class HomeFragment : Fragment(), Handler.Callback {
         // snow 크기 설정
         scaleX = Random.nextFloat() * .7f + .2f
         scaleY = scaleX
-        // measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
     }
 
     private fun dropSnow() {
@@ -119,7 +109,6 @@ class HomeFragment : Fragment(), Handler.Callback {
                 }
             })
         }
-
         set.start()
     }
 
