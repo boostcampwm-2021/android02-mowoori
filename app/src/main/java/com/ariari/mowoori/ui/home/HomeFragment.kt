@@ -4,11 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.navigation.findNavController
 import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.FragmentHomeBinding
+import com.ariari.mowoori.ui.home.adapter.DrawerAdapter
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class HomeFragment : Fragment() {
@@ -30,7 +29,7 @@ class HomeFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
         showBottomNavigation()
         setDrawerOpenListener()
-        setGroupAddClickListener()
+        setDrawerAdapter()
     }
 
     private fun showBottomNavigation() {
@@ -44,11 +43,15 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun setGroupAddClickListener() {
-        binding.navViewDrawer.getHeaderView(0).findViewById<TextView>(R.id.tv_drawer_header_add)
-            .setOnClickListener {
-                it.findNavController().navigate(R.id.action_homeFragment_to_inviteCheckFragment)
-            }
+    private fun setDrawerAdapter() {
+        val adapter: DrawerAdapter by lazy {
+            DrawerAdapter(object : DrawerAdapter.OnItemClickListener {
+                override fun itemClick() {
+                    binding.drawerHome.close()
+                }
+            })
+        }
+        binding.rvDrawer.adapter = adapter
     }
 
     override fun onDestroyView() {
