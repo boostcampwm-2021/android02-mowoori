@@ -5,8 +5,6 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.os.Bundle
-import android.os.Handler
-import android.os.Message
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,20 +12,22 @@ import android.view.animation.AccelerateInterpolator
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.FragmentHomeBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import kotlin.random.Random
 
 
-class HomeFragment : Fragment(), Handler.Callback {
+class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding ?: error(getString(R.string.binding_error))
 
-    private val SNOWING_MESSAGE_ID = 10
-    private val delayedSnowing: Handler = Handler(this@HomeFragment)
     private var isSnowing = true
 
     override fun onCreateView(
@@ -45,7 +45,7 @@ class HomeFragment : Fragment(), Handler.Callback {
         showBottomNavigation()
         setDrawerOpenListener()
         setGroupAddClickListener()
-        delayedSnowing.sendEmptyMessageDelayed(SNOWING_MESSAGE_ID, 100)
+        setAnimator()
     }
 
     private fun showBottomNavigation() {
@@ -67,10 +67,22 @@ class HomeFragment : Fragment(), Handler.Callback {
     }
 
     override fun onDestroyView() {
+        Timber.d("destroy")
         super.onDestroyView()
         isSnowing = false
-        delayedSnowing.removeCallbacksAndMessages(null)
         _binding = null
+        Timber.d("$isSnowing")
+    }
+
+    private fun setAnimator() {
+        Timber.d("animator")
+        viewLifecycleOwner.lifecycleScope.launch {
+            while (isSnowing) {
+                Timber.d("scope")
+                dropSnow()
+                delay(100)
+            }
+        }
     }
 
     private fun makeSnow() = ImageView(requireContext()).apply {
@@ -110,13 +122,5 @@ class HomeFragment : Fragment(), Handler.Callback {
             })
         }
         set.start()
-    }
-
-    override fun handleMessage(msg: Message): Boolean {
-        if (msg.what == SNOWING_MESSAGE_ID && isSnowing) {
-            dropSnow()
-            delayedSnowing.sendEmptyMessageDelayed(SNOWING_MESSAGE_ID, 100)
-        }
-        return true
     }
 }
