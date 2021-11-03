@@ -1,6 +1,7 @@
 package com.ariari.mowoori.ui.home
 
 import android.animation.Animator
+import android.animation.AnimatorInflater
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
@@ -11,12 +12,15 @@ import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.FragmentHomeBinding
+import com.ariari.mowoori.util.TimberUtil
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -24,7 +28,6 @@ import kotlin.random.Random
 
 
 class HomeFragment : Fragment() {
-
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding ?: error(getString(R.string.binding_error))
 
@@ -46,6 +49,7 @@ class HomeFragment : Fragment() {
         setDrawerOpenListener()
         setGroupAddClickListener()
         setAnimator()
+        setClickListener()
     }
 
     private fun showBottomNavigation() {
@@ -67,7 +71,6 @@ class HomeFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        Timber.d("destroy")
         super.onDestroyView()
         isSnowing = false
         _binding = null
@@ -75,20 +78,63 @@ class HomeFragment : Fragment() {
     }
 
     private fun setAnimator() {
-        Timber.d("animator")
         viewLifecycleOwner.lifecycleScope.launch {
-            while (isSnowing) {
-                Timber.d("scope")
-                dropSnow()
-                delay(100)
+            async {
+                while (isSnowing) {
+                    dropSnow()
+                    delay(100)
+                }
             }
+            async {
+                // bounceSnowBall()
+                val snowFace = binding.ivHomeSnowFace
+                snowFace.isVisible = true
+
+                val snowUpAnim =
+                    AnimatorInflater.loadAnimator(requireContext(), R.animator.animator_snow_up)
+                        .apply {
+                            setTarget(snowFace)
+                            Timber.d("1")
+                        }
+
+                val snowDownAnim =
+                    AnimatorInflater.loadAnimator(requireContext(), R.animator.animator_snow_down)
+                        .apply {
+                            setTarget(snowFace)
+                            Timber.d("2")
+                        }
+
+                snowUpAnim.addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
+                        if (isSnowing) {
+                            snowDownAnim.start()
+                        }
+                    }
+                })
+                snowDownAnim.addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
+                        if (isSnowing) {
+                            snowUpAnim.start()
+                        }
+                    }
+                })
+                snowUpAnim.start()
+            }
+        }
+    }
+
+    private fun setClickListener() {
+        binding.containerHome.setOnClickListener {
+            isSnowing = !isSnowing
         }
     }
 
     private fun makeSnow() = ImageView(requireContext()).apply {
         setImageResource(R.drawable.ic_snow)
         // snow 크기 설정
-        scaleX = Random.nextFloat() * .7f + .2f
+        scaleX = Random.nextFloat() * .3f + .2f
         scaleY = scaleX
     }
 
@@ -96,6 +142,7 @@ class HomeFragment : Fragment() {
         val snow = makeSnow()
         binding.containerHome.addView(snow)
 
+        TimberUtil.timber("height", "${binding.containerHome.height}")
         // snow 좌표 설정
         val snowStartHeight = snow.scaleY + 100f
         val startX = Random.nextFloat() * binding.containerHome.width
@@ -116,8 +163,9 @@ class HomeFragment : Fragment() {
             duration = (Math.random() * 3000 + 3000).toLong()
             addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator?) {
+                    Timber.d("End")
                     super.onAnimationEnd(animation)
-                    _binding?.containerHome?.removeView(snow)
+                    binding?.containerHome?.removeView(snow)
                 }
             })
         }
