@@ -39,7 +39,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun setDrawerOpenListener() {
-        binding.toolbarHome.setNavigationOnClickListener {
+        binding.tbHome.setNavigationOnClickListener {
             binding.drawerHome.open()
         }
     }
