@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.FragmentHomeBinding
 import com.ariari.mowoori.ui.home.adapter.DrawerAdapter
+import com.ariari.mowoori.ui.home.adapter.DrawerAdapterDecoration
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class HomeFragment : Fragment() {
@@ -30,6 +31,8 @@ class HomeFragment : Fragment() {
         showBottomNavigation()
         setDrawerOpenListener()
         setDrawerAdapter()
+        val itemDecoration = DrawerAdapterDecoration()
+        binding.rvDrawer.addItemDecoration(itemDecoration)
     }
 
     private fun showBottomNavigation() {
@@ -46,7 +49,9 @@ class HomeFragment : Fragment() {
     private fun setDrawerAdapter() {
         val adapter: DrawerAdapter by lazy {
             DrawerAdapter(object : DrawerAdapter.OnItemClickListener {
-                override fun itemClick() {
+                override fun itemClick(position: Int) {
+                    // TODO: 그룹 이동
+                    // TODO: 그룹 아이템 배경 색상 변경
                     binding.drawerHome.close()
                 }
             })

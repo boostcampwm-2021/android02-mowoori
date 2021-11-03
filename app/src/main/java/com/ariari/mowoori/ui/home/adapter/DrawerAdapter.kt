@@ -1,6 +1,7 @@
 package com.ariari.mowoori.ui.home.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
@@ -13,7 +14,7 @@ class DrawerAdapter(private val listener: OnItemClickListener) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     interface OnItemClickListener {
-        fun itemClick()
+        fun itemClick(position: Int)
     }
 
     companion object {
@@ -21,7 +22,13 @@ class DrawerAdapter(private val listener: OnItemClickListener) :
         private const val GROUP = 1
     }
 
-    private val groups = listOf(GroupInfo("정직한 코박쥐들"), GroupInfo("못생긴 원숭이들"), GroupInfo("고약한 거북이들"))
+    private val groups = listOf(
+        GroupInfo("정직한 코박쥐들"),
+        GroupInfo("못생긴 원숭이들"),
+        GroupInfo("고약한 거북이들"),
+        GroupInfo("귀여운 개구리들"),
+        GroupInfo("행복한 캥거루들")
+    )
 
     override fun getItemViewType(position: Int): Int {
         return when (position) {
@@ -44,7 +51,7 @@ class DrawerAdapter(private val listener: OnItemClickListener) :
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is HeaderViewHolder -> {
-
+                // nothing to bind
             }
             else -> {
                 (holder as GroupViewHolder).bind(groups[position - 1])
@@ -68,12 +75,18 @@ class DrawerAdapter(private val listener: OnItemClickListener) :
 
         init {
             binding.root.setOnClickListener {
-                listener.itemClick()
+                listener.itemClick(adapterPosition)
             }
         }
 
         fun bind(groupInfo: GroupInfo) {
             binding.tvDrawerGroupName.text = groupInfo.groupName
         }
+    }
+
+    fun getHeaderLayoutView(recyclerView: RecyclerView): View {
+        return ItemDrawerHeaderBinding.inflate(LayoutInflater.from(recyclerView.context),
+            recyclerView,
+            false).root
     }
 }
