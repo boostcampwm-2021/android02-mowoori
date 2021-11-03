@@ -14,14 +14,18 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.FragmentHomeBinding
 import com.ariari.mowoori.util.TimberUtil
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.coroutines.async
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import kotlin.random.Random
@@ -31,7 +35,13 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding ?: error(getString(R.string.binding_error))
 
-    private var isSnowing = true
+    private val viewModel: HomeViewModel by viewModels()
+
+    private var snowJob: Job? = null
+
+    private lateinit var snowFace: ImageView
+    private lateinit var snowFaceDownAnim: AnimatorSet
+    private lateinit var snowFaceUpAnim: ObjectAnimator
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,7 +58,8 @@ class HomeFragment : Fragment() {
         showBottomNavigation()
         setDrawerOpenListener()
         setGroupAddClickListener()
-        setAnimator()
+        setObserver()
+        setAnimation()
         setClickListener()
     }
 
@@ -70,64 +81,88 @@ class HomeFragment : Fragment() {
             }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        isSnowing = false
-        _binding = null
-        Timber.d("$isSnowing")
+    private fun setObserver() {
+        viewModel.isSnowing.observe(viewLifecycleOwner, Observer {
+            updateSnowAnimation(it)
+        })
+        viewModel.snowmanLevel.observe(viewLifecycleOwner, Observer {
+            updateSnowmanAnimation(it)
+        })
     }
 
-    private fun setAnimator() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            async {
-                while (isSnowing) {
-                    dropSnow()
-                    delay(100)
-                }
-            }
-            async {
-                // bounceSnowBall()
-                val snowFace = binding.ivHomeSnowFace
-                snowFace.isVisible = true
+    private fun setAnimation() {
+        viewModel.updateIsSnowing()
+        // 현재 임시로 1단계 눈사람 지정
+        viewModel.updateSnowmanLevel(SnowmanLevel.SNOW_FACE)
 
-                val snowUpAnim =
-                    AnimatorInflater.loadAnimator(requireContext(), R.animator.animator_snow_up)
-                        .apply {
-                            setTarget(snowFace)
-                            Timber.d("1")
-                        }
-
-                val snowDownAnim =
-                    AnimatorInflater.loadAnimator(requireContext(), R.animator.animator_snow_down)
-                        .apply {
-                            setTarget(snowFace)
-                            Timber.d("2")
-                        }
-
-                snowUpAnim.addListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator?) {
-                        super.onAnimationEnd(animation)
-                        if (isSnowing) {
-                            snowDownAnim.start()
-                        }
-                    }
-                })
-                snowDownAnim.addListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator?) {
-                        super.onAnimationEnd(animation)
-                        if (isSnowing) {
-                            snowUpAnim.start()
-                        }
-                    }
-                })
-                snowUpAnim.start()
-            }
-        }
+        snowFace = binding.ivHomeSnowFace
+        snowFaceDownAnim = AnimatorInflater
+            .loadAnimator(
+                requireContext(),
+                R.animator.animator_snow_down
+            ).apply {
+                setTarget(snowFace)
+                Timber.d("2")
+            } as AnimatorSet
+        snowFaceUpAnim = AnimatorInflater
+            .loadAnimator(requireContext(), R.animator.animator_snow_up)
+            .apply {
+                setTarget(snowFace)
+                Timber.d("1")
+            } as ObjectAnimator
     }
 
     private fun setClickListener() {
         binding.containerHome.setOnClickListener {
-            isSnowing = !isSnowing
+            viewModel.updateIsSnowing()
+        }
+    }
+
+    private fun updateSnowAnimation(isSnowing: Boolean) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            if (isSnowing) {
+                TimberUtil.timber("start", snowJob.toString())
+                snowJob = launch {
+                    while (isActive) {
+                        dropSnow(100L)
+                    }
+                }
+            } else {
+                TimberUtil.timber("cancel", snowJob.toString())
+                snowJob!!.cancelAndJoin()
+            }
+        }
+    }
+
+    private fun updateSnowmanAnimation(snowmanLevel: SnowmanLevel) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            when (snowmanLevel) {
+                SnowmanLevel.SNOW_NO -> {
+                    // TODO: 눈사람이 녹아버리는 애니메이션 추가
+                }
+                SnowmanLevel.SNOW_FACE -> {
+                    snowFace.isVisible = true
+                    snowFaceUpAnim.addListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator?) {
+                            super.onAnimationEnd(animation)
+                            snowFaceDownAnim.start()
+                        }
+                    })
+                    snowFaceDownAnim.addListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator?) {
+                            super.onAnimationEnd(animation)
+                            snowFaceUpAnim.start()
+                        }
+                    })
+                    snowFaceUpAnim.start()
+                }
+                SnowmanLevel.SNOW_BODY -> {
+                    // TODO: 눈사람 2단계 - 몸통까지 생겼을 때
+                }
+                SnowmanLevel.SNOW_CLOTHES -> {
+                    // TODO: 눈사람 3단계(최종) - 팔 등 추가 장식
+                }
+            }
         }
     }
 
@@ -138,11 +173,10 @@ class HomeFragment : Fragment() {
         scaleY = scaleX
     }
 
-    private fun dropSnow() {
+    private suspend fun dropSnow(delayTime: Long) {
         val snow = makeSnow()
         binding.containerHome.addView(snow)
 
-        TimberUtil.timber("height", "${binding.containerHome.height}")
         // snow 좌표 설정
         val snowStartHeight = snow.scaleY + 100f
         val startX = Random.nextFloat() * binding.containerHome.width
@@ -162,13 +196,28 @@ class HomeFragment : Fragment() {
             playTogether(moverX, moverY)
             duration = (Math.random() * 3000 + 3000).toLong()
             addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationCancel(animation: Animator?) {
+                    super.onAnimationCancel(animation)
+                }
+
                 override fun onAnimationEnd(animation: Animator?) {
                     Timber.d("End")
                     super.onAnimationEnd(animation)
-                    binding?.containerHome?.removeView(snow)
+                    binding.containerHome.removeView(snow)
                 }
             })
         }
+        viewModel.addSnowAnimSet(set)
+
         set.start()
+        delay(delayTime)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.cancelSnowAnimSets()
+        snowFaceDownAnim.cancel()
+        snowFaceUpAnim.cancel()
+        _binding = null
     }
 }
