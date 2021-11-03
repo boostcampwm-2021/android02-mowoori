@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.ItemDrawerGroupBinding
 import com.ariari.mowoori.databinding.ItemDrawerHeaderBinding
+import com.ariari.mowoori.ui.home.entity.GroupInfo
 
 class DrawerAdapter(private val listener: OnItemClickListener) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -20,7 +21,7 @@ class DrawerAdapter(private val listener: OnItemClickListener) :
         private const val GROUP = 1
     }
 
-    private val groups = listOf("정직한 코박쥐들", "멍청한 원숭이들", "화목한 캥거루들")
+    private val groups = listOf(GroupInfo("정직한 코박쥐들"), GroupInfo("못생긴 원숭이들"), GroupInfo("고약한 거북이들"))
 
     override fun getItemViewType(position: Int): Int {
         return when (position) {
@@ -71,8 +72,8 @@ class DrawerAdapter(private val listener: OnItemClickListener) :
             }
         }
 
-        fun bind(groupName: String) {
-            binding.tvDrawerGroupName.text = groupName
+        fun bind(groupInfo: GroupInfo) {
+            binding.tvDrawerGroupName.text = groupInfo.groupName
         }
     }
 }
