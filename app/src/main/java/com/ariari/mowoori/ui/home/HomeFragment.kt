@@ -9,7 +9,6 @@ import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.FragmentHomeBinding
 import com.ariari.mowoori.ui.home.adapter.DrawerAdapter
 import com.ariari.mowoori.ui.home.adapter.DrawerAdapterDecoration
-import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class HomeFragment : Fragment() {
 
@@ -28,16 +27,9 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
-        showBottomNavigation()
         setDrawerOpenListener()
         setDrawerAdapter()
-        val itemDecoration = DrawerAdapterDecoration()
-        binding.rvDrawer.addItemDecoration(itemDecoration)
-    }
-
-    private fun showBottomNavigation() {
-        requireActivity().findViewById<BottomNavigationView>(R.id.bottom_nav_main).visibility =
-            View.VISIBLE
+        setRecyclerViewDecoration()
     }
 
     private fun setDrawerOpenListener() {
@@ -57,6 +49,11 @@ class HomeFragment : Fragment() {
             })
         }
         binding.rvDrawer.adapter = adapter
+    }
+
+    private fun setRecyclerViewDecoration() {
+        val itemDecoration = DrawerAdapterDecoration()
+        binding.rvDrawer.addItemDecoration(itemDecoration)
     }
 
     override fun onDestroyView() {
