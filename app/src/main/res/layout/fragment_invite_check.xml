@@ -6,9 +6,11 @@
 
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.constraintlayout.motion.widget.MotionLayout
+        android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:layoutDescription="@xml/fragment_invite_check_xml_constraintlayout_scene">
 
         <TextView
             android:id="@+id/tv_invite_check_title"
@@ -27,7 +29,7 @@
             android:id="@+id/btn_invite_check_yes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/border_sky_blue_line_24"
+            android:background="@drawable/border_sky_blue_line_64"
             android:padding="24dp"
             android:text="@string/invite_check_yes"
             android:textColor="@color/sky_blue_2094FF"
@@ -42,7 +44,7 @@
             android:id="@+id/btn_invite_check_no"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@drawable/border_sky_blue_line_24"
+            android:background="@drawable/border_sky_blue_line_64"
             android:padding="8dp"
             android:text="@string/invite_check_no"
             android:textColor="@color/sky_blue_2094FF"
@@ -53,5 +55,5 @@
             app:layout_constraintStart_toStartOf="@+id/btn_invite_check_yes"
             app:layout_constraintTop_toBottomOf="@id/btn_invite_check_yes" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.motion.widget.MotionLayout>
 </layout>

@@ -9,6 +9,7 @@ import androidx.navigation.findNavController
 import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.FragmentInviteCheckBinding
 import dagger.hilt.android.AndroidEntryPoint
+import com.ariari.mowoori.ui.group.entity.GroupMode
 
 @AndroidEntryPoint
 class InviteCheckFragment : Fragment() {
@@ -33,13 +34,17 @@ class InviteCheckFragment : Fragment() {
 
     private fun setNavigateToInviteCode() {
         binding.btnInviteCheckYes.setOnClickListener {
-            it.findNavController().navigate(R.id.action_inviteCheckFragment_to_inviteCodeFragment)
+            it.findNavController()
+                .navigate(InviteCheckFragmentDirections.actionInviteCheckFragmentToGroupNameFragment(
+                    GroupMode.INVITE))
         }
     }
 
     private fun setNavigateToGroupName() {
         binding.btnInviteCheckNo.setOnClickListener {
-            it.findNavController().navigate(R.id.action_inviteCheckFragment_to_groupNameFragment)
+            it.findNavController()
+                .navigate(InviteCheckFragmentDirections.actionInviteCheckFragmentToGroupNameFragment(
+                    GroupMode.NEW))
         }
     }
 
