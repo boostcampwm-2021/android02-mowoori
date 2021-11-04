@@ -25,7 +25,6 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import kotlin.random.Random
 
 
@@ -46,6 +45,7 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        // setHasOptionsMenu(true)
         return binding.root
     }
 
@@ -58,6 +58,55 @@ class HomeFragment : Fragment() {
         setObserver()
         setAnimation()
         setClickListener()
+        setMenuListener()
+    }
+
+//    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+//        TimberUtil.timber("create", "${menu}")
+//        inflater.inflate(R.menu.tb_home_menu, menu)
+//        super.onCreateOptionsMenu(menu, inflater)
+//    }
+//
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        TimberUtil.timber("item", "${item.itemId}")
+//        when (item.itemId) {
+//            R.id.alarmFragment -> {
+//
+//            }
+//            R.id.menu_tb_home_sun -> {
+//                TimberUtil.timber("lottie", "sun")
+//                val lottieSun = binding.lottieHomeSun
+//                lottieSun.isVisible = true
+//                lottieSun.playAnimation()
+//                lottieSun.isVisible = false
+//            }
+//        }
+//
+//        return super.onOptionsItemSelected(item)
+//    }
+
+    private fun setMenuListener() {
+        binding.tbHome.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.alarmFragment -> {
+
+                }
+                R.id.menu_tb_home_sun -> {
+                    TimberUtil.timber("lottie", "sun")
+                    binding.lottieHomeSun.apply {
+                        isVisible = true
+                        addAnimatorListener(object : AnimatorListenerAdapter() {
+                            override fun onAnimationEnd(animation: Animator?) {
+                                super.onAnimationEnd(animation)
+                                isVisible = false
+                            }
+                        })
+                        playAnimation()
+                    }
+                }
+            }
+            false
+        }
     }
 
     private fun setDrawerOpenListener() {
@@ -212,7 +261,7 @@ class HomeFragment : Fragment() {
                 }
 
                 override fun onAnimationEnd(animation: Animator?) {
-                    Timber.d("End")
+                    // Timber.d("End")
                     super.onAnimationEnd(animation)
                     binding.containerHome.removeView(snow)
                 }
