@@ -1,17 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<objectAnimator xmlns:android="http://schemas.android.com/apk/res/android"
-    android:duration="1300">
-    <propertyValuesHolder
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+    <objectAnimator
+        android:duration="1300"
         android:interpolator="@android:anim/decelerate_interpolator"
         android:propertyName="translationY"
+        android:startOffset="300"
         android:valueFrom="0dp"
         android:valueTo="-200dp" />
-    <propertyValuesHolder
-        android:propertyName="scaleX"
-        android:valueFrom="1"
-        android:valueTo="0.7" />
-    <propertyValuesHolder
-        android:propertyName="scaleY"
-        android:valueFrom="0.6"
-        android:valueTo="1" />
-</objectAnimator>
+    <objectAnimator android:duration="1300">
+        <propertyValuesHolder
+            android:propertyName="scaleX"
+            android:valueFrom="1"
+            android:valueTo="0.9" />
+        <propertyValuesHolder
+            android:propertyName="scaleY"
+            android:valueFrom="0.8"
+            android:valueTo="1" />
+    </objectAnimator>
+</set>
+

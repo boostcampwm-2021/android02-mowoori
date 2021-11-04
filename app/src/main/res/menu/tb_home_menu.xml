@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/alarmFragment"
+        android:icon="@drawable/ic_alarm"
+        app:showAsAction="ifRoom"
+        android:title="alarm" />
+    <item
+        android:id="@+id/menu_tb_home_sun"
+        android:icon="@drawable/ic_home_sun"
+        app:showAsAction="ifRoom"
+        android:title="sun" />
+</menu>

@@ -59,4 +59,7 @@ dependencies {
 
     // timber log
     implementation "com.jakewharton.timber:timber:$timberVersion"
+
+    // lottie
+    implementation "com.airbnb.android:lottie:$lottieVersion"
 }

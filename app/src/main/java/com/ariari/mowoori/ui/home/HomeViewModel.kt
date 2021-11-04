@@ -1,6 +1,6 @@
 package com.ariari.mowoori.ui.home
 
-import android.animation.AnimatorSet
+import android.animation.Animator
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,7 +12,7 @@ class HomeViewModel : ViewModel() {
     private var _snowmanLevel = MutableLiveData<SnowmanLevel>()
     val snowmanLevel: LiveData<SnowmanLevel> = _snowmanLevel
 
-    private val snowAnimSets: MutableList<AnimatorSet> = mutableListOf()
+    private val snowAnimList: MutableList<Animator> = mutableListOf()
 
     fun updateIsSnowing() {
         if (isSnowing.value == null) {
@@ -26,12 +26,12 @@ class HomeViewModel : ViewModel() {
         _snowmanLevel.postValue(snowmanLevel)
     }
 
-    fun addSnowAnimSet(set: AnimatorSet) {
-        snowAnimSets.add(set)
+    fun addSnowAnim(anim: Animator) {
+        snowAnimList.add(anim)
     }
 
-    fun cancelSnowAnimSets() {
-        snowAnimSets.forEach {
+    fun cancelSnowAnimList() {
+        snowAnimList.forEach {
             it.cancel()
         }
     }
