@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -20,6 +22,8 @@ class GroupFragment : Fragment() {
     private val binding get() = _binding ?: error(getString(R.string.binding_error))
     private val viewModel: GroupViewModel by viewModels()
     private val args: GroupFragmentArgs by navArgs()
+
+    // 애니메이션 xml 파일 객체화
     private val objectAnimator: Animator by lazy {
         AnimatorInflater.loadAnimator(requireContext(), R.animator.animator_invalid_vibrate)
     }
@@ -32,6 +36,7 @@ class GroupFragment : Fragment() {
         _binding = FragmentGroupBinding.inflate(inflater, container, false)
         return binding.root
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setAnimationTarget()
@@ -70,9 +75,10 @@ class GroupFragment : Fragment() {
         viewModel.isValid.observe(viewLifecycleOwner, { isValid ->
             if (isValid) {
                 viewModel.addNewGroup()
+                binding.tvGroupInvalid.isInvisible = true
                 this.findNavController().navigate(R.id.action_groupNameFragment_to_homeFragment)
             } else {
-                // TODO: 그룹 이름이 유효하지 않다고 명시
+                binding.tvGroupInvalid.isVisible = true
                 objectAnimator.start()
             }
         })

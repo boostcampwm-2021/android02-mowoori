@@ -43,6 +43,18 @@
             app:layout_constraintStart_toStartOf="@id/tv_group_title"
             app:layout_constraintTop_toBottomOf="@id/tv_group_title" />
 
+        <TextView
+            android:id="@+id/tv_group_invalid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/group_invalid"
+            android:textColor="@color/red_FF0000"
+            android:textSize="16sp"
+            android:visibility="invisible"
+            app:layout_constraintStart_toStartOf="@id/et_group"
+            app:layout_constraintTop_toBottomOf="@id/et_group" />
+
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_group_complete"
             android:layout_width="wrap_content"
