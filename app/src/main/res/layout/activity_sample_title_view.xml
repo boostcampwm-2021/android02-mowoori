@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="com.ariari.mowoori.ui.custom.TitleViewMode" />
+
+        <variable
+            name="viewModel"
+            type="com.ariari.mowoori.ui.custom.SampleViewModel" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.custom.SampleTitleViewActivity">
+
+        <!-- titleView 제목 app:titleViewText 사용해서 데이터바인딩 사용 -->
+        <!-- titleView 모드 app:titleViewMode 사용해서 데이터바인딩 사용 -->
+        <!-- 뒤로가기 버튼 클릭 시 이벤트 app:onBackClick 사용해서 데이터바인딩 사용 -->
+        <com.ariari.mowoori.ui.custom.CustomTitleView
+            android:id="@+id/title_view_back"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:onBackClick="@{viewModel::setBackButtonClick}"
+            app:titleViewMode="@{TitleViewMode.TITLE_VIEW_BACK_BUTTON}"
+            app:titleViewText="@{viewModel.backTitle}" />
+
+        <!-- titleView 제목 app:titleViewText 사용해서 데이터바인딩 사용 -->
+        <!-- titleView 모드 app:titleViewMode 사용해서 데이터바인딩 사용 -->
+        <!-- 종료 버튼 클릭 시 이벤트 app:onCloseClick 사용해서 데이터바인딩 사용 -->
+        <com.ariari.mowoori.ui.custom.CustomTitleView
+            android:id="@+id/title_view_close"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title_view_back"
+            app:onCloseClick="@{viewModel::setCloseButtonClick}"
+            app:titleViewMode="@{TitleViewMode.TITLE_VIEW_CLOSE_BUTTON}"
+            app:titleViewText="@{viewModel.closeTitle}" />
+
+        <!-- titleView 제목 app:text 사용해서 데이터바인딩이 아닌 그냥 텍스트 사용 -->
+        <!-- titleView 모드 app:titleViewMode 사용해서 데이터바인딩 사용 -->
+        <!-- 플러스 버튼 클릭 시 이벤트 app:onPlusClick 사용해서 데이터바인딩 사용 -->
+        <com.ariari.mowoori.ui.custom.CustomTitleView
+            android:id="@+id/title_view2_plus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title_view_close"
+            app:onPlusClick="@{viewModel::setPlusButtonClick}"
+            app:titleViewMode="@{TitleViewMode.TITLE_VIEW_PLUS_BUTTON}"
+            app:text="플러스" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
