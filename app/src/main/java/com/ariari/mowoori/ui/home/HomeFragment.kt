@@ -14,12 +14,12 @@ import android.view.animation.AccelerateInterpolator
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.navigation.findNavController
 import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.FragmentHomeBinding
+import com.ariari.mowoori.ui.home.adapter.DrawerAdapter
+import com.ariari.mowoori.ui.home.adapter.DrawerAdapterDecoration
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlin.random.Random
-
 
 class HomeFragment : Fragment(), Handler.Callback {
 
@@ -42,28 +42,36 @@ class HomeFragment : Fragment(), Handler.Callback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
-        showBottomNavigation()
         setDrawerOpenListener()
+        setDrawerAdapter()
+        setRecyclerViewDecoration()
         setGroupAddClickListener()
         delayedSnowing.sendEmptyMessageDelayed(SNOWING_MESSAGE_ID, 100)
     }
 
-    private fun showBottomNavigation() {
-        requireActivity().findViewById<BottomNavigationView>(R.id.bottom_nav_main).visibility =
-            View.VISIBLE
-    }
 
     private fun setDrawerOpenListener() {
-        binding.toolbarHome.setNavigationOnClickListener {
+        binding.tbHome.setNavigationOnClickListener {
             binding.drawerHome.open()
         }
     }
 
-    private fun setGroupAddClickListener() {
-        binding.navViewDrawer.getHeaderView(0).findViewById<TextView>(R.id.tv_drawer_header_add)
-            .setOnClickListener {
-                it.findNavController().navigate(R.id.action_homeFragment_to_inviteCheckFragment)
-            }
+    private fun setDrawerAdapter() {
+        val adapter: DrawerAdapter by lazy {
+            DrawerAdapter(object : DrawerAdapter.OnItemClickListener {
+                override fun itemClick(position: Int) {
+                    // TODO: 그룹 이동
+                    // TODO: 그룹 아이템 배경 색상 변경
+                    binding.drawerHome.close()
+                }
+            })
+        }
+        binding.rvDrawer.adapter = adapter
+    }
+
+    private fun setRecyclerViewDecoration() {
+        val itemDecoration = DrawerAdapterDecoration()
+        binding.rvDrawer.addItemDecoration(itemDecoration)
     }
 
     override fun onDestroyView() {
