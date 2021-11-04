@@ -23,40 +23,80 @@
             app:text="나의 미션"
             app:titleViewMode="@{TitleViewMode.TITLE_VIEW_PLUS_BUTTON}" />
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tab_layout_missions"
+        <TextView
+            android:id="@+id/tv_missions_not_done"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="24dp"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:paddingVertical="6dp"
+            android:text="@string/missions_not_done"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/tv_missions_done"
+            app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/title_view_missions"
-            app:tabIndicatorColor="@color/sky_blue_2094FF"
-            app:tabIndicatorHeight="4dp"
-            app:tabRippleColor="@android:color/transparent"
-            app:tabSelectedTextColor="@color/sky_blue_2094FF"
-            app:tabTextAppearance="@style/missions_tab_text"
-            app:tabTextColor="@color/black">
+            app:layout_constraintTop_toBottomOf="@id/title_view_missions" />
 
-            <com.google.android.material.tabs.TabItem
-                android:id="@+id/tab_not_done"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/missions_not_done" />
+        <TextView
+            android:id="@+id/tv_missions_done"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:paddingVertical="6dp"
+            android:text="@string/missions_done"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/tv_missions_fail"
+            app:layout_constraintStart_toEndOf="@id/tv_missions_not_done"
+            app:layout_constraintTop_toBottomOf="@id/title_view_missions" />
 
-            <com.google.android.material.tabs.TabItem
-                android:id="@+id/tab_done"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/missions_done" />
+        <TextView
+            android:id="@+id/tv_missions_fail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="24dp"
+            android:gravity="center"
+            android:paddingVertical="6dp"
+            android:text="@string/missions_fail"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_missions_done"
+            app:layout_constraintTop_toBottomOf="@id/title_view_missions" />
 
-            <com.google.android.material.tabs.TabItem
-                android:id="@+id/tab_fail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/missions_fail" />
+        <View
+            android:id="@+id/view_missions_not_done"
+            android:layout_width="0dp"
+            android:layout_height="4dp"
+            android:background="@color/sky_blue_2094FF"
+            app:layout_constraintEnd_toEndOf="@id/tv_missions_not_done"
+            app:layout_constraintStart_toStartOf="@id/tv_missions_not_done"
+            app:layout_constraintTop_toBottomOf="@id/tv_missions_not_done" />
 
-        </com.google.android.material.tabs.TabLayout>
+        <View
+            android:id="@+id/view_missions_done"
+            android:layout_width="0dp"
+            android:layout_height="4dp"
+            android:background="@color/sky_blue_2094FF"
+            app:layout_constraintEnd_toEndOf="@id/tv_missions_done"
+            app:layout_constraintStart_toStartOf="@id/tv_missions_done"
+            app:layout_constraintTop_toBottomOf="@id/tv_missions_done" />
+
+        <View
+            android:id="@+id/view_missions_fail"
+            android:layout_width="0dp"
+            android:layout_height="4dp"
+            android:background="@color/sky_blue_2094FF"
+            app:layout_constraintEnd_toEndOf="@id/tv_missions_fail"
+            app:layout_constraintStart_toStartOf="@id/tv_missions_fail"
+            app:layout_constraintTop_toBottomOf="@id/tv_missions_fail" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
@@ -66,7 +106,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tab_layout_missions"
+            app:layout_constraintTop_toBottomOf="@id/view_missions_not_done"
             tools:listitem="@layout/item_missions" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
