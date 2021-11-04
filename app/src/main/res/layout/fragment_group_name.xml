@@ -11,13 +11,50 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/tv_group_name_title"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="그룹 이름 입력 화면"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_margin="8dp"
+            android:text="@string/group_name_title"
+            android:textColor="@color/black"
+            android:textSize="36sp"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/et_group_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:hint="@string/group_name_hint"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:text="@string/group_name"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/btn_group_name_complete"
+            app:layout_constraintEnd_toEndOf="@id/tv_group_name_title"
+            app:layout_constraintStart_toStartOf="@id/tv_group_name_title"
+            app:layout_constraintTop_toBottomOf="@id/tv_group_name_title" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_group_name_complete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="24dp"
+            android:background="@drawable/border_sky_blue_line_64"
+            android:paddingStart="40dp"
+            android:paddingEnd="40dp"
+            android:text="@string/group_name_complete"
+            android:textColor="@color/sky_blue_2094FF"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
