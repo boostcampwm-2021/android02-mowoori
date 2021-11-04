@@ -41,12 +41,13 @@
             <com.google.android.material.appbar.AppBarLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:elevation="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <com.google.android.material.appbar.MaterialToolbar
-                    android:id="@+id/toolbar_home"
+                    android:id="@+id/tb_home"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
                     android:background="@color/sky_blue_F1F5FF"
@@ -60,13 +61,14 @@
             android:id="@+id/nav_view_drawer"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_gravity="start"
-            app:headerLayout="@layout/header_navigation_drawer">
+            android:layout_gravity="start">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_drawer"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent" />
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_drawer_group" />
 
         </com.google.android.material.navigation.NavigationView>
     </androidx.drawerlayout.widget.DrawerLayout>
