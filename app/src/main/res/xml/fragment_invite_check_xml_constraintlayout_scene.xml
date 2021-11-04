@@ -42,4 +42,12 @@
                 motion:motionTarget="@+id/tv_invite_check_title" />
         </KeyFrameSet>
     </Transition>
+
+    <ConstraintSet android:id="@+id/start">
+
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/end">
+
+    </ConstraintSet>
 </MotionScene>

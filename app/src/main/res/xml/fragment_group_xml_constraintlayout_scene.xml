@@ -34,4 +34,12 @@
                 motion:motionTarget="@+id/btn_group_complete" />
         </KeyFrameSet>
     </Transition>
+
+    <ConstraintSet android:id="@+id/start">
+
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/end">
+
+    </ConstraintSet>
 </MotionScene>
