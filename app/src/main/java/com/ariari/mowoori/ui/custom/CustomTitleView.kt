@@ -1,6 +1,7 @@
 package com.ariari.mowoori.ui.custom
 
 import android.content.Context
+import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -23,10 +24,12 @@ class CustomTitleView : ConstraintLayout {
 
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
         initView()
+        getAttrs(attrs)
     }
 
     constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs) {
         initView()
+        getAttrs(attrs, defStyle)
     }
 
     private fun initView() {
@@ -39,6 +42,24 @@ class CustomTitleView : ConstraintLayout {
         )
         binding.view = this
     }
+
+
+    private fun getAttrs(attrs: AttributeSet) {
+        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.CustomTitleView)
+        setTypedArray(typedArray)
+    }
+
+    private fun getAttrs(attrs: AttributeSet, defStyle: Int) {
+        val typedArray =
+            context.obtainStyledAttributes(attrs, R.styleable.CustomTitleView, defStyle, 0)
+        setTypedArray(typedArray)
+    }
+
+    private fun setTypedArray(typedArray: TypedArray) {
+        val titleText = typedArray.getString(R.styleable.CustomTitleView_text) ?: ""
+        setTitleViewText(titleText)
+    }
+
 
     fun setTitleViewText(title: String) {
         binding.tvCustomTitleViewTitle.text = title
