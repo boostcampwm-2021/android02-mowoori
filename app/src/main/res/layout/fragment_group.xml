@@ -11,7 +11,7 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/tv_group_name_title"
+            android:id="@+id/tv_group_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
@@ -24,7 +24,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
-            android:id="@+id/et_group_name"
+            android:id="@+id/et_group"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
@@ -36,13 +36,13 @@
             android:textColor="@color/black"
             android:textSize="36sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/btn_group_name_complete"
-            app:layout_constraintEnd_toEndOf="@id/tv_group_name_title"
-            app:layout_constraintStart_toStartOf="@id/tv_group_name_title"
-            app:layout_constraintTop_toBottomOf="@id/tv_group_name_title" />
+            app:layout_constraintBottom_toTopOf="@id/btn_group_complete"
+            app:layout_constraintEnd_toEndOf="@id/tv_group_title"
+            app:layout_constraintStart_toStartOf="@id/tv_group_title"
+            app:layout_constraintTop_toBottomOf="@id/tv_group_title" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_group_name_complete"
+            android:id="@+id/btn_group_complete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="24dp"

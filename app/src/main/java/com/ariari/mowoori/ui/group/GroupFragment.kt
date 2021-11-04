@@ -7,29 +7,44 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.ariari.mowoori.R
-import com.ariari.mowoori.databinding.FragmentGroupNameBinding
+import com.ariari.mowoori.databinding.FragmentGroupBinding
+import com.ariari.mowoori.ui.group.entity.GroupMode
 
-class GroupNameFragment : Fragment() {
+class GroupFragment : Fragment() {
 
-    private var _binding: FragmentGroupNameBinding? = null
+    private var _binding: FragmentGroupBinding? = null
     private val binding get() = _binding ?: error(getString(R.string.binding_error))
     private val viewModel: GroupViewModel by viewModels()
+    private val args: GroupFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = FragmentGroupNameBinding.inflate(inflater, container, false)
+        _binding = FragmentGroupBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setGroupName()
-        setGroupNameValidation()
-        setValidationObserver()
+        when (args.groupMode) {
+            GroupMode.INVITE -> {
+                setTitle(R.string.group_invite_title)
+            }
+            GroupMode.NEW -> {
+                setTitle(R.string.group_name_title)
+                setGroupName()
+                setGroupNameValidation()
+                setValidationObserver()
+            }
+        }
+    }
+
+    private fun setTitle(resId: Int) {
+        binding.tvGroupTitle.setText(resId)
     }
 
     private fun setGroupName() {
@@ -37,8 +52,8 @@ class GroupNameFragment : Fragment() {
     }
 
     private fun setGroupNameValidation() {
-        binding.btnGroupNameComplete.setOnClickListener {
-            viewModel.checkGroupNameValidation(binding.etGroupName.text.toString())
+        binding.btnGroupComplete.setOnClickListener {
+            viewModel.checkGroupNameValidation(binding.etGroup.text.toString())
         }
     }
 

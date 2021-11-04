@@ -31,27 +31,22 @@
         android:label="InviteCheckFragment"
         tools:layout="@layout/fragment_invite_check">
         <action
-            android:id="@+id/action_inviteCheckFragment_to_inviteCodeFragment"
-            app:destination="@id/inviteCodeFragment" />
-        <action
             android:id="@+id/action_inviteCheckFragment_to_groupNameFragment"
             app:destination="@id/groupNameFragment" />
     </fragment>
     <fragment
         android:id="@+id/groupNameFragment"
-        android:name="com.ariari.mowoori.ui.group.GroupNameFragment"
+        android:name="com.ariari.mowoori.ui.group.GroupFragment"
         android:label="GroupNameFragment"
-        tools:layout="@layout/fragment_group_name" >
+        tools:layout="@layout/fragment_group" >
         <action
             android:id="@+id/action_groupNameFragment_to_homeFragment"
             app:destination="@id/homeFragment"
             app:popUpTo="@id/homeFragment"
             app:popUpToInclusive="true" />
+        <argument
+            android:name="groupMode"
+            app:argType="com.ariari.mowoori.ui.group.entity.GroupMode" />
     </fragment>
-    <fragment
-        android:id="@+id/inviteCodeFragment"
-        android:name="com.ariari.mowoori.ui.group.InviteCodeFragment"
-        android:label="InviteCodeFragment"
-        tools:layout="@layout/fragment_invite_code" />
 
 </navigation>
