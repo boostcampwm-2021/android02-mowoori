@@ -14,6 +14,9 @@
         <action
             android:id="@+id/action_homeFragment_to_inviteCheckFragment"
             app:destination="@id/inviteCheckFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_notificationFragment"
+            app:destination="@id/notificationFragment" />
     </fragment>
     <fragment
         android:id="@+id/membersFragment"
@@ -48,5 +51,9 @@
             android:name="groupMode"
             app:argType="com.ariari.mowoori.ui.group.entity.GroupMode" />
     </fragment>
+    <fragment
+        android:id="@+id/notificationFragment"
+        android:name="com.ariari.mowoori.ui.notification.NotificationFragment"
+        android:label="NotificationFragment" />
 
 </navigation>
