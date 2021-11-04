@@ -11,35 +11,27 @@
             <KeyAttribute
                 android:alpha="0.0"
                 motion:framePosition="0"
-                motion:motionTarget="@+id/btn_invite_check_yes" />
-            <KeyAttribute
-                android:alpha="0.0"
-                motion:framePosition="10"
-                motion:motionTarget="@+id/btn_invite_check_yes" />
+                motion:motionTarget="@+id/tv_group_title" />
             <KeyAttribute
                 android:alpha="1.0"
                 motion:framePosition="100"
-                motion:motionTarget="@+id/btn_invite_check_yes" />
+                motion:motionTarget="@+id/tv_group_title" />
             <KeyAttribute
-                android:alpha="0.0"
+                android:alpha="0"
                 motion:framePosition="0"
-                motion:motionTarget="@+id/btn_invite_check_no" />
-            <KeyAttribute
-                android:alpha="0.0"
-                motion:framePosition="60"
-                motion:motionTarget="@+id/btn_invite_check_no" />
+                motion:motionTarget="@+id/et_group" />
             <KeyAttribute
                 android:alpha="1.0"
                 motion:framePosition="100"
-                motion:motionTarget="@+id/btn_invite_check_no" />
+                motion:motionTarget="@+id/et_group" />
             <KeyAttribute
-                android:alpha="0.0"
+                android:alpha="0"
                 motion:framePosition="0"
-                motion:motionTarget="@+id/tv_invite_check_title" />
+                motion:motionTarget="@+id/btn_group_complete" />
             <KeyAttribute
                 android:alpha="1.0"
                 motion:framePosition="100"
-                motion:motionTarget="@+id/tv_invite_check_title" />
+                motion:motionTarget="@+id/btn_group_complete" />
         </KeyFrameSet>
     </Transition>
 </MotionScene>
