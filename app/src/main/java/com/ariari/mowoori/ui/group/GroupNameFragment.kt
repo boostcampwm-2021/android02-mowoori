@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
 import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.FragmentGroupNameBinding
 
@@ -24,5 +25,12 @@ class GroupNameFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setNavigateToHome()
+    }
+
+    private fun setNavigateToHome() {
+        binding.btnGroupNameComplete.setOnClickListener {
+            it.findNavController().navigate(R.id.action_groupNameFragment_to_homeFragment)
+        }
     }
 }
