@@ -1,11 +1,14 @@
 <resources>
     <string name="app_name">MoWoori</string>
     <string name="binding_error">Binding not initialized to reference the view.</string>
-    <string name="default_web_client_id">537612252343-60e4gr390pg6eb02ehvae3j8oc2d3roh.apps.googleusercontent.com</string>
+    <string name="google_auth_client_id">537612252343-60e4gr390pg6eb02ehvae3j8oc2d3roh.apps.googleusercontent.com</string>
 
     <string name="bottom_nav_home">Home</string>
     <string name="bottom_nav_missions">Missions</string>
     <string name="bottom_nav_members">Members</string>
+    <string name="register_please_enter_nickname">닉네임을\n입력해주세요</string>
+    <string name="register_nickname_hint">(1자 이상 8자 이하)</string>
+    <string name="desc_app_logo">앱 로고</string>
 
     <string name="drawer_header_group_list">그룹 리스트</string>
 

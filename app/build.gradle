@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-kapt'
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -43,6 +44,7 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:$constraintlayoutVersion"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
+    implementation 'com.google.firebase:firebase-database-ktx:20.0.2'
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$extJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
@@ -51,7 +53,7 @@ dependencies {
     implementation "androidx.navigation:navigation-ui-ktx:$navigationVersion"
 
     implementation platform("com.google.firebase:firebase-bom:$firebaseBomVersion")
-    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-auth-ktx'
     implementation "com.google.android.gms:play-services-auth:$googleAuthVersion"
     implementation "com.github.bumptech.glide:glide:$glideVersion"
 
