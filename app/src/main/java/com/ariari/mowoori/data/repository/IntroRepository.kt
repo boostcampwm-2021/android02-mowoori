@@ -5,5 +5,11 @@ import com.ariari.mowoori.util.Event
 import com.google.firebase.database.DataSnapshot
 
 interface IntroRepository {
-    fun checkUserRegistered(userUid: String): LiveData<Event<Boolean>>
+    suspend fun checkUserRegistered(userUid: String): Boolean
+
+    suspend fun getRandomNickName(): String
+
+    fun getUserUid(): String?
+
+    suspend fun userRegister(nickname: String): Boolean
 }
