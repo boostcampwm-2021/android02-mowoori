@@ -12,7 +12,8 @@ import androidx.core.view.isVisible
 import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.ActivitySplashBinding
 import com.ariari.mowoori.ui.main.MainActivity
-import com.ariari.mowoori.ui.register.RegisterActivity
+import com.ariari.mowoori.util.EventObserver
+//import com.ariari.mowoori.ui.register.RegisterActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
@@ -66,13 +67,13 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun setObservers() {
-        viewModel.isUserRegistered.observe(this) {
+        viewModel.isUserRegistered.observe(this, EventObserver {
             if (it) {
                 moveToMain()
             } else {
                 moveToRegister()
             }
-        }
+        })
     }
 
     private fun signIn() {
@@ -94,7 +95,7 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun moveToRegister() {
-        startActivity(Intent(this, RegisterActivity::class.java))
+//        startActivity(Intent(this, RegisterActivity::class.java))
     }
 
     private fun moveToMain() {

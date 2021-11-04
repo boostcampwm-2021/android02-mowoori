@@ -11,13 +11,13 @@ import com.google.firebase.ktx.Firebase
 
 class SplashViewModel : ViewModel() {
     private val database: DatabaseReference = Firebase.database.reference
-    private val _isUserRegistered = MutableLiveData<Boolean>()
-    val isUserRegistered: LiveData<Boolean> = _isUserRegistered
+    private val _isUserRegistered = MutableLiveData<Event<Boolean>>()
+    val isUserRegistered: LiveData<Event<Boolean>> = _isUserRegistered
 
     fun checkUserRegistered(userUid: String) {
         database.child("users").child(userUid).get().addOnCompleteListener {
             val snapshot = it.result
-            _isUserRegistered.value = snapshot.value != null
+            _isUserRegistered.value = Event(snapshot.value != null)
         }
     }
 }
