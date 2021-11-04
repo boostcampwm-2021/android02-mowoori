@@ -47,5 +47,7 @@
 
     <!--notification-->
     <string name="item_notification_title"><font color="#000000">모우리</font>님이 <b>매일 잔디채우기</b> 미션에 <b>2</b>번째 스탬프를 찍었어요!!!!!!!!!!!!!!!!!!!!!</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

@@ -4,13 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.FragmentMissionsBinding
 import com.ariari.mowoori.ui.missions.adapter.MissionsAdapter
 import com.ariari.mowoori.util.EventObserver
-import com.ariari.mowoori.util.toastMessage
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -25,7 +26,7 @@ class MissionsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentMissionsBinding.inflate(inflater, container, false)
+        _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_missions, container, false)
         return binding.root
     }
 
@@ -50,7 +51,7 @@ class MissionsFragment : Fragment() {
 
     private fun setPlusBtnClickObserve() {
         missionsViewModel.plusBtnClick.observe(viewLifecycleOwner, EventObserver {
-            requireContext().toastMessage("미션 추가 버튼 클릭")
+            this.findNavController().navigate(R.id.action_missionsFragment_to_missionsAddFragment)
         })
     }
 
