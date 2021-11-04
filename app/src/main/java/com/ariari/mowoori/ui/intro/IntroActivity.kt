@@ -1,6 +1,5 @@
-package com.ariari.mowoori.ui.splash
+package com.ariari.mowoori.ui.intro
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.animation.AlphaAnimation
@@ -10,22 +9,21 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import com.ariari.mowoori.R
-import com.ariari.mowoori.databinding.ActivitySplashBinding
+import com.ariari.mowoori.databinding.ActivityIntroBinding
 import com.ariari.mowoori.ui.main.MainActivity
 import com.ariari.mowoori.util.EventObserver
-//import com.ariari.mowoori.ui.register.RegisterActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
+class IntroActivity : AppCompatActivity() {
 
-@SuppressLint("CustomSplashScreen")
-class SplashActivity : AppCompatActivity() {
-
-    private val viewModel: SplashViewModel by viewModels()
+    private val viewModel: IntroViewModel by viewModels()
     private lateinit var auth: FirebaseAuth
     private val binding by lazy {
-        ActivitySplashBinding.inflate(layoutInflater)
+        ActivityIntroBinding.inflate(layoutInflater)
     }
     private lateinit var signLauncher: ActivityResultLauncher<String>
 

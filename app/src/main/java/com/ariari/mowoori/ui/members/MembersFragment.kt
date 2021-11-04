@@ -7,7 +7,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.FragmentMembersBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MembersFragment : Fragment() {
     private var _binding: FragmentMembersBinding? = null
     private val binding get() = _binding ?: error(getString(R.string.binding_error))

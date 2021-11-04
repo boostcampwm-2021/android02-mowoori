@@ -7,7 +7,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.FragmentInviteCodeBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class InviteCodeFragment : Fragment() {
 
     private var _binding: FragmentInviteCodeBinding? = null

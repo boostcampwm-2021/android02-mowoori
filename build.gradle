@@ -16,6 +16,8 @@ buildscript {
         espressoVersion = '3.4.0'
         timberVersion = '4.7.1'
         lottieVersion = "4.1.0"
+        hiltVersion = "2.38.1"
+        hiltCompilerVersion = "1.0.0"
     }
     repositories {
         google()
@@ -25,7 +27,7 @@ buildscript {
         classpath "com.android.tools.build:gradle:7.0.3"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.31"
         classpath 'com.google.gms:google-services:4.3.10'
-
+        classpath 'com.google.dagger:hilt-android-gradle-plugin:2.38.1'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }

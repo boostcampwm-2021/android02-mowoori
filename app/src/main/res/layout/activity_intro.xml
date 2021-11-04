@@ -6,7 +6,7 @@
 
         <variable
             name="viewModel"
-            type="com.ariari.mowoori.ui.splash.SplashViewModel" />
+            type="com.ariari.mowoori.ui.intro.IntroViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
