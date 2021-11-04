@@ -24,12 +24,39 @@
             app:titleViewMode="@{TitleViewMode.TITLE_VIEW_PLUS_BUTTON}" />
 
         <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tab_missions"
-            android:layout_width="wrap_content"
+            android:id="@+id/tab_layout_missions"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
+            android:layout_marginHorizontal="24dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/title_view_missions" />
+            app:layout_constraintTop_toBottomOf="@id/title_view_missions"
+            app:tabIndicatorColor="@color/sky_blue_2094FF"
+            app:tabIndicatorHeight="4dp"
+            app:tabRippleColor="@android:color/transparent"
+            app:tabSelectedTextColor="@color/sky_blue_2094FF"
+            app:tabTextAppearance="@style/missions_tab_text"
+            app:tabTextColor="@color/black">
+
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/tab_not_done"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/missions_not_done" />
+
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/tab_done"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/missions_done" />
+
+            <com.google.android.material.tabs.TabItem
+                android:id="@+id/tab_fail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/missions_fail" />
+
+        </com.google.android.material.tabs.TabLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
@@ -39,7 +66,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tab_missions"
+            app:layout_constraintTop_toBottomOf="@id/tab_layout_missions"
             tools:listitem="@layout/item_missions" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

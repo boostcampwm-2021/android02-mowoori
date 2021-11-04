@@ -28,6 +28,11 @@
 
     <!--description-->
     <string name="desc_home_snow_face">눈사람 얼굴</string>
+
+    <!-- MissionsFragment -->
     <string name="item_missions_stamp_count">%d/%d</string>
+    <string name="missions_not_done">미완료</string>
+    <string name="missions_done">완료</string>
+    <string name="missions_fail">실패</string>
 
 </resources>
