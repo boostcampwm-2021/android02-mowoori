@@ -7,6 +7,18 @@
 
         <import type="com.ariari.mowoori.ui.custom.TitleViewMode" />
 
+        <import type="android.view.View" />
+
+        <import type="android.graphics.Typeface" />
+
+        <variable
+            name="viewModel"
+            type="com.ariari.mowoori.ui.missions.MissionsViewModel" />
+
+        <variable
+            name="missionsMode"
+            type="Integer" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -30,9 +42,10 @@
             android:layout_marginStart="24dp"
             android:layout_marginTop="20dp"
             android:gravity="center"
+            android:onClick="@{()->viewModel.setNotDoneType()}"
             android:paddingVertical="6dp"
             android:text="@string/missions_not_done"
-            android:textColor="@color/black"
+            android:textColor="@{missionsMode==viewModel.NOT_DONE_TYPE ? @color/sky_blue_2094FF : @color/black}"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@id/tv_missions_done"
@@ -46,9 +59,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:gravity="center"
+            android:onClick="@{()->viewModel.setDoneType()}"
             android:paddingVertical="6dp"
             android:text="@string/missions_done"
-            android:textColor="@color/black"
+            android:textColor="@{missionsMode==viewModel.DONE_TYPE ? @color/sky_blue_2094FF : @color/black}"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@id/tv_missions_fail"
@@ -62,9 +76,10 @@
             android:layout_marginTop="20dp"
             android:layout_marginEnd="24dp"
             android:gravity="center"
+            android:onClick="@{()->viewModel.setFailType()}"
             android:paddingVertical="6dp"
             android:text="@string/missions_fail"
-            android:textColor="@color/black"
+            android:textColor="@{missionsMode==viewModel.FAIL_TYPE ? @color/sky_blue_2094FF : @color/black}"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
@@ -76,6 +91,7 @@
             android:layout_width="0dp"
             android:layout_height="4dp"
             android:background="@color/sky_blue_2094FF"
+            android:visibility="@{missionsMode==viewModel.NOT_DONE_TYPE ? View.VISIBLE : View.INVISIBLE}"
             app:layout_constraintEnd_toEndOf="@id/tv_missions_not_done"
             app:layout_constraintStart_toStartOf="@id/tv_missions_not_done"
             app:layout_constraintTop_toBottomOf="@id/tv_missions_not_done" />
@@ -85,6 +101,7 @@
             android:layout_width="0dp"
             android:layout_height="4dp"
             android:background="@color/sky_blue_2094FF"
+            android:visibility="@{missionsMode==viewModel.DONE_TYPE ? View.VISIBLE : View.INVISIBLE}"
             app:layout_constraintEnd_toEndOf="@id/tv_missions_done"
             app:layout_constraintStart_toStartOf="@id/tv_missions_done"
             app:layout_constraintTop_toBottomOf="@id/tv_missions_done" />
@@ -94,6 +111,7 @@
             android:layout_width="0dp"
             android:layout_height="4dp"
             android:background="@color/sky_blue_2094FF"
+            android:visibility="@{missionsMode==viewModel.FAIL_TYPE ? View.VISIBLE : View.INVISIBLE}"
             app:layout_constraintEnd_toEndOf="@id/tv_missions_fail"
             app:layout_constraintStart_toStartOf="@id/tv_missions_fail"
             app:layout_constraintTop_toBottomOf="@id/tv_missions_fail" />
