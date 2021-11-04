@@ -6,28 +6,28 @@ import androidx.lifecycle.ViewModel
 import com.ariari.mowoori.util.Event
 
 class SampleViewModel: ViewModel() {
-    private val _backButtonClick = MutableLiveData<Event<Boolean>>()
-    val backButtonClick: LiveData<Event<Boolean>> = _backButtonClick
+    private val _backBtnClick = MutableLiveData<Event<Boolean>>()
+    val backBtnClick: LiveData<Event<Boolean>> = _backBtnClick
 
-    private val _plusButtonClick = MutableLiveData<Event<Boolean>>()
-    val plusButtonClick: LiveData<Event<Boolean>> = _plusButtonClick
+    private val _plusBtnClick = MutableLiveData<Event<Boolean>>()
+    val plusBtnClick: LiveData<Event<Boolean>> = _plusBtnClick
 
-    private val _closeButtonClick = MutableLiveData<Event<Boolean>>()
-    val closeButtonClick: LiveData<Event<Boolean>> = _closeButtonClick
+    private val _closeBtnClick = MutableLiveData<Event<Boolean>>()
+    val closeBtnClick: LiveData<Event<Boolean>> = _closeBtnClick
 
     val backTitle = "뒤로가기"
     val closeTitle = "종료"
     val plusTitle = "추가"
 
-    fun setBackButtonClick() {
-        _backButtonClick.value = Event(true)
+    fun setBackBtnClick() {
+        _backBtnClick.value = Event(true)
     }
 
-    fun setCloseButtonClick() {
-        _closeButtonClick.value = Event(true)
+    fun setCloseBtnClick() {
+        _closeBtnClick.value = Event(true)
     }
 
-    fun setPlusButtonClick() {
-        _plusButtonClick.value = Event(true)
+    fun setPlusBtnClick() {
+        _plusBtnClick.value = Event(true)
     }
 }

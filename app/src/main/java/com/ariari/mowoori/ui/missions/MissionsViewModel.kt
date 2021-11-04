@@ -6,8 +6,15 @@ import androidx.lifecycle.ViewModel
 import com.ariari.mowoori.util.Event
 
 class MissionsViewModel : ViewModel() {
+    private val _plusBtnClick = MutableLiveData<Event<Boolean>>()
+    val plusBtnClick: LiveData<Event<Boolean>> = _plusBtnClick
+
     private val _missionsType = MutableLiveData(Event(NOT_DONE_TYPE))
     val missionsType: LiveData<Event<Int>> = _missionsType
+
+    fun setPlusBtnClick() {
+        _plusBtnClick.value = Event(true)
+    }
 
     fun setNotDoneType() {
         _missionsType.value = Event(NOT_DONE_TYPE)

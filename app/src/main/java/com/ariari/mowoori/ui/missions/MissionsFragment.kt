@@ -34,12 +34,19 @@ class MissionsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = missionsViewModel
+        setPlusBtnClickObserve()
         setMissionsTypeObserve()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun setPlusBtnClickObserve() {
+        missionsViewModel.plusBtnClick.observe(viewLifecycleOwner, EventObserver {
+            requireContext().toastMessage("미션 추가 버튼 클릭")
+        })
     }
 
     private fun setMissionsTypeObserve() {
