@@ -1,5 +1,7 @@
 package com.ariari.mowoori.ui.group
 
+import android.animation.Animator
+import android.animation.AnimatorInflater
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +20,9 @@ class GroupFragment : Fragment() {
     private val binding get() = _binding ?: error(getString(R.string.binding_error))
     private val viewModel: GroupViewModel by viewModels()
     private val args: GroupFragmentArgs by navArgs()
+    private val objectAnimator: Animator by lazy {
+        AnimatorInflater.loadAnimator(requireContext(), R.animator.animator_invalid_vibrate)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -27,9 +32,9 @@ class GroupFragment : Fragment() {
         _binding = FragmentGroupBinding.inflate(inflater, container, false)
         return binding.root
     }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setAnimationTarget()
         when (args.groupMode) {
             GroupMode.INVITE -> {
                 setTitle(R.string.group_invite_title)
@@ -41,6 +46,10 @@ class GroupFragment : Fragment() {
                 setValidationObserver()
             }
         }
+    }
+
+    private fun setAnimationTarget() {
+        objectAnimator.setTarget(binding.etGroup)
     }
 
     private fun setTitle(resId: Int) {
@@ -64,6 +73,7 @@ class GroupFragment : Fragment() {
                 this.findNavController().navigate(R.id.action_groupNameFragment_to_homeFragment)
             } else {
                 // TODO: 그룹 이름이 유효하지 않다고 명시
+                objectAnimator.start()
             }
         })
     }
