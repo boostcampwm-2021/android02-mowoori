@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-kapt'
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -53,6 +54,7 @@ dependencies {
     implementation platform("com.google.firebase:firebase-bom:$firebaseBomVersion")
     implementation 'com.google.firebase:firebase-auth'
     implementation "com.google.android.gms:play-services-auth:$googleAuthVersion"
+    implementation 'com.google.firebase:firebase-database-ktx'
     implementation "com.github.bumptech.glide:glide:$glideVersion"
 
     // timber log
