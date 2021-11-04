@@ -11,6 +11,7 @@ import androidx.core.view.isVisible
 import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.ActivityIntroBinding
 import com.ariari.mowoori.ui.main.MainActivity
+import com.ariari.mowoori.ui.register.RegisterActivity
 import com.ariari.mowoori.util.EventObserver
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -36,25 +37,8 @@ class IntroActivity : AppCompatActivity() {
         setListeners()
         setObservers()
         setSignLauncher()
-    }
-
-    private fun setSignLauncher() {
-        signLauncher = registerForActivityResult(SignInIntentContract()) { tokenId: String? ->
-            tokenId?.let {
-                firebaseAuthWithGoogle(it)
-            }
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        val currentUser: FirebaseUser? = auth.currentUser
-        if (currentUser == null) {
-            val animation = AlphaAnimation(0f, 1f).apply { duration = 2000 }
-            binding.btnSplashSignIn.animation = animation
-            binding.btnSplashSignIn.isVisible = true
-        } else {
-            viewModel.checkUserRegistered(currentUser.uid)
+        if (auth.currentUser == null) {
+            showSignInButton()
         }
     }
 
@@ -74,8 +58,28 @@ class IntroActivity : AppCompatActivity() {
         })
     }
 
+    private fun setSignLauncher() {
+        signLauncher = registerForActivityResult(SignInIntentContract()) { tokenId: String? ->
+            tokenId?.let {
+                firebaseAuthWithGoogle(it)
+            }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        showSignInButton()
+    }
+
+    private fun showSignInButton() {
+        val animation = AlphaAnimation(0f, 1f).apply { duration = 2000 }
+        binding.btnSplashSignIn.animation = animation
+        binding.btnSplashSignIn.isVisible = true
+    }
+
+
     private fun signIn() {
-        signLauncher.launch(getString(R.string.google_auth_client_id))
+        signLauncher.launch(getString(R.string.default_web_client_id))
     }
 
     private fun firebaseAuthWithGoogle(idToken: String) {
@@ -93,10 +97,14 @@ class IntroActivity : AppCompatActivity() {
     }
 
     private fun moveToRegister() {
-//        startActivity(Intent(this, RegisterActivity::class.java))
+        startActivity(Intent(this, RegisterActivity::class.java))
     }
 
     private fun moveToMain() {
-        startActivity(Intent(this, MainActivity::class.java))
+        startActivity(
+            Intent(
+                this,
+                MainActivity::class.java
+            ).apply { Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK })
     }
 }

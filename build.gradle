@@ -18,6 +18,8 @@ buildscript {
         lottieVersion = "4.1.0"
         hiltVersion = "2.38.1"
         hiltCompilerVersion = "1.0.0"
+        coroutineVersion = '1.5.0'
+        coroutinePlayServices = '1.1.1'
     }
     repositories {
         google()
