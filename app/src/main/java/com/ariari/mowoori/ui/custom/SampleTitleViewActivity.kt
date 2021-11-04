@@ -24,7 +24,7 @@ class SampleTitleViewActivity : AppCompatActivity() {
     }
 
     private fun setBackButtonClickObserve() {
-        mainViewModel.backButtonClick.observe(this@SampleTitleViewActivity, EventObserver {
+        mainViewModel.backBtnClick.observe(this@SampleTitleViewActivity, EventObserver {
             if(it){
                 toastMessage("back 버튼 클릭")
             }
@@ -32,7 +32,7 @@ class SampleTitleViewActivity : AppCompatActivity() {
     }
 
     private fun setCloseButtonClickObserve() {
-        mainViewModel.closeButtonClick.observe(this@SampleTitleViewActivity, EventObserver {
+        mainViewModel.closeBtnClick.observe(this@SampleTitleViewActivity, EventObserver {
             if(it){
                 toastMessage("close 버튼 클릭")
             }
@@ -40,7 +40,7 @@ class SampleTitleViewActivity : AppCompatActivity() {
     }
 
     private fun setPlusButtonClickObserve() {
-        mainViewModel.plusButtonClick.observe(this@SampleTitleViewActivity, EventObserver {
+        mainViewModel.plusBtnClick.observe(this@SampleTitleViewActivity, EventObserver {
             if(it){
                 toastMessage("plus 버튼 클릭")
             }

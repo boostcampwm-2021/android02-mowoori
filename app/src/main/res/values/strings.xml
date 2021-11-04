@@ -38,6 +38,14 @@
     <!--home-->
     <string name="desc_home_snow_face">눈사람 얼굴</string>
 
+    <!-- MissionsFragment -->
+    <string name="item_missions_stamp_count">%d/%d</string>
+    <string name="missions_my_mission">나의 미션</string>
+    <string name="missions_not_done">미완료</string>
+    <string name="missions_done">완료</string>
+    <string name="missions_fail">실패</string>
+
     <!--notification-->
     <string name="item_notification_title"><font color="#000000">모우리</font>님이 <b>매일 잔디채우기</b> 미션에 <b>2</b>번째 스탬프를 찍었어요!!!!!!!!!!!!!!!!!!!!!</string>
+
 </resources>
