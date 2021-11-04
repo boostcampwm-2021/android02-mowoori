@@ -4,6 +4,10 @@
 
     <data>
 
+        <variable
+            name="missionInfo"
+            type="com.ariari.mowoori.ui.missions.entity.MissionInfo" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -28,7 +32,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="미션명미션명미션명미션명미션명미션명"
+            android:text="@{missionInfo.missionName}"
             android:textColor="@color/black"
             android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -40,7 +44,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:gravity="end"
-            android:text="@{@string/item_missions_stamp_count(10,30)}"
+            android:text="@{@string/item_missions_stamp_count(missionInfo.curStamp, missionInfo.totalStamp)}"
             android:textColor="@color/black"
             android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent"
