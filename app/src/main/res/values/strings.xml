@@ -28,5 +28,6 @@
 
     <!--description-->
     <string name="desc_home_snow_face">눈사람 얼굴</string>
+    <string name="item_missions_stamp_count">%d/%d</string>
 
 </resources>

@@ -14,8 +14,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="8dp"
-        android:paddingVertical="10dp">
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="14dp">
 
         <ImageButton
             android:id="@+id/btn_custom_title_view_back"
@@ -63,7 +63,7 @@
             android:layout_marginHorizontal="16dp"
             android:maxLines="1"
             android:textColor="@color/black"
-            android:textSize="20sp"
+            android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/btn_custom_title_view_plus"
