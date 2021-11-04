@@ -3,6 +3,7 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-kapt'
     id 'com.google.gms.google-services'
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -49,17 +50,26 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:$extJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
 
+    // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
     implementation "androidx.navigation:navigation-ui-ktx:$navigationVersion"
 
+    // Firebase
     implementation platform("com.google.firebase:firebase-bom:$firebaseBomVersion")
     implementation 'com.google.firebase:firebase-auth-ktx'
     implementation "com.google.android.gms:play-services-auth:$googleAuthVersion"
+
+    // Glide
     implementation "com.github.bumptech.glide:glide:$glideVersion"
 
-    // timber log
+    // Timber log
     implementation "com.jakewharton.timber:timber:$timberVersion"
 
-    // lottie
+    // Lottie
     implementation "com.airbnb.android:lottie:$lottieVersion"
+
+    // Hilt
+    implementation "com.google.dagger:hilt-android:$hiltVersion"
+    kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"
+    kapt "androidx.hilt:hilt-compiler:$hiltCompilerVersion"
 }

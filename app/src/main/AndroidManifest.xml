@@ -3,7 +3,7 @@
     package="com.ariari.mowoori">
 
     <application
-        android:name="com.ariari.mowoori.App"
+        android:name="com.ariari.mowoori.MoWooriApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -14,7 +14,7 @@
             android:name=".ui.custom.SampleTitleViewActivity"
             android:exported="true" />
         <activity
-            android:name=".ui.splash.SplashActivity"
+            android:name=".ui.intro.IntroActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

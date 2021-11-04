@@ -1,4 +1,4 @@
-package com.ariari.mowoori.ui.splash
+package com.ariari.mowoori.ui.intro
 
 import android.app.Activity
 import android.content.Context
