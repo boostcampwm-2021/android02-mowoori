@@ -13,11 +13,12 @@
     <string name="invite_check_yes">네, 초대받았어요!</string>
     <string name="invite_check_no">초대가 뭐죠?\n저는 몰라요 ㅠㅠ</string>
 
-    <!--group_name-->
+    <!--group-->
     <string name="group_name_title">`우리`의\n이름을 정해주세요</string>
     <string name="group_name_complete">완료</string>
     <string name="group_name">정직한 코박쥐들</string>
     <string name="group_name_hint">`우리`의 이름을 입력해주세요</string>
+    <string name="group_invite_title">초대코드를\n입력해주세요</string>
 
     <!--description-->
     <string name="desc_home_snow_face">눈사람 얼굴</string>
