@@ -1,6 +1,7 @@
 package com.ariari.mowoori.ui.main
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -39,9 +40,21 @@ class MainActivity : AppCompatActivity() {
     private fun setBottomNavVisibility() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.homeFragment -> binding.bottomNavMain.isVisible = true
-                R.id.inviteCheckFragment -> binding.bottomNavMain.isGone = true
+                R.id.homeFragment, R.id.membersFragment -> showBottomNav()
+                R.id.missionsFragment -> {
+                    // 나의 미션 or 구성원의 미션에 따라 달라짐.
+                    showBottomNav()
+                }
+                else -> hideBottomNav()
             }
         }
+    }
+
+    private fun showBottomNav() {
+        binding.bottomNavMain.isVisible = true
+    }
+
+    private fun hideBottomNav() {
+        binding.bottomNavMain.isGone = true
     }
 }
