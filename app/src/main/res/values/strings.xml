@@ -2,6 +2,7 @@
     <string name="app_name">MoWoori</string>
     <string name="binding_error">Binding not initialized to reference the view.</string>
     <string name="google_auth_client_id">537612252343-60e4gr390pg6eb02ehvae3j8oc2d3roh.apps.googleusercontent.com</string>
+    <string name="nothing">아무것도 없어요</string>
 
     <string name="bottom_nav_home">Home</string>
     <string name="bottom_nav_missions">Missions</string>
@@ -26,7 +27,15 @@
     <string name="invite_check_yes">네, 초대받았어요!</string>
     <string name="invite_check_no">초대가 뭐죠?\n저는 몰라요 ㅠㅠ</string>
 
-    <!--description-->
+    <!--group-->
+    <string name="group_name_title">`우리`의\n이름을 정해주세요</string>
+    <string name="group_name_complete">완료</string>
+    <string name="group_name">정직한 코박쥐들</string>
+    <string name="group_name_hint">`우리`의 이름을 입력해주세요</string>
+    <string name="group_invite_title">초대코드를\n입력해주세요</string>
+    <string name="group_invalid">올바르지 않은 형식입니다.</string>
+
+    <!--home-->
     <string name="desc_home_snow_face">눈사람 얼굴</string>
 
     <!-- MissionsFragment -->
@@ -35,5 +44,8 @@
     <string name="missions_not_done">미완료</string>
     <string name="missions_done">완료</string>
     <string name="missions_fail">실패</string>
+
+    <!--notification-->
+    <string name="item_notification_title"><font color="#000000">모우리</font>님이 <b>매일 잔디채우기</b> 미션에 <b>2</b>번째 스탬프를 찍었어요!!!!!!!!!!!!!!!!!!!!!</string>
 
 </resources>

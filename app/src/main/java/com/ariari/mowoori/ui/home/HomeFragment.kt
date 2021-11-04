@@ -15,6 +15,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.FragmentHomeBinding
 import com.ariari.mowoori.ui.home.adapter.DrawerAdapter
@@ -26,6 +27,7 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import kotlin.random.Random
 
 @AndroidEntryPoint
@@ -90,7 +92,7 @@ class HomeFragment : Fragment() {
         binding.tbHome.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.alarmFragment -> {
-
+                    findNavController().navigate(R.id.action_homeFragment_to_notificationFragment)
                 }
                 R.id.menu_tb_home_sun -> {
                     TimberUtil.timber("lottie", "sun")
@@ -275,6 +277,7 @@ class HomeFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        Timber.d("destroy")
         viewModel.cancelSnowAnimList()
         _binding = null
     }
