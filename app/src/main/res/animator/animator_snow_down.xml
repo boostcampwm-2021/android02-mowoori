@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+    <objectAnimator
+        android:duration="1300"
+        android:propertyName="translationX"
+        android:valueFrom="0dp"
+        android:valueTo="0dp" />
+    <objectAnimator android:duration="1300">
+        <propertyValuesHolder
+            android:propertyName="translationY"
+            android:valueFrom="-200dp"
+            android:valueTo="0dp" />
+        <propertyValuesHolder
+            android:propertyName="scaleX"
+            android:valueFrom="0.7"
+            android:valueTo="1" />
+        <propertyValuesHolder
+            android:propertyName="scaleY"
+            android:valueFrom="1"
+            android:valueTo="0.6" />
+    </objectAnimator>
+</set>

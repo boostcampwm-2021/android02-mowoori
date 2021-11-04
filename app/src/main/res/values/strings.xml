@@ -10,4 +10,23 @@
     <string name="register_nickname_hint">(1자 이상 8자 이하)</string>
     <string name="desc_app_logo">앱 로고</string>
 
+    <string name="drawer_header_group_list">그룹 리스트</string>
+
+    <!-- CustomTitleView -->
+    <string name="title_view_back">뒤로가기 타이틀 뷰</string>
+    <string name="title_view_close">종료 타이틀 뷰</string>
+    <string name="title_view_plus">추가 타이틀 뷰</string>
+    <string name="desc_title_view_back">뒤로가기 버튼</string>
+    <string name="desc_title_view_close">창 끄기 버튼</string>
+    <string name="desc_title_view_plus">정보 추가 버튼</string>
+    <string name="title_view_text">View Title</string>
+
+    <!--invite_check-->
+    <string name="invite_check_title">`우리`의\n초대를 받으셨나요?</string>
+    <string name="invite_check_yes">네, 초대받았어요!</string>
+    <string name="invite_check_no">초대가 뭐죠?\n저는 몰라요 ㅠㅠ</string>
+
+    <!--description-->
+    <string name="desc_home_snow_face">눈사람 얼굴</string>
+
 </resources>
