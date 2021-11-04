@@ -1,7 +1,6 @@
 package com.ariari.mowoori.ui.custom
 
 import android.content.Context
-import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -24,12 +23,10 @@ class CustomTitleView : ConstraintLayout {
 
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
         initView()
-        getAttrs(attrs)
     }
 
     constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs) {
         initView()
-        getAttrs(attrs, defStyle)
     }
 
     private fun initView() {
@@ -43,25 +40,7 @@ class CustomTitleView : ConstraintLayout {
         binding.view = this
     }
 
-    private fun getAttrs(attrs: AttributeSet) {
-        // obtainStyledAttributes 함수는 Context의 Theme에서 Style로 지정한 속성 정보 리스트를 가져오는 역할을 합니다.
-        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.CustomTitleView)
-        setTypedArray(typedArray)
-    }
-
-    private fun getAttrs(attrs: AttributeSet, defStyle: Int) {
-        // obtainStyledAttributes 함수는 Context의 Theme에서 Style로 지정한 속성 정보 리스트를 가져오는 역할을 합니다.
-        val typedArray =
-            context.obtainStyledAttributes(attrs, R.styleable.CustomTitleView, defStyle, 0)
-        setTypedArray(typedArray)
-    }
-
-    private fun setTypedArray(typedArray: TypedArray) {
-        val titleText = typedArray.getString(R.styleable.CustomTitleView_titleText) ?: ""
-        setTitleText(titleText)
-    }
-
-    private fun setTitleText(title: String) {
+    fun setTitleViewText(title: String) {
         binding.tvCustomTitleViewTitle.text = title
     }
 
@@ -75,15 +54,15 @@ class CustomTitleView : ConstraintLayout {
         }
     }
 
-    fun setBackButtonClickListener(clickEvent: () -> Unit) {
+    fun setOnBackClick(clickEvent: () -> Unit) {
         binding.btnCustomTitleViewBack.setOnClickListener { clickEvent() }
     }
 
-    fun setCloseButtonClickListener(clickEvent: () -> Unit) {
+    fun setOnCloseClick(clickEvent: () -> Unit) {
         binding.btnCustomTitleViewClose.setOnClickListener { clickEvent() }
     }
 
-    fun setPlusButtonClickListener(clickEvent: () -> Unit) {
+    fun setOnPlusClick(clickEvent: () -> Unit) {
         binding.btnCustomTitleViewPlus.setOnClickListener { clickEvent() }
     }
 }
