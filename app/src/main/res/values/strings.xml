@@ -9,6 +9,12 @@
 
     <string name="drawer_header_group_list">그룹 리스트</string>
 
+    <!--invite_check-->
+    <string name="invite_check_title">`우리`의\n초대를 받으셨나요?</string>
+    <string name="invite_check_yes">네, 초대받았어요!</string>
+    <string name="invite_check_no">초대가 뭐죠?\n저는 몰라요 ㅠㅠ</string>
+
     <!--description-->
     <string name="desc_home_snow_face">눈사람 얼굴</string>
+
 </resources>
