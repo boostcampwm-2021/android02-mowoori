@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_navigation"
+    app:startDestination="@id/homeFragment">
+
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.ariari.mowoori.ui.home.HomeFragment"
+        android:label="HomeFragment"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_homeFragment_to_inviteCheckFragment"
+            app:destination="@id/inviteCheckFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_notificationFragment"
+            app:destination="@id/notificationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/membersFragment"
+        android:name="com.ariari.mowoori.ui.members.MembersFragment"
+        android:label="MembersFragment"
+        tools:layout="@layout/fragment_members" />
+    <fragment
+        android:id="@+id/missionsFragment"
+        android:name="com.ariari.mowoori.ui.missions.MissionsFragment"
+        android:label="MissionsFragment"
+        tools:layout="@layout/fragment_missions">
+        <action
+            android:id="@+id/action_missionsFragment_to_missionsAddFragment"
+            app:destination="@id/missionsAddFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/inviteCheckFragment"
+        android:name="com.ariari.mowoori.ui.group.InviteCheckFragment"
+        android:label="InviteCheckFragment"
+        tools:layout="@layout/fragment_invite_check">
+        <action
+            android:id="@+id/action_inviteCheckFragment_to_groupNameFragment"
+            app:destination="@id/groupNameFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/groupNameFragment"
+        android:name="com.ariari.mowoori.ui.group.GroupFragment"
+        android:label="GroupNameFragment"
+        tools:layout="@layout/fragment_group">
+        <action
+            android:id="@+id/action_groupNameFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="true" />
+        <argument
+            android:name="groupMode"
+            app:argType="com.ariari.mowoori.ui.group.entity.GroupMode" />
+    </fragment>
+    <fragment
+        android:id="@+id/notificationFragment"
+        android:name="com.ariari.mowoori.ui.notification.NotificationFragment"
+        android:label="NotificationFragment" />
+    <fragment
+        android:id="@+id/missionsAddFragment"
+        android:name="com.ariari.mowoori.ui.missions_add.MissionsAddFragment"
+        android:label="MissionsAddFragment"
+        tools:layout="@layout/fragment_missions_add" />
+
+</navigation>

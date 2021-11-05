@@ -1,5 +1,59 @@
 <resources>
     <string name="app_name">MoWoori</string>
+    <string name="binding_error">Binding not initialized to reference the view.</string>
+    <string name="nothing">아무것도 없어요</string>
 
-    <string name="default_web_client_id">537612252343-60e4gr390pg6eb02ehvae3j8oc2d3roh.apps.googleusercontent.com</string>
+    <string name="bottom_nav_home">Home</string>
+    <string name="bottom_nav_missions">Missions</string>
+    <string name="bottom_nav_members">Members</string>
+
+    <string name="drawer_header_group_list">그룹 리스트</string>
+
+    <!-- Register -->
+    <string name="register_please_enter_nickname">닉네임을\n입력해주세요</string>
+    <string name="register_nickname_hint">(1자 이상 10자 이하)</string>
+    <string name="register_nickname_error_msg">닉네임을 확인해주세요</string>
+    <string name="register_fail_msg">회원가입에 실패했습니다.</string>
+
+    <!-- CustomTitleView -->
+    <string name="title_view_back">뒤로가기 타이틀 뷰</string>
+    <string name="title_view_close">종료 타이틀 뷰</string>
+    <string name="title_view_plus">추가 타이틀 뷰</string>
+    <string name="desc_title_view_back">뒤로가기 버튼</string>
+    <string name="desc_title_view_close">창 끄기 버튼</string>
+    <string name="desc_title_view_plus">정보 추가 버튼</string>
+    <string name="title_view_text">View Title</string>
+
+    <!--invite_check-->
+    <string name="invite_check_title">`우리`의\n초대를 받으셨나요?</string>
+    <string name="invite_check_yes">네, 초대받았어요!</string>
+    <string name="invite_check_no">초대가 뭐죠?\n저는 몰라요 ㅠㅠ</string>
+
+    <!--group-->
+    <string name="group_name_title">`우리`의\n이름을 정해주세요</string>
+    <string name="group_name_complete">완료</string>
+    <string name="group_name">정직한 코박쥐들</string>
+    <string name="group_name_hint">`우리`의 이름을 입력해주세요</string>
+    <string name="group_invite_title">초대코드를\n입력해주세요</string>
+    <string name="group_invalid">올바르지 않은 형식입니다.</string>
+
+    <!--description-->
+    <string name="desc_app_logo">앱 로고</string>
+    <!--home-->
+    <string name="desc_home_snow_face">눈사람 얼굴</string>
+    <string name="all_complete">완료</string>
+    <string name="desc_profile_image">프로필 이미지</string>
+
+    <!-- MissionsFragment -->
+    <string name="item_missions_stamp_count">%d/%d</string>
+    <string name="missions_my_mission">나의 미션</string>
+    <string name="missions_not_done">미완료</string>
+    <string name="missions_done">완료</string>
+    <string name="missions_fail">실패</string>
+
+    <!--notification-->
+    <string name="item_notification_title"><font color="#000000">모우리</font>님이 <b>매일 잔디채우기</b> 미션에 <b>2</b>번째 스탬프를 찍었어요!!!!!!!!!!!!!!!!!!!!!</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>
