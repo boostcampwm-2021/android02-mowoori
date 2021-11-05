@@ -4,10 +4,26 @@ import android.animation.Animator
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
+import com.ariari.mowoori.ui.home.entity.Group
+import com.ariari.mowoori.ui.home.entity.GroupInfo
+import com.ariari.mowoori.ui.register.entity.User
+import com.ariari.mowoori.ui.register.entity.UserInfo
+import com.ariari.mowoori.util.Event
+import com.google.firebase.database.FirebaseDatabase
+import com.google.gson.Gson
 
 class HomeViewModel : ViewModel() {
+    // TODO: Hilt 인스턴스 주입
+    private val firebaseDatabase = FirebaseDatabase.getInstance()
+    private val databaseReference = firebaseDatabase.reference
+    private val gson = Gson()
+
+    private val _userInfo = MutableLiveData<Event<UserInfo>>()
+    val userInfo: LiveData<Event<UserInfo>> = _userInfo
+
+    private val _currentGroupInfo = MutableLiveData<GroupInfo>()
+    val currentGroupInfo: LiveData<GroupInfo> = _currentGroupInfo
+
     private var _isSnowing = MutableLiveData<Boolean>()
     val isSnowing: LiveData<Boolean> = _isSnowing
 
@@ -15,6 +31,31 @@ class HomeViewModel : ViewModel() {
     val snowmanLevel: LiveData<SnowmanLevel> = _snowmanLevel
 
     private val snowAnimList: MutableList<Animator> = mutableListOf()
+
+    fun setUserInfo() {
+        // TODO: 레포지토리에서 실행되는 코드
+        val tempUserId = "kldaji"
+        databaseReference.child("users").child(tempUserId).get().addOnSuccessListener {
+            val userInfoJson = it.value ?: return@addOnSuccessListener
+            val userInfo = gson.fromJson(userInfoJson.toString(), UserInfo::class.java)
+            _userInfo.value = Event(userInfo)
+        }.addOnFailureListener {
+            // TODO: 실패처리
+        }
+    }
+
+    fun setCurrentGroup(userInfo: UserInfo) {
+        // 처음 선택되는 그룹은 항상 첫번째 그룹
+        val firstGroupId = userInfo.groupList.firstOrNull() ?: return
+        // TODO: 레포지토리에서 실행되는 코드
+        databaseReference.child("groups").child(firstGroupId).get().addOnSuccessListener {
+            val groupInfoJson = it.value ?: return@addOnSuccessListener
+            val groupInfo = gson.fromJson(groupInfoJson.toString(), GroupInfo::class.java)
+            _currentGroupInfo.value = groupInfo
+        }.addOnFailureListener {
+            // TODO: 실패처리
+        }
+    }
 
     fun updateIsSnowing() {
         if (isSnowing.value == null) {

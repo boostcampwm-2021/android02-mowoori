@@ -20,6 +20,7 @@ import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.FragmentHomeBinding
 import com.ariari.mowoori.ui.home.adapter.DrawerAdapter
 import com.ariari.mowoori.ui.home.adapter.DrawerAdapterDecoration
+import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.util.TimberUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
@@ -55,6 +56,12 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
+        // TODO: getUserInfo -> setGroup
+        // TODO: getFirstOrNull
+        // TODO: currentGroup
+        setUserInfo()
+        setUserInfoObserver()
+        setGroupInfoObserver()
         setDrawerOpenListener()
         setDrawerAdapter()
         setRecyclerViewDecoration()
@@ -62,6 +69,23 @@ class HomeFragment : Fragment() {
         setAnimation()
         setClickListener()
         setMenuListener()
+    }
+
+    private fun setUserInfo() {
+        // TODO: 유저아이디는 로컬에서 가져오기 (현재는 더미 데이터 사용)
+        viewModel.setUserInfo()
+    }
+
+    private fun setUserInfoObserver() {
+        viewModel.userInfo.observe(viewLifecycleOwner, EventObserver { userInfo ->
+            viewModel.setCurrentGroup(userInfo)
+        })
+    }
+
+    private fun setGroupInfoObserver() {
+        viewModel.currentGroupInfo.observe(viewLifecycleOwner, { groupInfo ->
+            binding.tbHome.title = groupInfo.groupName
+        })
     }
 
 //    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
