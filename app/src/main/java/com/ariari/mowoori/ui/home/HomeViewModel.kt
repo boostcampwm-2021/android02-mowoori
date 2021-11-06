@@ -46,28 +46,31 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    fun setCurrentGroup(userInfo: UserInfo) {
-        // 처음 선택되는 그룹은 항상 첫번째 그룹
-        val firstGroupId = userInfo.groupList.firstOrNull() ?: return
-        // TODO: 레포지토리에서 실행되는 코드
-        databaseReference.child("groups").child(firstGroupId).get().addOnSuccessListener {
-            val groupInfoJson = it.value ?: return@addOnSuccessListener
-            val groupInfo = gson.fromJson(groupInfoJson.toString(), GroupInfo::class.java)
-            _currentGroupInfo.value = groupInfo
-        }.addOnFailureListener {
-            // TODO: 실패처리
-        }
-    }
-
     fun setGroupInfoList(userInfo: UserInfo) {
-        userInfo.groupList.forEach { groupId ->
+        userInfo.groupList.forEachIndexed { index, groupId ->
             databaseReference.child("groups").child(groupId).get().addOnSuccessListener {
                 val groupInfoJson = it.value ?: return@addOnSuccessListener
                 val groupInfo = gson.fromJson(groupInfoJson.toString(), GroupInfo::class.java)
+                if (index == 0) {
+                    groupInfo.selected = true
+                    _currentGroupInfo.value = groupInfo
+                }
                 mutableGroupList.add(groupInfo)
                 _groupInfoList.value = mutableGroupList
+            }.addOnFailureListener {
+                // TODO: 실패처리
             }
         }
+    }
+
+    fun setCurrentGroupInfo(position: Int) {
+        mutableGroupList.forEach { groupInfo ->
+            groupInfo.selected = false
+        }
+        // 헤더를 포함한 위치 값이기 떄문에 -1 을 해주어야 한다.
+        mutableGroupList[position - 1].selected = true
+        _groupInfoList.value = mutableGroupList
+        _currentGroupInfo.value = mutableGroupList[position - 1]
     }
 
     fun updateIsSnowing() {

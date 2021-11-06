@@ -57,9 +57,6 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
-        // TODO: getUserInfo -> setGroup
-        // TODO: getFirstOrNull
-        // TODO: currentGroup
         setUserInfo()
         setUserInfoObserver()
         setCurrentGroupInfoObserver()
@@ -80,7 +77,6 @@ class HomeFragment : Fragment() {
 
     private fun setUserInfoObserver() {
         viewModel.userInfo.observe(viewLifecycleOwner, EventObserver { userInfo ->
-            viewModel.setCurrentGroup(userInfo)
             viewModel.setGroupInfoList(userInfo)
         })
     }
@@ -155,8 +151,7 @@ class HomeFragment : Fragment() {
     private fun setDrawerAdapter() {
         adapter = DrawerAdapter(object : DrawerAdapter.OnItemClickListener {
             override fun itemClick(position: Int) {
-                // TODO: 그룹 이동
-                // TODO: 그룹 아이템 배경 색상 변경
+                viewModel.setCurrentGroupInfo(position)
                 binding.drawerHome.close()
             }
         })
