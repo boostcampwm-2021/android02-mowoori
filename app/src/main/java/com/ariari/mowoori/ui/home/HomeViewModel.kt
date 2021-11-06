@@ -4,9 +4,7 @@ import android.animation.Animator
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.ariari.mowoori.ui.home.entity.Group
 import com.ariari.mowoori.ui.home.entity.GroupInfo
-import com.ariari.mowoori.ui.register.entity.User
 import com.ariari.mowoori.ui.register.entity.UserInfo
 import com.ariari.mowoori.util.Event
 import com.google.firebase.database.FirebaseDatabase
@@ -23,6 +21,10 @@ class HomeViewModel : ViewModel() {
 
     private val _currentGroupInfo = MutableLiveData<GroupInfo>()
     val currentGroupInfo: LiveData<GroupInfo> = _currentGroupInfo
+
+    private val mutableGroupList = mutableListOf<GroupInfo>()
+    private val _groupInfoList = MutableLiveData<List<GroupInfo>>()
+    val groupInfoList: LiveData<List<GroupInfo>> = _groupInfoList
 
     private var _isSnowing = MutableLiveData<Boolean>()
     val isSnowing: LiveData<Boolean> = _isSnowing
@@ -54,6 +56,17 @@ class HomeViewModel : ViewModel() {
             _currentGroupInfo.value = groupInfo
         }.addOnFailureListener {
             // TODO: 실패처리
+        }
+    }
+
+    fun setGroupInfoList(userInfo: UserInfo) {
+        userInfo.groupList.forEach { groupId ->
+            databaseReference.child("groups").child(groupId).get().addOnSuccessListener {
+                val groupInfoJson = it.value ?: return@addOnSuccessListener
+                val groupInfo = gson.fromJson(groupInfoJson.toString(), GroupInfo::class.java)
+                mutableGroupList.add(groupInfo)
+                _groupInfoList.value = mutableGroupList
+            }
         }
     }
 

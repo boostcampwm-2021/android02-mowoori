@@ -22,13 +22,7 @@ class DrawerAdapter(private val listener: OnItemClickListener) :
         private const val GROUP = 1
     }
 
-    private val groups = listOf(
-        GroupInfo("정직한 코박쥐들"),
-        GroupInfo("못생긴 원숭이들"),
-        GroupInfo("고약한 거북이들"),
-        GroupInfo("귀여운 개구리들"),
-        GroupInfo("행복한 캥거루들")
-    )
+    var groups = listOf<GroupInfo>()
 
     override fun getItemViewType(position: Int): Int {
         return when (position) {

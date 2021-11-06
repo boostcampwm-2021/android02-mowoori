@@ -38,6 +38,7 @@ class HomeFragment : Fragment() {
 
     private val viewModel: HomeViewModel by viewModels()
 
+    private lateinit var adapter: DrawerAdapter
     private var snowJob: Job? = null
     private lateinit var snowFace: ImageView
     private lateinit var snowFaceDownAnim: Animator
@@ -61,7 +62,8 @@ class HomeFragment : Fragment() {
         // TODO: currentGroup
         setUserInfo()
         setUserInfoObserver()
-        setGroupInfoObserver()
+        setCurrentGroupInfoObserver()
+        setGroupInfoListObserver()
         setDrawerOpenListener()
         setDrawerAdapter()
         setRecyclerViewDecoration()
@@ -79,12 +81,20 @@ class HomeFragment : Fragment() {
     private fun setUserInfoObserver() {
         viewModel.userInfo.observe(viewLifecycleOwner, EventObserver { userInfo ->
             viewModel.setCurrentGroup(userInfo)
+            viewModel.setGroupInfoList(userInfo)
         })
     }
 
-    private fun setGroupInfoObserver() {
+    private fun setCurrentGroupInfoObserver() {
         viewModel.currentGroupInfo.observe(viewLifecycleOwner, { groupInfo ->
             binding.tbHome.title = groupInfo.groupName
+        })
+    }
+
+    private fun setGroupInfoListObserver() {
+        viewModel.groupInfoList.observe(viewLifecycleOwner, { groupInfoList ->
+            adapter.groups = groupInfoList
+            adapter.notifyDataSetChanged()
         })
     }
 
@@ -143,15 +153,13 @@ class HomeFragment : Fragment() {
     }
 
     private fun setDrawerAdapter() {
-        val adapter: DrawerAdapter by lazy {
-            DrawerAdapter(object : DrawerAdapter.OnItemClickListener {
-                override fun itemClick(position: Int) {
-                    // TODO: 그룹 이동
-                    // TODO: 그룹 아이템 배경 색상 변경
-                    binding.drawerHome.close()
-                }
-            })
-        }
+        adapter = DrawerAdapter(object : DrawerAdapter.OnItemClickListener {
+            override fun itemClick(position: Int) {
+                // TODO: 그룹 이동
+                // TODO: 그룹 아이템 배경 색상 변경
+                binding.drawerHome.close()
+            }
+        })
         binding.rvDrawer.adapter = adapter
     }
 
