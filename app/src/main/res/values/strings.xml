@@ -2,11 +2,11 @@
     <string name="app_name">MoWoori</string>
     <string name="binding_error">Binding not initialized to reference the view.</string>
     <string name="nothing">아무것도 없어요</string>
+    <string name="desc_app_logo">앱 로고</string>
 
     <string name="bottom_nav_home">Home</string>
     <string name="bottom_nav_missions">Missions</string>
     <string name="bottom_nav_members">Members</string>
-
     <string name="drawer_header_group_list">그룹 리스트</string>
 
     <!-- Register -->
@@ -14,6 +14,7 @@
     <string name="register_nickname_hint">(1자 이상 10자 이하)</string>
     <string name="register_nickname_error_msg">닉네임을 확인해주세요</string>
     <string name="register_fail_msg">회원가입에 실패했습니다.</string>
+    <string name="desc_profile_image">프로필 이미지</string>
 
     <!-- CustomTitleView -->
     <string name="title_view_back">뒤로가기 타이틀 뷰</string>
@@ -37,12 +38,9 @@
     <string name="group_invite_title">초대코드를\n입력해주세요</string>
     <string name="group_invalid">올바르지 않은 형식입니다.</string>
 
-    <!--description-->
-    <string name="desc_app_logo">앱 로고</string>
     <!--home-->
     <string name="desc_home_snow_face">눈사람 얼굴</string>
     <string name="all_complete">완료</string>
-    <string name="desc_profile_image">프로필 이미지</string>
 
     <!-- MissionsFragment -->
     <string name="item_missions_stamp_count">%d/%d</string>
