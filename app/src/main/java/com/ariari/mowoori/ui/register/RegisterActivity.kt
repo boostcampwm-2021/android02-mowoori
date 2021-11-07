@@ -2,7 +2,6 @@ package com.ariari.mowoori.ui.register
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log.e
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -10,14 +9,8 @@ import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.ActivityRegisterBinding
 import com.ariari.mowoori.ui.main.MainActivity
 import com.ariari.mowoori.util.EventObserver
-import com.ariari.mowoori.util.TimberUtil
 import com.ariari.mowoori.util.toastMessage
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.request.RequestOptions
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
+import com.ariari.mowoori.widget.ProgressDialogManager
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -46,6 +39,7 @@ class RegisterActivity : AppCompatActivity() {
         setInvalidNickNameObserver()
         setRegisterSuccessObserver()
         setProfileClickObserver()
+        setLoadingEventObserver()
     }
 
     private fun setInvalidNickNameObserver() {
@@ -56,6 +50,7 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun setRegisterSuccessObserver() {
         viewModel.registerSuccessEvent.observe(this, EventObserver {
+            ProgressDialogManager.instance.clear()
             if (it) {
                 moveToMain()
             } else {
@@ -67,6 +62,16 @@ class RegisterActivity : AppCompatActivity() {
     private fun setProfileClickObserver() {
         viewModel.profileImageClickEvent.observe(this, EventObserver {
             getContent.launch("image/*")
+        })
+    }
+
+    private fun setLoadingEventObserver() {
+        viewModel.loadingEvent.observe(this,EventObserver{
+            if(it){
+                ProgressDialogManager.instance.show(this)
+            }else{
+                ProgressDialogManager.instance.clear()
+            }
         })
     }
 

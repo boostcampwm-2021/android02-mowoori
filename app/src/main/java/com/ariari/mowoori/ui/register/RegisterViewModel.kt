@@ -30,6 +30,9 @@ class RegisterViewModel @Inject constructor(
     private val _profileImageUri = MutableLiveData<Uri>()
     val profileImageUri: LiveData<Uri> = _profileImageUri
 
+    private val _loadingEvent = MutableLiveData<Event<Boolean>>()
+    val loadingEvent: LiveData<Event<Boolean>> = _loadingEvent
+
     fun createNickName() {
         viewModelScope.launch {
             val nickname = introRepository.getRandomNickName()
@@ -46,6 +49,7 @@ class RegisterViewModel @Inject constructor(
     }
 
     fun clickComplete() {
+        _loadingEvent.value = Event(true)
         val nickname = profileText.get() ?: ""
         if (!checkNicknameValid(nickname)) {
             _invalidNicknameEvent.value = Event(Unit)
