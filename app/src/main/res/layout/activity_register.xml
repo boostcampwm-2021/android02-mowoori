@@ -31,13 +31,17 @@
 
         <ImageView
             android:id="@+id/iv_register_profile"
+            imageUri="@{viewModel.profileImageUri}"
+            isCircle="@{true}"
             android:layout_width="134dp"
             android:layout_height="134dp"
             android:layout_marginTop="95dp"
+            android:onClick="@{()->viewModel.clickProfile()}"
             android:src="@drawable/ic_profile_empty"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_register_title" />
+            app:layout_constraintTop_toBottomOf="@id/tv_register_title"
+            android:contentDescription="@string/desc_profile_image" />
 
         <EditText
             android:id="@+id/et_register_nickname"
@@ -49,7 +53,6 @@
             android:autofillHints="username"
             android:background="@null"
             android:gravity="center"
-            android:hint=""
             android:inputType="text"
             android:lines="1"
             android:maxLength="10"
@@ -60,7 +63,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/iv_register_profile"
-            tools:text="전설의 코박쥐" />
+            tools:text="전설의 코박쥐"
+            tools:ignore="LabelFor" />
 
         <View
             android:layout_width="0dp"
