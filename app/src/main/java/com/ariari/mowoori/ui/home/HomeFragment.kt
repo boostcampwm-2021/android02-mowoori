@@ -5,6 +5,7 @@ import android.animation.AnimatorInflater
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -44,6 +45,12 @@ class HomeFragment : Fragment() {
     private lateinit var snowFaceDownAnim: Animator
     private lateinit var snowFaceUpAnim: Animator
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        // onAttach 콜백함수는 최초 한번만 실행된다.
+        setUserInfo()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -57,7 +64,6 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
-        setUserInfo()
         setUserInfoObserver()
         setCurrentGroupInfoObserver()
         setGroupInfoListObserver()
