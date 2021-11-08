@@ -18,7 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MissionsFragment : Fragment() {
     private var _binding: FragmentMissionsBinding? = null
     private val binding get() = _binding ?: error(getString(R.string.binding_error))
-    private val missionsViewModel by viewModels<MissionsViewModel>()
+    private val missionsViewModel: MissionsViewModel by viewModels()
     private val missionsAdapter = MissionsAdapter()
 
     override fun onCreateView(
@@ -35,9 +35,9 @@ class MissionsFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = missionsViewModel
         setMissionsRvAdapter()
-        setPlusBtnClickObserve()
-        setMissionsTypeObserve()
-        setMissionsListObserve()
+        setPlusBtnClickObserver()
+        setMissionsTypeObserver()
+        setMissionsListObserver()
     }
 
     override fun onDestroyView() {
@@ -49,19 +49,19 @@ class MissionsFragment : Fragment() {
         binding.rvMissions.adapter = missionsAdapter
     }
 
-    private fun setPlusBtnClickObserve() {
+    private fun setPlusBtnClickObserver() {
         missionsViewModel.plusBtnClick.observe(viewLifecycleOwner, EventObserver {
             this.findNavController().navigate(R.id.action_missionsFragment_to_missionsAddFragment)
         })
     }
 
-    private fun setMissionsTypeObserve() {
+    private fun setMissionsTypeObserver() {
         missionsViewModel.missionsType.observe(viewLifecycleOwner, EventObserver {
             missionsViewModel.setMissionsList()
         })
     }
 
-    private fun setMissionsListObserve() {
+    private fun setMissionsListObserver() {
         missionsViewModel.missionsList.observe(viewLifecycleOwner) { missionsList ->
             missionsAdapter.submitList(missionsList)
         }
