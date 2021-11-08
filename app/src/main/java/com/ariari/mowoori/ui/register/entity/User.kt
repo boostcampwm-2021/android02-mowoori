@@ -7,5 +7,6 @@ data class User(
 
 data class UserInfo(
     val nickName: String,
+    val profileImage: String,
     val groupList: List<String> = emptyList(),
 )
