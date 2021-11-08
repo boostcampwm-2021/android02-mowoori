@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val introRepository: IntroRepository
+    private val introRepository: IntroRepository,
 ) : ViewModel() {
     val profileText = MutableLiveData("")
     private val _invalidNicknameEvent = MutableLiveData<Event<Unit>>()
