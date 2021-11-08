@@ -1,7 +1,6 @@
 package com.ariari.mowoori.ui.register
 
 import android.net.Uri
-import androidx.databinding.ObservableField
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,6 +9,7 @@ import com.ariari.mowoori.data.repository.IntroRepository
 import com.ariari.mowoori.ui.register.entity.UserInfo
 import com.ariari.mowoori.util.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,7 +17,7 @@ import javax.inject.Inject
 class RegisterViewModel @Inject constructor(
     private val introRepository: IntroRepository
 ) : ViewModel() {
-    val profileText = ObservableField("")
+    val profileText = MutableLiveData("")
     private val _invalidNicknameEvent = MutableLiveData<Event<Unit>>()
     val invalidNicknameEvent: LiveData<Event<Unit>> = _invalidNicknameEvent
 
@@ -34,9 +34,9 @@ class RegisterViewModel @Inject constructor(
     val loadingEvent: LiveData<Event<Boolean>> = _loadingEvent
 
     fun createNickName() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val nickname = introRepository.getRandomNickName()
-            profileText.set(nickname)
+            profileText.postValue(nickname)
         }
     }
 
@@ -50,12 +50,12 @@ class RegisterViewModel @Inject constructor(
 
     fun clickComplete() {
         _loadingEvent.value = Event(true)
-        val nickname = profileText.get() ?: ""
+        val nickname = profileText.value ?: ""
         if (!checkNicknameValid(nickname)) {
             _invalidNicknameEvent.value = Event(Unit)
             return
         }
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             var uploadUrl = ""
             profileImageUri.value?.let {
                 uploadUrl = introRepository.putUserProfile(it)
@@ -66,7 +66,7 @@ class RegisterViewModel @Inject constructor(
                     profileImage = uploadUrl
                 )
             )
-            _registerSuccessEvent.value = Event(success)
+            _registerSuccessEvent.postValue(Event(success))
         }
     }
 
