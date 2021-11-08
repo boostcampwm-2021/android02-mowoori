@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val introRepository: IntroRepository
+    private val introRepository: IntroRepository,
 ) : ViewModel() {
     val profileText = MutableLiveData("")
     private val _invalidNicknameEvent = MutableLiveData<Event<Unit>>()
@@ -48,7 +48,7 @@ class RegisterViewModel @Inject constructor(
         _profileImageUri.postValue(uri)
     }
 
-    fun clickComplete() {
+    fun registerUserInfo() {
         _loadingEvent.value = Event(true)
         val nickname = profileText.value ?: ""
         if (!checkNicknameValid(nickname)) {

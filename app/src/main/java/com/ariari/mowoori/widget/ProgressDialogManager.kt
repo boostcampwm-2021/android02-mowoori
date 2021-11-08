@@ -18,7 +18,7 @@ class ProgressDialogManager {
             progressDialog = ProgressDialog(context)
             progressDialog?.show()
         } catch (e: Exception) {
-            TimberUtil.timber("ProgressDialogManager","clear: $e")
+            TimberUtil.timber("ProgressDialogManager", "clear: $e")
         }
     }
 
@@ -30,11 +30,11 @@ class ProgressDialogManager {
                 progressDialog = null
             }
         } catch (e: Exception) {
-            TimberUtil.timber("ProgressDialogManager","clear: $e")
+            TimberUtil.timber("ProgressDialogManager", "clear: $e")
         }
     }
 
-    inner class ProgressDialog(context: Context) : Dialog(context,R.style.DialogTheme ) {
+    inner class ProgressDialog(context: Context) : Dialog(context, R.style.DialogTheme) {
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             setContentView(R.layout.dialog_progress)
