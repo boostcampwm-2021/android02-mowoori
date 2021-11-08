@@ -56,8 +56,7 @@ class MissionsFragment : Fragment() {
     }
 
     private fun setMissionsTypeObserve() {
-        missionsViewModel.missionsType.observe(viewLifecycleOwner, EventObserver { type ->
-            binding.missionsMode = type
+        missionsViewModel.missionsType.observe(viewLifecycleOwner, EventObserver {
             missionsViewModel.setMissionsList()
         })
     }
