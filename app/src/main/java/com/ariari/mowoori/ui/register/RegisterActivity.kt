@@ -66,20 +66,20 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun setLoadingEventObserver() {
-        viewModel.loadingEvent.observe(this,EventObserver{
-            if(it){
+        viewModel.loadingEvent.observe(this, EventObserver {
+            if (it) {
                 ProgressDialogManager.instance.show(this)
-            }else{
+            } else {
                 ProgressDialogManager.instance.clear()
             }
         })
     }
 
     private fun moveToMain() {
-        startActivity(
-            Intent(
-                this,
-                MainActivity::class.java
-            ).apply { Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK })
+        val intent = Intent(this, MainActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        }
+        startActivity(intent)
     }
 }
