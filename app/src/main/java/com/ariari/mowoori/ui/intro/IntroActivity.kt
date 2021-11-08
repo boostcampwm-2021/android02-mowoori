@@ -25,7 +25,12 @@ class IntroActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivityIntroBinding.inflate(layoutInflater)
     }
-    private lateinit var signLauncher: ActivityResultLauncher<String>
+    private val signLauncher =
+        registerForActivityResult(SignInIntentContract()) { tokenId: String? ->
+            tokenId?.let {
+                firebaseAuthWithGoogle(it)
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +40,6 @@ class IntroActivity : AppCompatActivity() {
 
         setListeners()
         setObservers()
-        setSignLauncher()
         if (auth.currentUser == null) {
             showSignInButton()
         }
@@ -48,6 +52,7 @@ class IntroActivity : AppCompatActivity() {
     }
 
     private fun setObservers() {
+        // TODO: 로그인 액티비티 백스택에서 제거
         viewModel.isUserRegistered.observe(this, EventObserver {
             if (it) {
                 moveToMain()
@@ -55,14 +60,6 @@ class IntroActivity : AppCompatActivity() {
                 moveToRegister()
             }
         })
-    }
-
-    private fun setSignLauncher() {
-        signLauncher = registerForActivityResult(SignInIntentContract()) { tokenId: String? ->
-            tokenId?.let {
-                firebaseAuthWithGoogle(it)
-            }
-        }
     }
 
     override fun onStart() {
@@ -75,7 +72,6 @@ class IntroActivity : AppCompatActivity() {
         binding.btnSplashSignIn.animation = animation
         binding.btnSplashSignIn.isVisible = true
     }
-
 
     private fun signIn() {
         signLauncher.launch(getString(R.string.default_web_client_id))
