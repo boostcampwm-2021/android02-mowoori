@@ -8,11 +8,14 @@ import android.view.inputmethod.InputMethodManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.DialogFragment
 import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.ActivityRegisterBinding
 import com.ariari.mowoori.ui.main.MainActivity
 import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.util.toastMessage
+import com.ariari.mowoori.widget.BaseDialogFragment
+import com.ariari.mowoori.widget.ConfirmDialogFragment
 import com.ariari.mowoori.widget.ProgressDialogManager
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -36,6 +39,7 @@ class RegisterActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         setObservers()
         setRootClick()
+        setCompleteClick()
         viewModel.createNickName()
     }
 
@@ -59,6 +63,20 @@ class RegisterActivity : AppCompatActivity() {
         val inputMethodManager =
             this.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(v.windowToken, 0)
+    }
+
+    private fun setCompleteClick() {
+        binding.btnRegisterComplete.setOnClickListener {
+            ConfirmDialogFragment(object : BaseDialogFragment.NoticeDialogListener {
+                override fun onDialogPositiveClick(dialog: DialogFragment) {
+                    viewModel.registerUserInfo()
+                }
+
+                override fun onDialogNegativeClick(dialog: DialogFragment) {
+                    dialog.dismiss()
+                }
+            }).show(supportFragmentManager, "ConfirmFragment")
+        }
     }
 
     private fun setInvalidNickNameObserver() {

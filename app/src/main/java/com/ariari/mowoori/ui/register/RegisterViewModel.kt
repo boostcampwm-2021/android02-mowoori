@@ -48,7 +48,7 @@ class RegisterViewModel @Inject constructor(
         _profileImageUri.postValue(uri)
     }
 
-    fun clickComplete() {
+    fun registerUserInfo() {
         _loadingEvent.value = Event(true)
         val nickname = profileText.value ?: ""
         if (!checkNicknameValid(nickname)) {

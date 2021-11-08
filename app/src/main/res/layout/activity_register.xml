@@ -36,12 +36,12 @@
             android:layout_width="134dp"
             android:layout_height="134dp"
             android:layout_marginTop="95dp"
+            android:contentDescription="@string/desc_profile_image"
             android:onClick="@{()->viewModel.clickProfile()}"
             android:src="@drawable/ic_profile_empty"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_register_title"
-            android:contentDescription="@string/desc_profile_image" />
+            app:layout_constraintTop_toBottomOf="@id/tv_register_title" />
 
         <EditText
             android:id="@+id/et_register_nickname"
@@ -63,8 +63,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/iv_register_profile"
-            tools:text="전설의 코박쥐"
-            tools:ignore="LabelFor" />
+            tools:ignore="LabelFor"
+            tools:text="전설의 코박쥐" />
 
         <View
             android:layout_width="0dp"
@@ -86,12 +86,12 @@
             app:layout_constraintTop_toBottomOf="@id/et_register_nickname" />
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_register_complete"
             style="?attr/materialButtonOutlinedStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="32dp"
             android:layout_marginBottom="20dp"
-            android:onClick="@{()->viewModel.clickComplete()}"
             android:paddingHorizontal="24dp"
             android:paddingVertical="10dp"
             android:text="@string/all_complete"
