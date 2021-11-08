@@ -22,7 +22,6 @@ class HomeViewModel : ViewModel() {
     private val _currentGroupInfo = MutableLiveData<GroupInfo>()
     val currentGroupInfo: LiveData<GroupInfo> = _currentGroupInfo
 
-    private val mutableGroupList = mutableListOf<GroupInfo>()
     private val _groupInfoList = MutableLiveData<List<GroupInfo>>()
     val groupInfoList: LiveData<List<GroupInfo>> = _groupInfoList
 
@@ -47,6 +46,7 @@ class HomeViewModel : ViewModel() {
     }
 
     fun setGroupInfoList(userInfo: UserInfo) {
+        val tempGroupList = mutableListOf<GroupInfo>()
         userInfo.groupList.forEachIndexed { index, groupId ->
             databaseReference.child("groups").child(groupId).get().addOnSuccessListener {
                 val groupInfoJson = it.value ?: return@addOnSuccessListener
@@ -55,8 +55,8 @@ class HomeViewModel : ViewModel() {
                     groupInfo.selected = true
                     _currentGroupInfo.value = groupInfo
                 }
-                mutableGroupList.add(groupInfo)
-                _groupInfoList.value = mutableGroupList
+                tempGroupList.add(groupInfo)
+                _groupInfoList.value = tempGroupList
             }.addOnFailureListener {
                 // TODO: 실패처리
             }
@@ -64,13 +64,19 @@ class HomeViewModel : ViewModel() {
     }
 
     fun setCurrentGroupInfo(position: Int) {
-        mutableGroupList.forEach { groupInfo ->
-            groupInfo.selected = false
+        val tempGroupList = _groupInfoList.value?.mapIndexed { index, groupInfo ->
+            when (index) {
+                // 헤더를 포함한 위치 값이기 떄문에 -1 을 해주어야 한다.
+                position - 1 -> {
+                    groupInfo.selected = true
+                    _currentGroupInfo.value = groupInfo
+                }
+                else -> groupInfo.selected = false
+            }
+            groupInfo
         }
-        // 헤더를 포함한 위치 값이기 떄문에 -1 을 해주어야 한다.
-        mutableGroupList[position - 1].selected = true
-        _groupInfoList.value = mutableGroupList
-        _currentGroupInfo.value = mutableGroupList[position - 1]
+        tempGroupList ?: return
+        _groupInfoList.value = tempGroupList.requireNoNulls()
     }
 
     fun updateIsSnowing() {
