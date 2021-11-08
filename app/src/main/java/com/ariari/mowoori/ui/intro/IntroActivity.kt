@@ -49,6 +49,7 @@ class IntroActivity : AppCompatActivity() {
     }
 
     private fun setObservers() {
+        // TODO: 로그인 액티비티 백스택에서 제거
         viewModel.isUserRegistered.observe(this, EventObserver {
             if (it) {
                 moveToMain()

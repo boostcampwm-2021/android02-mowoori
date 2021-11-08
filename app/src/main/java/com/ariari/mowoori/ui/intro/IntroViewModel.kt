@@ -11,6 +11,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,9 +23,9 @@ class IntroViewModel @Inject constructor(
     val isUserRegistered: LiveData<Event<Boolean>> = _isUserRegistered
 
     fun checkUserRegistered(userUid: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val isRegistered = introRepository.checkUserRegistered(userUid)
-            _isUserRegistered.value = Event(isRegistered)
+            _isUserRegistered.postValue(Event(isRegistered))
         }
     }
 }
