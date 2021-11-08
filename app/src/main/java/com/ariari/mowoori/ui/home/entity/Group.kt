@@ -9,4 +9,5 @@ data class GroupInfo(
     val groupName: String = "",
     val userList: List<String> = emptyList(),
     val missionList: List<String> = emptyList(),
+    var selected: Boolean = false,
 )

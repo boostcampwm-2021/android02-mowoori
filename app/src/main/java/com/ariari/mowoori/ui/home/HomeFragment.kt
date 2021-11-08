@@ -5,6 +5,7 @@ import android.animation.AnimatorInflater
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +21,7 @@ import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.FragmentHomeBinding
 import com.ariari.mowoori.ui.home.adapter.DrawerAdapter
 import com.ariari.mowoori.ui.home.adapter.DrawerAdapterDecoration
+import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.util.TimberUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
@@ -37,10 +39,17 @@ class HomeFragment : Fragment() {
 
     private val viewModel: HomeViewModel by viewModels()
 
+    private lateinit var adapter: DrawerAdapter
     private var snowJob: Job? = null
     private lateinit var snowFace: ImageView
     private lateinit var snowFaceDownAnim: Animator
     private lateinit var snowFaceUpAnim: Animator
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        // onAttach 콜백함수는 최초 한번만 실행된다.
+        setUserInfo()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,6 +64,9 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
+        setUserInfoObserver()
+        setCurrentGroupInfoObserver()
+        setGroupInfoListObserver()
         setDrawerOpenListener()
         setDrawerAdapter()
         setRecyclerViewDecoration()
@@ -62,6 +74,30 @@ class HomeFragment : Fragment() {
         setAnimation()
         setClickListener()
         setMenuListener()
+    }
+
+    private fun setUserInfo() {
+        // TODO: 유저아이디는 로컬에서 가져오기 (현재는 더미 데이터 사용)
+        viewModel.setUserInfo()
+    }
+
+    private fun setUserInfoObserver() {
+        viewModel.userInfo.observe(viewLifecycleOwner, EventObserver { userInfo ->
+            viewModel.setGroupInfoList(userInfo)
+        })
+    }
+
+    private fun setCurrentGroupInfoObserver() {
+        viewModel.currentGroupInfo.observe(viewLifecycleOwner, { groupInfo ->
+            binding.tbHome.title = groupInfo.groupName
+        })
+    }
+
+    private fun setGroupInfoListObserver() {
+        viewModel.groupInfoList.observe(viewLifecycleOwner, { groupInfoList ->
+            adapter.groups = groupInfoList
+            adapter.notifyDataSetChanged()
+        })
     }
 
 //    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -119,15 +155,12 @@ class HomeFragment : Fragment() {
     }
 
     private fun setDrawerAdapter() {
-        val adapter: DrawerAdapter by lazy {
-            DrawerAdapter(object : DrawerAdapter.OnItemClickListener {
-                override fun itemClick(position: Int) {
-                    // TODO: 그룹 이동
-                    // TODO: 그룹 아이템 배경 색상 변경
-                    binding.drawerHome.close()
-                }
-            })
-        }
+        adapter = DrawerAdapter(object : DrawerAdapter.OnItemClickListener {
+            override fun itemClick(position: Int) {
+                viewModel.setCurrentGroupInfo(position)
+                binding.drawerHome.close()
+            }
+        })
         binding.rvDrawer.adapter = adapter
     }
 
