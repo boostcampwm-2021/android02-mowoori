@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.MissionsRepository
 import com.ariari.mowoori.ui.missions.entity.Mission
+import com.ariari.mowoori.ui.missions.entity.MissionInfo
 import com.ariari.mowoori.util.Event
 import com.ariari.mowoori.util.getCurrentDate
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,6 +20,9 @@ class MissionsViewModel @Inject constructor(
 ) : ViewModel() {
     private val _plusBtnClick = MutableLiveData<Event<Boolean>>()
     val plusBtnClick: LiveData<Event<Boolean>> = _plusBtnClick
+
+    private val _itemClick = MutableLiveData<Event<MissionInfo>>()
+    val itemClick: LiveData<Event<MissionInfo>> = _itemClick
 
     private val _missionsType = MutableLiveData(Event(NOT_DONE_TYPE))
     val missionsType: LiveData<Event<Int>> = _missionsType
@@ -87,6 +91,11 @@ class MissionsViewModel @Inject constructor(
                 else -> throw IllegalStateException()
             }
         }
+    }
+
+    fun setItemClick(missionInfo: MissionInfo) {
+        Timber.d("item click")
+        _itemClick.postValue(Event(missionInfo))
     }
 
     companion object {
