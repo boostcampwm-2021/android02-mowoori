@@ -25,6 +25,7 @@ class MissionsAddViewModel @Inject constructor(
     private val _isPostMission = MutableLiveData<Event<Boolean>>()
     val isPostMission: LiveData<Event<Boolean>> = _isPostMission
 
+    // 테스트를 위한 객체
     var groupId: String = "testGroupId"
     val mission = Mission("mission74", MissionInfo("미완료 미션1", "user1", 30, 10, 211101, 211201))
 
@@ -39,18 +40,23 @@ class MissionsAddViewModel @Inject constructor(
     fun createNewMission() {
         Timber.d("createMission")
         viewModelScope.launch {
+            // 해당 group에 missionId 추가
             var missionIdList = missionsRepository.getMissionIdList(groupId)
             if (missionIdList.isEmpty()) missionIdList = mutableListOf()
             (missionIdList as MutableList).add(mission.missionId)
             missionsRepository.postMissionIdList(groupId, missionIdList)
 
+            // missions에 mission 추가
+            postMission()
 
+            // 화면 종료 Event 실행
+            _isPostMission.value = Event(true)
         }
     }
 
-    private suspend fun postMission(missionIdList: List<String>) {
+    private suspend fun postMission() {
         Timber.d("startPostMission")
-        missionsRepository.postMission(groupId, mission)
+        missionsRepository.postMission(mission)
         Timber.d("finishPostMission")
     }
 }

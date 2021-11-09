@@ -19,11 +19,20 @@ class MissionsAddFragment :
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = missionsAddViewModel
+        missionsAddViewModel.getGroupId()
+
         setPlusBtnClickObserver()
+        setBackEventObserver()
     }
 
     private fun setPlusBtnClickObserver() {
         missionsAddViewModel.backBtnClick.observe(viewLifecycleOwner, EventObserver {
+            this.findNavController().navigateUp()
+        })
+    }
+
+    private fun setBackEventObserver() {
+        missionsAddViewModel.isPostMission.observe(viewLifecycleOwner, EventObserver {
             this.findNavController().navigateUp()
         })
     }

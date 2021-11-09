@@ -43,9 +43,9 @@ class MissionsRepositoryImpl @Inject constructor(
         return missionList
     }
 
-    override suspend fun postMission(groupId: String, mission: Mission) {
-        firebaseReference.child("groups").child(groupId).child("missionList")
-            .setValue(mission.missionId).await()
+    override suspend fun postMission(mission: Mission) {
+        firebaseReference.child("missions").child(mission.missionId)
+            .setValue(mission.missionInfo).await()
     }
 
     override suspend fun postMissionIdList(groupId: String, missionIdList: List<String>) {

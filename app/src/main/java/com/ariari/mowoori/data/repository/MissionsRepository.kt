@@ -13,5 +13,5 @@ interface MissionsRepository {
 
     // mission 추가
     suspend fun postMissionIdList(groupId: String, missionIdList: List<String>)
-    suspend fun postMission(groupdId: String, mission: Mission)
+    suspend fun postMission(mission: Mission)
 }
