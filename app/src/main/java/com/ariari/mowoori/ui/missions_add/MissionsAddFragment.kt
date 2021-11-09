@@ -8,8 +8,9 @@ import com.ariari.mowoori.R
 import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentMissionsAddBinding
 import com.ariari.mowoori.util.EventObserver
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class MissionsAddFragment :
     BaseFragment<FragmentMissionsAddBinding>(R.layout.fragment_missions_add) {
     private val missionsAddViewModel: MissionsAddViewModel by viewModels()

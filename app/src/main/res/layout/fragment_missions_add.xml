@@ -133,6 +133,7 @@
             android:textSize="24sp"
             android:textStyle="bold"
             app:cornerRadius="30dp"
+            android:onClick="@{()->viewModel.createNewMission()}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:strokeColor="@color/sky_blue_2094FF"
