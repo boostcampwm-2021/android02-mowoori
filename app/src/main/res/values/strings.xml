@@ -55,6 +55,11 @@
     <string name="stamps_complete">오늘도 완료!</string>
     <string name="stamps_stamp">스탬프</string>
 
+    <!-- DialogFragment -->
+    <string name="dialog_yes">예</string>
+    <string name="dialog_no">아니오</string>
+    <string name="dialog_message">계속 진행하시겠습니까?</string>
+
     <!--notification-->
     <string name="item_notification_title"><font color="#000000">모우리</font>님이 <b>매일 잔디채우기</b> 미션에 <b>2</b>번째 스탬프를 찍었어요!!!!!!!!!!!!!!!!!!!!!</string>
     <!-- TODO: Remove or change this placeholder text -->
