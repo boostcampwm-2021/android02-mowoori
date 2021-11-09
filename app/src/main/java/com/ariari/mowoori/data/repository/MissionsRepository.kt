@@ -8,4 +8,10 @@ interface MissionsRepository {
 
     // missions에서 mission 전부 다 들고오기 -> 이후 자기가 속한 group꺼인지 확인, userId도 확인
     suspend fun getMissions(userId: String): List<Mission>
+
+    // get group
+
+    // mission 추가
+    suspend fun postMissionIdList(groupId: String, missionIdList: List<String>)
+    suspend fun postMission(mission: Mission)
 }
