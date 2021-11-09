@@ -2,8 +2,9 @@ package com.ariari.mowoori.ui.stamp
 
 import android.os.Bundle
 import android.view.View
-import android.view.ViewTreeObserver
+import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import com.ariari.mowoori.R
@@ -22,9 +23,12 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val missionInfo = safeArgs.missionInfo
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
         setAdapter()
         setSpanCount()
         setSpanCountObserver()
+        setBackBtnObserver()
     }
 
     private fun setAdapter() {
@@ -42,7 +46,7 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
     private fun setSpanCount() {
         // 뷰 사이즈 측정 시점을 관찰하는 옵저버
         binding.rvStamps.viewTreeObserver.addOnGlobalLayoutListener(object :
-            ViewTreeObserver.OnGlobalLayoutListener {
+            OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 // 뷰의 측정이 자주 일어날 경우 중첩된 리스너 등록을 방지하기 위해 콜백 함수가 호출되면 해당 리스너를 제거한다.
                 binding.rvStamps.viewTreeObserver.removeOnGlobalLayoutListener(this)
@@ -52,6 +56,12 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
                     resources.getDimension(R.dimen.stamp_width) + resources.getDimension(R.dimen.stamp_padding)
                 viewModel.setSpanCount(recyclerViewWidth / itemWidth)
             }
+        })
+    }
+
+    private fun setBackBtnObserver() {
+        viewModel.backBtnClick.observe(viewLifecycleOwner, EventObserver {
+            this.findNavController().navigateUp()
         })
     }
 }

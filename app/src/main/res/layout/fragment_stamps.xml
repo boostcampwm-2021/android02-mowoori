@@ -6,6 +6,10 @@
     <data>
 
         <import type="com.ariari.mowoori.ui.custom.TitleViewMode" />
+
+        <variable
+            name="viewModel"
+            type="com.ariari.mowoori.ui.stamp.StampsViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -18,6 +22,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:onBackClick="@{viewModel::setBackBtnClick}"
             app:layout_constraintTop_toTopOf="parent"
             app:text="@string/stamps_mission"
             app:titleViewMode="@{TitleViewMode.TITLE_VIEW_BACK_BUTTON}" />
