@@ -1,33 +1,21 @@
 package com.ariari.mowoori.ui.missions
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.ariari.mowoori.R
+import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentMissionsBinding
 import com.ariari.mowoori.ui.missions.adapter.MissionsAdapter
 import com.ariari.mowoori.util.EventObserver
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MissionsFragment : Fragment() {
-    private var _binding: FragmentMissionsBinding? = null
-    private val binding get() = _binding ?: error(getString(R.string.binding_error))
+class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment_missions) {
     private val missionsViewModel: MissionsViewModel by viewModels()
-    private val missionsAdapter = MissionsAdapter()
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_missions, container, false)
-        return binding.root
+    private val missionsAdapter: MissionsAdapter by lazy {
+        MissionsAdapter(missionsViewModel)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -38,11 +26,7 @@ class MissionsFragment : Fragment() {
         setPlusBtnClickObserver()
         setMissionsTypeObserver()
         setMissionsListObserver()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+        setItemClickObserver()
     }
 
     private fun setMissionsRvAdapter() {
@@ -65,5 +49,15 @@ class MissionsFragment : Fragment() {
         missionsViewModel.missionsList.observe(viewLifecycleOwner) { missionsList ->
             missionsAdapter.submitList(missionsList)
         }
+    }
+
+    private fun setItemClickObserver() {
+        missionsViewModel.itemClick.observe(viewLifecycleOwner, EventObserver {
+            findNavController().navigate(
+                MissionsFragmentDirections.actionMissionsFragmentToStampsFragment(
+                    it
+                )
+            )
+        })
     }
 }
