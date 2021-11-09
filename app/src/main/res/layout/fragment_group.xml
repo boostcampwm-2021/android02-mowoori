@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
+        <variable
+            name="viewModel"
+            type="com.ariari.mowoori.ui.group.GroupViewModel" />
     </data>
 
     <androidx.constraintlayout.motion.widget.MotionLayout
@@ -30,18 +34,19 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:hint="@string/group_name_hint"
             android:importantForAutofill="no"
+            android:lines="1"
             android:inputType="text"
-            android:text="@string/group_name"
+            android:text="@={viewModel.groupName}"
             android:textAlignment="center"
             android:textColor="@color/black"
-            android:textSize="36sp"
+            android:textSize="32sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@id/btn_group_complete"
             app:layout_constraintEnd_toEndOf="@id/tv_group_title"
             app:layout_constraintStart_toStartOf="@id/tv_group_title"
-            app:layout_constraintTop_toBottomOf="@id/tv_group_title" />
+            app:layout_constraintTop_toBottomOf="@id/tv_group_title"
+            tools:ignore="LabelFor" />
 
         <TextView
             android:id="@+id/tv_group_invalid"
