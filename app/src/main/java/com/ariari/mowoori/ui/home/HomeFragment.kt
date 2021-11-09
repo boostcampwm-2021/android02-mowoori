@@ -14,6 +14,7 @@ import android.view.animation.AccelerateInterpolator
 import android.widget.ImageView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -45,9 +46,8 @@ class HomeFragment : Fragment() {
     private lateinit var snowFaceDownAnim: Animator
     private lateinit var snowFaceUpAnim: Animator
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        // onAttach 콜백함수는 최초 한번만 실행된다.
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         setUserInfo()
     }
 
@@ -77,7 +77,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun setUserInfo() {
-        // TODO: 유저아이디는 로컬에서 가져오기 (현재는 더미 데이터 사용)
         viewModel.setUserInfo()
     }
 
