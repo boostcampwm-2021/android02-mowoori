@@ -64,7 +64,7 @@
     <string name="missions_add_how_mission_title">얼마동안 할건가요?</string>
     <string name="missions_add_when">2021.10.26 ~ 2021.11.30</string>
     <string name="missions_add_count_front">미션을</string>
-    <string name="missions_add_count_middle">10번</string>
-    <string name="missions_add_count_back">수행할거에요.</string>
+    <string name="missions_add_count_middle">10</string>
+    <string name="missions_add_count_back">번 수행할거에요.</string>
 
 </resources>

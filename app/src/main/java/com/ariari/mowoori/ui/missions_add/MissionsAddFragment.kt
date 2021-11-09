@@ -7,6 +7,8 @@ import androidx.navigation.fragment.findNavController
 import com.ariari.mowoori.R
 import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentMissionsAddBinding
+import com.ariari.mowoori.ui.missions.entity.Mission
+import com.ariari.mowoori.ui.missions.entity.MissionInfo
 import com.ariari.mowoori.util.EventObserver
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -36,4 +38,15 @@ class MissionsAddFragment :
             this.findNavController().navigateUp()
         })
     }
+
+    val mission = Mission("mission74", MissionInfo("미완료 미션1", "user1", 30, 10, 211101, 211201))
+
+//    private fun setIsCreateMissionObserver() {
+//        missionsAddViewModel.isCreateMission.observe(viewLifecycleOwner, EventObserver {
+//            val missionInfo = MissionInfo(,)
+//            with(binding) {
+//                val missionInfo = MissionInfo(etMissionsAddWhat.text.toString(), )
+//            }
+//        })
+//    }
 }
