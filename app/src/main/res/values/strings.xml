@@ -11,7 +11,7 @@
 
     <!-- Register -->
     <string name="register_please_enter_nickname">닉네임을\n입력해주세요</string>
-    <string name="register_nickname_hint">(1자 이상 10자 이하)</string>
+    <string name="register_nickname_hint">(1자 이상 11자 이하)</string>
     <string name="register_nickname_error_msg">닉네임을 확인해주세요</string>
     <string name="register_fail_msg">회원가입에 실패했습니다.</string>
     <string name="desc_profile_image">프로필 이미지</string>
