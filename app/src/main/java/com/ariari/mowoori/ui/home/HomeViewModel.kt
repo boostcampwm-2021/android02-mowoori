@@ -62,8 +62,7 @@ class HomeViewModel @Inject constructor(
         val tempGroupList = mutableListOf<GroupInfo>()
         userInfo.groupList.forEachIndexed { index, groupId ->
             databaseReference.child("groups").child(groupId).get().addOnSuccessListener {
-                val groupInfoJson = it.value ?: return@addOnSuccessListener
-                val groupInfo = gson.fromJson(groupInfoJson.toString(), GroupInfo::class.java)
+                val groupInfo = it.getValue(GroupInfo::class.java) ?: return@addOnSuccessListener
                 if (index == 0) {
                     groupInfo.selected = true
                     _currentGroupInfo.value = groupInfo
