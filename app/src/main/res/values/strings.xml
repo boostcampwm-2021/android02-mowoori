@@ -61,6 +61,8 @@
     <string name="dialog_yes">예</string>
     <string name="dialog_no">아니오</string>
     <string name="dialog_message">계속 진행하시겠습니까?</string>
+    <string name="dialog_cancel">취소</string>
+    <string name="dialog_save">저장</string>
 
     <!--notification-->
     <string name="item_notification_title"><font color="#000000">모우리</font>님이 <b>매일 잔디채우기</b> 미션에 <b>2</b>번째 스탬프를 찍었어요!!!!!!!!!!!!!!!!!!!!!</string>
