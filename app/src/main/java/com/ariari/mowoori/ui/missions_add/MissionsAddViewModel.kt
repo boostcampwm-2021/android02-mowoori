@@ -10,7 +10,6 @@ import com.ariari.mowoori.ui.missions.entity.MissionInfo
 import com.ariari.mowoori.util.Event
 import com.ariari.mowoori.util.TimberUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -28,6 +27,12 @@ class MissionsAddViewModel @Inject constructor(
     private val _isCreateMission = MutableLiveData<Event<Boolean>>()
     val isCreateMission: LiveData<Event<Boolean>> = _isCreateMission
 
+    private val _numberCountClick = MutableLiveData<Event<Unit>>()
+    val numberCountClick: LiveData<Event<Unit>> = _numberCountClick
+
+    private val _missionCount = MutableLiveData<Int>()
+    val missionCount: LiveData<Int> = _missionCount
+
     // 테스트를 위한 객체
     var groupId: String = "testGroupId"
     val mission = Mission("mission74", MissionInfo("미완료 미션1", "user1", 30, 10, 211101, 211201))
@@ -43,8 +48,6 @@ class MissionsAddViewModel @Inject constructor(
     fun postMission() {
         Timber.d("createMission")
         viewModelScope.launch {
-
-
             // 해당 group에 missionId 추가
             var missionIdList = missionsRepository.getMissionIdList(groupId)
             if (missionIdList.isEmpty()) missionIdList = mutableListOf()
@@ -61,5 +64,14 @@ class MissionsAddViewModel @Inject constructor(
 
     private suspend fun createMission() {
 
+    }
+
+    fun showNumberPicker() {
+        _numberCountClick.postValue(Event(Unit))
+    }
+
+    fun updateMissionCount(count: Int) {
+        TimberUtil.timber("update", _missionCount.value.toString())
+        _missionCount.value = count
     }
 }
