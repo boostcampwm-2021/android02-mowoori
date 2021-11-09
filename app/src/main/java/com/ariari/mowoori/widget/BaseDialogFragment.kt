@@ -25,6 +25,19 @@ abstract class BaseDialogFragment<T : ViewDataBinding>(private val layoutId: Int
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setDrawable()
+    }
+
+    private fun setDrawable() {
+        requireNotNull(dialog).apply {
+            requireNotNull(window).apply {
+                setBackgroundDrawableResource(R.drawable.border_white_fill_16)
+            }
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
