@@ -1,0 +1,16 @@
+package com.ariari.mowoori.ui.stamp
+
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.ariari.mowoori.util.Event
+
+class StampsViewModel: ViewModel() {
+
+    private val _spanCount = MutableLiveData<Event<Int>>()
+    val spanCount: LiveData<Event<Int>> get() = _spanCount
+
+    fun setSpanCount(result: Float) {
+        _spanCount.value = Event(result.toInt())
+    }
+}

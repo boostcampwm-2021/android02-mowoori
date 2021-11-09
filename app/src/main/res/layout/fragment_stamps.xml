@@ -27,14 +27,11 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_margin="32dp"
-            android:background="@drawable/border_black_line"
             android:padding="10dp"
-            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:layout_constraintBottom_toTopOf="@id/btn_stamps_complete"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/title_view_stamps"
-            app:spanCount="4"
             tools:listitem="@layout/item_stamps" />
 
         <androidx.appcompat.widget.AppCompatButton
