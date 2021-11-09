@@ -49,6 +49,12 @@
     <string name="missions_done">완료</string>
     <string name="missions_fail">실패</string>
 
+    <!-- StampFragment -->
+    <string name="stamps_mission">매일 잔디 채우기</string>
+    <string name="stamps_number">1</string>
+    <string name="stamps_complete">오늘도 완료!</string>
+    <string name="stamps_stamp">스탬프</string>
+
     <!--notification-->
     <string name="item_notification_title"><font color="#000000">모우리</font>님이 <b>매일 잔디채우기</b> 미션에 <b>2</b>번째 스탬프를 찍었어요!!!!!!!!!!!!!!!!!!!!!</string>
     <!-- TODO: Remove or change this placeholder text -->
