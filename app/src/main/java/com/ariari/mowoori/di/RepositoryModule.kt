@@ -1,5 +1,7 @@
 package com.ariari.mowoori.di
 
+import com.ariari.mowoori.data.repository.GroupRepository
+import com.ariari.mowoori.data.repository.GroupRepositoryImpl
 import com.ariari.mowoori.data.repository.HomeRepository
 import com.ariari.mowoori.data.repository.HomeRepositoryImpl
 import com.ariari.mowoori.data.repository.IntroRepository
@@ -34,7 +36,6 @@ object RepositoryModule {
         firebaseAuth: FirebaseAuth
     ): MissionsRepository =
         MissionsRepositoryImpl(databaseReference, firebaseAuth)
-        IntroRepositoryImpl(databaseReference, storageReference,firebaseAuth)
 
     @Provides
     @Singleton
@@ -42,4 +43,12 @@ object RepositoryModule {
         databaseReference: DatabaseReference,
         firebaseAuth: FirebaseAuth
     ): HomeRepository = HomeRepositoryImpl(databaseReference,firebaseAuth)
+
+    @Provides
+    @Singleton
+    fun providesGroupRepository(
+        databaseReference: DatabaseReference,
+        firebaseAuth: FirebaseAuth
+    ): GroupRepository = GroupRepositoryImpl(databaseReference,firebaseAuth)
+
 }
