@@ -26,11 +26,11 @@ class StampsViewModel @Inject constructor(private val stampsRepository: StampsRe
     private val _missionName = MutableLiveData<Event<String>>()
     val missionName: LiveData<Event<String>> get() = _missionName
 
-    private val _stampIdList = MutableLiveData<List<String>>()
-    val stampIdList: LiveData<List<String>> get() = _stampIdList
-
     private val _stampList = MutableLiveData<MutableList<Stamp>>()
     val stampList: LiveData<MutableList<Stamp>> get() = _stampList
+
+    private val _selectedStampInfo = MutableLiveData<Event<StampInfo>>()
+    val selectedStampInfo: LiveData<Event<StampInfo>> get() = _selectedStampInfo
 
     fun setSpanCount(result: Float) {
         _spanCount.value = Event(result.toInt())
@@ -53,22 +53,27 @@ class StampsViewModel @Inject constructor(private val stampsRepository: StampsRe
     }
 
     fun setStampList(stampIdList: List<String>) {
-        stampIdList.forEachIndexed { index, stampId ->
-            viewModelScope.launch(Dispatchers.IO) {
+        val currentStampList = _stampList.value ?: return
+        // postValue 이슈 방지를 위해 for 문 밖에서 스코프 설정
+        viewModelScope.launch(Dispatchers.IO) {
+            val tempStampList = mutableListOf<Stamp>()
+            stampIdList.forEach { stampId ->
                 stampsRepository.getStampInfo(stampId)
                     .onSuccess { stampInfo ->
-                        putStamp(stampId, index, stampInfo)
+                        tempStampList.add(Stamp(stampId, stampInfo))
                     }
                     .onFailure {
-                        println("Stamp - ${it.message}")
+                        println("${it.message}")
                     }
             }
+            // 리스트의 깊은 복사를 위한 addAll 처리
+            tempStampList.addAll(currentStampList.subList(stampIdList.size, currentStampList.size))
+            _stampList.postValue(tempStampList)
         }
     }
 
-    private fun putStamp(stampId: String, index: Int, stampInfo: StampInfo) {
-        val tempStampList = _stampList.value ?: return
-        tempStampList[index] = Stamp(stampId, stampInfo)
-        _stampList.postValue(tempStampList)
+    fun setSelectedStampInfo(position: Int, currentStamp: Int) {
+        if (position >= currentStamp) return
+        _selectedStampInfo.value = Event(_stampList.value?.get(position)?.stampInfo!!)
     }
 }

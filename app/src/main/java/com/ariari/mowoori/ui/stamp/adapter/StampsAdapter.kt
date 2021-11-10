@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.ItemStampsBinding
 import com.ariari.mowoori.ui.stamp.entity.Stamp
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
@@ -49,6 +50,9 @@ class StampsAdapter(private val listener: OnItemClickListener) :
 
         fun bind(stampInfo: StampInfo) {
             binding.tvItemStamps.text = (adapterPosition + 1).toString()
+            if (stampInfo.pictureUrl != "") {
+                binding.ivItemStamps.setImageResource(R.drawable.ic_launcher_background)
+            }
         }
     }
 }

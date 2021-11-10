@@ -1,7 +1,9 @@
 package com.ariari.mowoori.ui.stamp
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -32,6 +34,7 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         setAllEmptyStamps()
         setStampList()
         setStampListObserver()
+        setSelectedStampInfoObserver()
         // TODO: 사용자 정보 가져와서 본인의 미션이면 "오늘도 완료!" 버튼 visible
         setAdapter()
         setSpanCount()
@@ -61,12 +64,21 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         })
     }
 
+    private fun setSelectedStampInfoObserver() {
+        viewModel.selectedStampInfo.observe(viewLifecycleOwner, EventObserver { stampInfo ->
+            this.findNavController()
+                .navigate(StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
+                    stampInfo))
+        })
+    }
+
     private fun setAdapter() {
         adapter = StampsAdapter(object : StampsAdapter.OnItemClickListener {
             override fun itemClick(position: Int) {
                 // TODO: 포지션이 스탬프 리스트 사이즈보다 같거나 크면 무시
                 // TODO: 현재 선택된 스탬프 라이브데이터 변경 -> 옵저빙해서 네비게이션 이동
                 println("Stamp - ${adapter.currentList[position].stampInfo}")
+                viewModel.setSelectedStampInfo(position, missionInfo.curStamp)
             }
         })
         binding.rvStamps.adapter = adapter

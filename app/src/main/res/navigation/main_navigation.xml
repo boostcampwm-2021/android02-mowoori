@@ -76,6 +76,18 @@
         <argument
             android:name="missionInfo"
             app:argType="com.ariari.mowoori.ui.missions.entity.MissionInfo" />
+        <action
+            android:id="@+id/action_stampsFragment_to_stampDetailFragment"
+            app:destination="@id/stampDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/stampDetailFragment"
+        android:name="com.ariari.mowoori.ui.stamp_detail.StampDetailFragment"
+        android:label="StampDetailFragment"
+        tools:layout="@layout/fragment_stamp_detail">
+        <argument
+            android:name="stampInfo"
+            app:argType="com.ariari.mowoori.ui.stamp.entity.StampInfo" />
     </fragment>
 
 </navigation>
