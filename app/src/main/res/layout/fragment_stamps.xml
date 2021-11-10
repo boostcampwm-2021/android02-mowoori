@@ -22,10 +22,10 @@
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:onBackClick="@{viewModel::setBackBtnClick}"
             app:layout_constraintTop_toTopOf="parent"
-            app:text="@string/stamps_mission"
-            app:titleViewMode="@{TitleViewMode.TITLE_VIEW_BACK_BUTTON}" />
+            app:onBackClick="@{viewModel::setBackBtnClick}"
+            app:titleViewMode="@{TitleViewMode.TITLE_VIEW_BACK_BUTTON}"
+            app:titleViewText="@{viewModel.missionName.peekContent()}" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_stamps"

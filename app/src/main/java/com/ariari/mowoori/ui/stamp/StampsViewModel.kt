@@ -13,11 +13,18 @@ class StampsViewModel: ViewModel() {
     private val _backBtnClick = MutableLiveData<Event<Boolean>>()
     val backBtnClick: LiveData<Event<Boolean>> get() = _backBtnClick
 
+    private val _missionName = MutableLiveData<Event<String>>()
+    val missionName: LiveData<Event<String>> get() = _missionName
+
     fun setSpanCount(result: Float) {
         _spanCount.value = Event(result.toInt())
     }
 
     fun setBackBtnClick() {
         _backBtnClick.value = Event(true)
+    }
+
+    fun setMissionName(title: String) {
+        _missionName.value = Event(title)
     }
 }

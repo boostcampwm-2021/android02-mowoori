@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.ariari.mowoori.R
 import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentStampsBinding
+import com.ariari.mowoori.ui.missions.entity.MissionInfo
 import com.ariari.mowoori.ui.stamp.adapter.StampsAdapter
 import com.ariari.mowoori.util.EventObserver
 
@@ -19,10 +20,16 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
     private val safeArgs: StampsFragmentArgs by navArgs()
     private lateinit var adapter: StampsAdapter
     private val viewModel: StampsViewModel by viewModels()
+    private lateinit var missionInfo: MissionInfo
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val missionInfo = safeArgs.missionInfo
+        setMissionInfo()
+        setMissionName()
+        // TODO: 총 스탬프 개수만큼 리사이클러뷰에 적용
+        // TODO: 사용자 정보 가져와서 본인의 미션이면 "오늘도 완료!" 버튼 visible
+        // TODO: 스탬프 리스트를 라이브데이터에 저장
+
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
         setAdapter()
@@ -31,8 +38,22 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         setBackBtnObserver()
     }
 
+    private fun setMissionInfo() {
+        missionInfo = safeArgs.missionInfo
+    }
+
+    private fun setMissionName() {
+        viewModel.setMissionName(missionInfo.missionName)
+    }
+
     private fun setAdapter() {
-        adapter = StampsAdapter()
+        adapter = StampsAdapter(object: StampsAdapter.OnItemClickListener {
+            override fun itemClick(position: Int) {
+                // TODO: 포지션이 스탬프 리스트 사이즈보다 같거나 크면 무시
+                // TODO: 현재 선택된 스탬프 라이브데이터 변경 -> 옵저빙해서 네비게이션 이동
+                println("Stamp - $position")
+            }
+        })
         binding.rvStamps.adapter = adapter
     }
 
