@@ -8,7 +8,7 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="320dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="30dp">
 
@@ -44,7 +44,7 @@
             tools:text="WOoRi20201WOoRi20201WOoRi20201" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_confirm_yes"
+            android:id="@+id/btn_confirm_no"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -54,13 +54,13 @@
             android:textColor="@color/sky_blue_2094FF"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@id/btn_confirm_no"
+            app:layout_constraintEnd_toStartOf="@id/btn_confirm_yes"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_invite_code" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_confirm_no"
+            android:id="@+id/btn_confirm_yes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
@@ -70,7 +70,7 @@
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/btn_confirm_yes"
-            app:layout_constraintTop_toTopOf="@id/btn_confirm_yes" />
+            app:layout_constraintStart_toEndOf="@id/btn_confirm_no"
+            app:layout_constraintTop_toTopOf="@id/btn_confirm_no" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

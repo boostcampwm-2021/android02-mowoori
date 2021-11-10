@@ -1,7 +1,12 @@
 package com.ariari.mowoori.widget
 
+import android.content.Context
+import android.graphics.Point
+import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.DialogInviteBinding
@@ -37,8 +42,32 @@ class InviteDialogFragment(
     }
 
     private fun setCopyListener() {
-        binding.btnConfirmNo.setOnClickListener {
+        binding.tvInviteCode.setOnClickListener {
             listener.onCopyClick(this, inviteCode)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val size = getDeviceSize(requireContext())
+
+        val params: ViewGroup.LayoutParams? = dialog?.window?.attributes
+        val deviceWidth = size.first
+        params?.width = (deviceWidth * 0.9).toInt()
+        dialog?.window?.attributes = params as WindowManager.LayoutParams
+    }
+
+    private fun getDeviceSize(context: Context): Pair<Int, Int> {
+        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+
+        return if (Build.VERSION.SDK_INT < 30) {
+            val display = windowManager.defaultDisplay
+            val size = Point()
+            display.getSize(size)
+            Pair(size.x, size.y)
+        } else {
+            val rect = windowManager.currentWindowMetrics.bounds
+            Pair(rect.width(), rect.height())
         }
     }
 
