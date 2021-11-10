@@ -75,7 +75,20 @@ class MissionsAddFragment :
 
     private fun setCountEventObserver() {
         missionsAddViewModel.numberCountClick.observe(viewLifecycleOwner, EventObserver {
-            NumberPickerDialogFragment(missionsAddViewModel).show(
+            NumberPickerDialogFragment(
+                missionsAddViewModel.missionCount.value!!,
+                object : BaseDialogFragment.NoticeDialogListener {
+                    override fun onDialogPositiveClick(dialog: DialogFragment) {
+                        val np =
+                            (dialog as NumberPickerDialogFragment).binding.numberPickerMissionCount
+                        missionsAddViewModel.updateMissionCount(np.value)
+                        dialog.dismiss()
+                    }
+
+                    override fun onDialogNegativeClick(dialog: DialogFragment) {
+                        dialog.dismiss()
+                    }
+                }).show(
                 requireActivity().supportFragmentManager,
                 "NumberPickerFragment"
             )
@@ -124,18 +137,5 @@ class MissionsAddFragment :
             )
         }
     }
-
-
-//    private fun setLayout() {
-//        requireNotNull(dialog).apply {
-//            requireNotNull(window).apply {
-//                setLayout(
-//                    (resources.displayMetrics.widthPixels * 0.8).toInt(),
-//                    ViewGroup.LayoutParams.WRAP_CONTENT
-//                )
-//                setBackgroundDrawableResource(R.drawable.border_white_fill_10)
-//            }
-//        }
-//    }
 }
 
