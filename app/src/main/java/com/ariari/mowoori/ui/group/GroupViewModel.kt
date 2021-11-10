@@ -41,18 +41,19 @@ class GroupViewModel @Inject constructor(
             if (!exist) {
                 _inValidEvent.postValue(Event(Unit))
             } else {
-                val user = groupRepository.getUser().getOrNull() ?: run {
-                    _addGroupCompleteEvent.postValue(Event(""))
-                    return@launch
-                }
-                groupRepository.addUserToGroup(name, user).onSuccess { newGroupId ->
-                    _addGroupCompleteEvent.postValue(Event(newGroupId))
+                groupRepository.getUser().onSuccess {
+                    groupRepository.addUserToGroup(name, it).onSuccess { newGroupId ->
+                        _addGroupCompleteEvent.postValue(Event(newGroupId))
+                    }.onFailure {
+                        _addGroupCompleteEvent.postValue(Event(""))
+                    }
                 }.onFailure {
                     _addGroupCompleteEvent.postValue(Event(""))
                 }
             }
         }
     }
+
 
     fun addNewGroup() {
         viewModelScope.launch(Dispatchers.IO) {

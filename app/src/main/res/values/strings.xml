@@ -3,6 +3,7 @@
     <string name="binding_error">Binding not initialized to reference the view.</string>
     <string name="nothing">아무것도 없어요</string>
     <string name="desc_app_logo">앱 로고</string>
+    <string name="cancel">취소</string>
 
     <string name="bottom_nav_home">Home</string>
     <string name="bottom_nav_missions">Missions</string>
@@ -72,5 +73,11 @@
     <string name="missions_add_count_front">미션을</string>
     <string name="missions_add_count_middle">10</string>
     <string name="missions_add_count_back">번 수행할거에요.</string>
+
+    <!--members-->
+    <string name="members_title">\'우리\'들</string>
+    <string name="members_share">공유하기</string>
+    <string name="members_invite_code_title">초대코드</string>
+    <string name="members_invite_code_copy_complete">초대코드가 클립보드에 복사되었습니다.</string>
 
 </resources>
