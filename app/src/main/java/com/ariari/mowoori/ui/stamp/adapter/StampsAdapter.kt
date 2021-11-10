@@ -2,6 +2,7 @@ package com.ariari.mowoori.ui.stamp.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isInvisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -49,8 +50,10 @@ class StampsAdapter(private val listener: OnItemClickListener) :
         }
 
         fun bind(stampInfo: StampInfo) {
+            binding.tvItemStampsIndex.text = (adapterPosition + 1).toString()
             if (stampInfo.pictureUrl != "") {
                 binding.ivItemStamps.setImageResource(R.drawable.ic_launcher_background)
+                binding.tvItemStampsIndex.isInvisible = true
             }
         }
     }

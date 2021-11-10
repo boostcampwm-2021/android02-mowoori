@@ -56,7 +56,6 @@ class StampsViewModel @Inject constructor(private val stampsRepository: StampsRe
     }
 
     fun setStampList(stampIdList: List<String>) {
-        val currentStampList = _stampList.value ?: return
         // postValue 이슈 방지를 위해 for 문 밖에서 스코프 설정
         viewModelScope.launch(Dispatchers.IO) {
             val tempStampList = mutableListOf<Stamp>()
@@ -69,10 +68,21 @@ class StampsViewModel @Inject constructor(private val stampsRepository: StampsRe
                         println("${it.message}")
                     }
             }
-            // 리스트의 깊은 복사를 위한 addAll 처리
-            tempStampList.addAll(currentStampList.subList(stampIdList.size, currentStampList.size))
             _stampList.postValue(tempStampList)
         }
+    }
+
+    fun fillEmptyStamps(count: Int) {
+        val currentStampList = _stampList.value ?: return
+        if (count == 0) return
+
+        val tempEmptyStampList = mutableListOf<Stamp>()
+        // 리스트의 깊은 복사를 위한 addAll 처리
+        tempEmptyStampList.addAll(currentStampList)
+        repeat(count) {
+            tempEmptyStampList.add(Stamp(stampInfo = StampInfo()))
+        }
+        _stampList.value = tempEmptyStampList
     }
 
     fun setSelectedStampInfo(position: Int, currentStamp: Int) {

@@ -31,7 +31,6 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         binding.viewModel = viewModel
         setMissionInfo()
         setMissionName()
-        setAllEmptyStamps()
         setStampList()
         setAdapter()
         setSpanCount()
@@ -55,10 +54,6 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         viewModel.setMissionName(missionInfo.missionName)
     }
 
-    private fun setAllEmptyStamps() {
-        viewModel.setAllEmptyStamps(missionInfo.totalStamp)
-    }
-
     private fun setStampList() {
         viewModel.setStampList(missionInfo.stampList)
     }
@@ -66,6 +61,7 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
     private fun setStampListObserver() {
         viewModel.stampList.observe(viewLifecycleOwner, { stampList ->
             adapter.submitList(stampList)
+            viewModel.fillEmptyStamps(missionInfo.totalStamp - stampList.size)
         })
     }
 
@@ -95,8 +91,9 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
 
     private fun setCompleteClick() {
         binding.btnStampsComplete.setOnClickListener {
-            it.findNavController().navigate(StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
-                StampInfo(), missionInfo.missionName))
+            it.findNavController()
+                .navigate(StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
+                    StampInfo(), missionInfo.missionName))
         }
     }
 
