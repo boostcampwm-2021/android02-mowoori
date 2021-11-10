@@ -49,7 +49,6 @@ class StampsAdapter(private val listener: OnItemClickListener) :
         }
 
         fun bind(stampInfo: StampInfo) {
-            binding.tvItemStamps.text = (adapterPosition + 1).toString()
             if (stampInfo.pictureUrl != "") {
                 binding.ivItemStamps.setImageResource(R.drawable.ic_launcher_background)
             }

@@ -16,15 +16,17 @@
             android:layout_width="@dimen/stamp_width"
             android:layout_height="@dimen/stamp_height"
             android:background="@drawable/border_sky_blue_line_oval"
-            android:contentDescription="@string/stamps_stamp"
+            android:contentDescription="@string/desc_item_stamps_stamp"
             android:padding="@dimen/stamp_padding"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/tv_item_stamps"
+        <ImageView
+            android:contentDescription="@string/desc_item_stamps_icon"
+            android:src="@drawable/ic_snow"
+            android:id="@+id/iv_item_stamps_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/stamps_number"

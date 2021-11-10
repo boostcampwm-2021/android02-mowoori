@@ -32,6 +32,9 @@ class StampsViewModel @Inject constructor(private val stampsRepository: StampsRe
     private val _selectedStampInfo = MutableLiveData<Event<StampInfo>>()
     val selectedStampInfo: LiveData<Event<StampInfo>> get() = _selectedStampInfo
 
+    private val _isMyMission = MutableLiveData<Event<Boolean>>()
+    val isMyMission: LiveData<Event<Boolean>> get() = _isMyMission
+
     fun setSpanCount(result: Float) {
         _spanCount.value = Event(result.toInt())
     }
@@ -75,5 +78,15 @@ class StampsViewModel @Inject constructor(private val stampsRepository: StampsRe
     fun setSelectedStampInfo(position: Int, currentStamp: Int) {
         if (position >= currentStamp) return
         _selectedStampInfo.value = Event(_stampList.value?.get(position)?.stampInfo!!)
+    }
+
+    fun setIsMyMission(userId: String) {
+        stampsRepository.getUserId()
+            .onSuccess { uid ->
+                _isMyMission.value = Event(uid == userId)
+            }
+            .onFailure {
+                println("${it.message}")
+            }
     }
 }

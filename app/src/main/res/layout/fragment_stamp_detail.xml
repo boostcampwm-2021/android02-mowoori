@@ -22,8 +22,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:onBackClick="@{viewModel::setCloseBtnClick}"
-            app:titleViewMode="@{TitleViewMode.TITLE_VIEW_BACK_BUTTON}" />
+            app:onCloseClick="@{viewModel::setCloseBtnClick}"
+            app:titleViewMode="@{TitleViewMode.TITLE_VIEW_CLOSE_BUTTON}" />
 
         <TextView
             android:id="@+id/tv_stamp_detail"

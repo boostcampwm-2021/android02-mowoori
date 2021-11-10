@@ -88,6 +88,9 @@
         <argument
             android:name="stampInfo"
             app:argType="com.ariari.mowoori.ui.stamp.entity.StampInfo" />
+        <argument
+            android:name="missionName"
+            app:argType="string" />
     </fragment>
 
 </navigation>

@@ -16,4 +16,9 @@ class StampsRepositoryImpl @Inject constructor(
         snapshot.getValue(StampInfo::class.java)
             ?: throw NullPointerException("getStampInfo is null")
     }
+
+    override fun getUserId(): Result<String> = kotlin.runCatching {
+        val user = firebaseAuth.currentUser ?: throw throw NullPointerException("getUserId is null")
+        user.uid
+    }
 }

@@ -1,11 +1,10 @@
 package com.ariari.mowoori.ui.stamp
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import androidx.fragment.app.viewModels
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
@@ -14,6 +13,7 @@ import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentStampsBinding
 import com.ariari.mowoori.ui.missions.entity.MissionInfo
 import com.ariari.mowoori.ui.stamp.adapter.StampsAdapter
+import com.ariari.mowoori.ui.stamp.entity.StampInfo
 import com.ariari.mowoori.util.EventObserver
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -33,13 +33,18 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         setMissionName()
         setAllEmptyStamps()
         setStampList()
-        setStampListObserver()
-        setSelectedStampInfoObserver()
-        // TODO: 사용자 정보 가져와서 본인의 미션이면 "오늘도 완료!" 버튼 visible
         setAdapter()
         setSpanCount()
-        setSpanCountObserver()
+        setCompleteBtnVisible()
+        setCompleteClick()
+        setObserver()
+    }
+
+    private fun setObserver() {
         setBackBtnObserver()
+        setSpanCountObserver()
+        setStampListObserver()
+        setSelectedStampInfoObserver()
     }
 
     private fun setMissionInfo() {
@@ -68,7 +73,7 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         viewModel.selectedStampInfo.observe(viewLifecycleOwner, EventObserver { stampInfo ->
             this.findNavController()
                 .navigate(StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
-                    stampInfo))
+                    stampInfo, missionInfo.missionName))
         })
     }
 
@@ -82,6 +87,17 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
             }
         })
         binding.rvStamps.adapter = adapter
+    }
+
+    private fun setCompleteBtnVisible() {
+        viewModel.setIsMyMission(missionInfo.userId)
+    }
+
+    private fun setCompleteClick() {
+        binding.btnStampsComplete.setOnClickListener {
+            it.findNavController().navigate(StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
+                StampInfo(), missionInfo.missionName))
+        }
     }
 
     private fun setSpanCountObserver() {

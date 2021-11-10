@@ -50,6 +50,7 @@
             android:textColor="@color/sky_blue_2094FF"
             android:textSize="18sp"
             android:textStyle="bold"
+            android:visibility="@{viewModel.isMyMission().peekContent() ? 0 : 1}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
