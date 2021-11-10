@@ -25,7 +25,7 @@ class DatePickerDialogFragment(private val now: Int, private val listener: Notic
         }.init(
             getIntFormatYear(now), (getIntFormatMonth(now)-1)%13, getIntFormatDate(now)
         ) { view, year, month, date ->
-            Toast.makeText(view.context, "${year}년 ${month}월 ${date}일", Toast.LENGTH_SHORT).show()
+            // Toast.makeText(view.context, "${year}년 ${(month+1)%13}월 ${date}일", Toast.LENGTH_SHORT).show()
         }
     }
 

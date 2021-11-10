@@ -25,5 +25,6 @@ fun getIntFormatMonth(date: Int) = date / 100 % 100
 
 fun getIntFormatDate(date: Int) = date % 100
 
-
-
+fun getMissionStringFormatDate(date: Int): String {
+    return "${getIntFormatYear(date)}년 ${getIntFormatMonth(date)}월 ${getIntFormatDate(date)}일"
+}

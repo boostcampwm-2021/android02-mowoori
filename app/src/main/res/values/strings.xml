@@ -75,6 +75,8 @@
     <string name="missions_add_count_front">미션을</string>
     <string name="missions_add_count_middle">10</string>
     <string name="missions_add_count_back">번 수행할거에요.</string>
+    <string name="missions_add_when_start">%d년 %d월 %d일부터</string>
+    <string name="missions_add_when_end">%d년 %d월 %d일까지</string>
 
     <!--members-->
     <string name="members_title">\'우리\'들</string>

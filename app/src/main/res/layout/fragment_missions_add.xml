@@ -10,8 +10,6 @@
         <variable
             name="viewModel"
             type="com.ariari.mowoori.ui.missions_add.MissionsAddViewModel" />
-
-        <import type="com.ariari.mowoori.util.UtilKt" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -89,7 +87,7 @@
             android:layout_marginTop="24dp"
             android:autofillHints="no"
             android:hint="2021년 10월 11일"
-            android:text="@{viewModel.missionStartDate.toString()}"
+            missionDate="@{viewModel.missionStartDate}"
             android:textColor="@color/sky_blue_2094FF"
             android:textSize="22sp"
             app:layout_constraintStart_toEndOf="@id/tv_missions_add_when_start_title"
@@ -114,7 +112,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="24dp"
             android:autofillHints="no"
-            android:text="@{viewModel.missionEndDate.toString()}"
+            missionDate="@{viewModel.missionEndDate}"
             android:textColor="@color/sky_blue_2094FF"
             android:textSize="22sp"
             app:layout_constraintStart_toEndOf="@id/tv_missions_add_when_end_title"
