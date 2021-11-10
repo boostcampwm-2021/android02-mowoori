@@ -4,6 +4,8 @@ import com.ariari.mowoori.data.repository.IntroRepository
 import com.ariari.mowoori.data.repository.IntroRepositoryImpl
 import com.ariari.mowoori.data.repository.MissionsRepository
 import com.ariari.mowoori.data.repository.MissionsRepositoryImpl
+import com.ariari.mowoori.data.repository.StampsRepository
+import com.ariari.mowoori.data.repository.StampsRepositoryImpl
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.storage.StorageReference
@@ -32,4 +34,12 @@ object RepositoryModule {
         firebaseAuth: FirebaseAuth
     ): MissionsRepository =
         MissionsRepositoryImpl(databaseReference, firebaseAuth)
+
+    @Provides
+    @Singleton
+    fun providesStampsRepository(
+        databaseReference: DatabaseReference,
+        firebaseAuth: FirebaseAuth
+    ): StampsRepository =
+        StampsRepositoryImpl(databaseReference, firebaseAuth)
 }

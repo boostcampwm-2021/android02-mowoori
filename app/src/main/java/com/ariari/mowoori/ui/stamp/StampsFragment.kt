@@ -13,8 +13,9 @@ import com.ariari.mowoori.databinding.FragmentStampsBinding
 import com.ariari.mowoori.ui.missions.entity.MissionInfo
 import com.ariari.mowoori.ui.stamp.adapter.StampsAdapter
 import com.ariari.mowoori.util.EventObserver
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_stamps) {
 
     private val safeArgs: StampsFragmentArgs by navArgs()
@@ -24,14 +25,14 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setMissionInfo()
-        setMissionName()
-        // TODO: 총 스탬프 개수만큼 리사이클러뷰에 적용
-        // TODO: 사용자 정보 가져와서 본인의 미션이면 "오늘도 완료!" 버튼 visible
-        // TODO: 스탬프 리스트를 라이브데이터에 저장
-
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
+        setMissionInfo()
+        setMissionName()
+        setAllEmptyStamps()
+        setStampList()
+        setStampListObserver()
+        // TODO: 사용자 정보 가져와서 본인의 미션이면 "오늘도 완료!" 버튼 visible
         setAdapter()
         setSpanCount()
         setSpanCountObserver()
@@ -46,12 +47,26 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         viewModel.setMissionName(missionInfo.missionName)
     }
 
+    private fun setAllEmptyStamps() {
+        viewModel.setAllEmptyStamps(missionInfo.totalStamp)
+    }
+
+    private fun setStampList() {
+        viewModel.setStampList(missionInfo.stampList)
+    }
+
+    private fun setStampListObserver() {
+        viewModel.stampList.observe(viewLifecycleOwner, { stampList ->
+            adapter.submitList(stampList)
+        })
+    }
+
     private fun setAdapter() {
-        adapter = StampsAdapter(object: StampsAdapter.OnItemClickListener {
+        adapter = StampsAdapter(object : StampsAdapter.OnItemClickListener {
             override fun itemClick(position: Int) {
                 // TODO: 포지션이 스탬프 리스트 사이즈보다 같거나 크면 무시
                 // TODO: 현재 선택된 스탬프 라이브데이터 변경 -> 옵저빙해서 네비게이션 이동
-                println("Stamp - $position")
+                println("Stamp - ${adapter.currentList[position].stampInfo}")
             }
         })
         binding.rvStamps.adapter = adapter

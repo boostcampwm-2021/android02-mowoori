@@ -8,5 +8,5 @@ data class Stamp(
 data class StampInfo(
     val pictureUrl: String = "",
     val comment: String = "",
-    val timeStamp: String = "",
+    val timeStamp: Long = 0,
 )

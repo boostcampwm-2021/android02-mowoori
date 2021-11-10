@@ -2,25 +2,31 @@ package com.ariari.mowoori.ui.stamp.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.ariari.mowoori.databinding.ItemStampsBinding
 import com.ariari.mowoori.ui.stamp.entity.Stamp
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
 
 class StampsAdapter(private val listener: OnItemClickListener) :
-    RecyclerView.Adapter<StampsAdapter.StampViewHolder>() {
+    ListAdapter<Stamp, StampsAdapter.StampViewHolder>(stampsDiffUtil) {
+
+    companion object {
+        val stampsDiffUtil = object : DiffUtil.ItemCallback<Stamp>() {
+            override fun areItemsTheSame(oldItem: Stamp, newItem: Stamp): Boolean {
+                return oldItem.stampId == newItem.stampId
+            }
+
+            override fun areContentsTheSame(oldItem: Stamp, newItem: Stamp): Boolean {
+                return oldItem == newItem
+            }
+        }
+    }
 
     interface OnItemClickListener {
         fun itemClick(position: Int)
     }
-
-    private val stampList = listOf(Stamp("1", StampInfo("123", "hello", "2021")),
-        Stamp("1", StampInfo("123", "hello", "2021")),
-        Stamp("1", StampInfo("123", "hello", "2021")),
-        Stamp("1", StampInfo("123", "hello", "2021")),
-        Stamp("1", StampInfo("123", "hello", "2021")),
-        Stamp("1", StampInfo("123", "hello", "2021")),
-        Stamp("1", StampInfo("123", "hello", "2021")))
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StampViewHolder {
         return StampViewHolder(ItemStampsBinding.inflate(LayoutInflater.from(parent.context),
@@ -29,10 +35,8 @@ class StampsAdapter(private val listener: OnItemClickListener) :
     }
 
     override fun onBindViewHolder(holder: StampViewHolder, position: Int) {
-        holder.bind(stampList[position].stampInfo)
+        holder.bind(getItem(position).stampInfo)
     }
-
-    override fun getItemCount(): Int = stampList.size
 
     inner class StampViewHolder(private val binding: ItemStampsBinding) :
         RecyclerView.ViewHolder(binding.root) {
