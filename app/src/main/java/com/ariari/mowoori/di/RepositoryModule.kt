@@ -6,6 +6,8 @@ import com.ariari.mowoori.data.repository.HomeRepository
 import com.ariari.mowoori.data.repository.HomeRepositoryImpl
 import com.ariari.mowoori.data.repository.IntroRepository
 import com.ariari.mowoori.data.repository.IntroRepositoryImpl
+import com.ariari.mowoori.data.repository.MembersRepository
+import com.ariari.mowoori.data.repository.MembersRepositoryImpl
 import com.ariari.mowoori.data.repository.MissionsRepository
 import com.ariari.mowoori.data.repository.MissionsRepositoryImpl
 import com.ariari.mowoori.data.repository.StampsRepository
@@ -60,4 +62,13 @@ object RepositoryModule {
         firebaseAuth: FirebaseAuth
     ): StampsRepository =
         StampsRepositoryImpl(databaseReference, firebaseAuth)
+
+    @Provides
+    @Singleton
+    fun providesMembersRepository(
+        databaseReference: DatabaseReference,
+        firebaseAuth: FirebaseAuth
+    ): MembersRepository = MembersRepositoryImpl(databaseReference,firebaseAuth)
+
+
 }
