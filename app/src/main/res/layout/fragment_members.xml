@@ -1,13 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
+        <import type="com.ariari.mowoori.ui.custom.TitleViewMode" />
+
+        <variable
+            name="viewModel"
+            type="com.ariari.mowoori.ui.members.MembersViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+        <com.ariari.mowoori.ui.custom.CustomTitleView
+            android:id="@+id/title_view_members"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:onPlusClick="@{viewModel::clickPlusButton}"
+            app:text="@string/members_title"
+            app:titleViewMode="@{TitleViewMode.TITLE_VIEW_PLUS_BUTTON}" />
 
         <TextView
             android:layout_width="match_parent"
