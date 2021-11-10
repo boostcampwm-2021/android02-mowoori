@@ -3,8 +3,10 @@ package com.ariari.mowoori.ui.stamp
 import android.os.Bundle
 import android.view.View
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
+import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
@@ -29,6 +31,7 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
+        setStartEnterTransition()
         setMissionInfo()
         setMissionName()
         setStampList()
@@ -39,11 +42,13 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         setObserver()
     }
 
-    private fun setObserver() {
-        setBackBtnObserver()
-        setSpanCountObserver()
-        setStampListObserver()
-        setSelectedStampInfoObserver()
+    private fun setStartEnterTransition() {
+        // 리사이클러 뷰가 측정이 완료될 때까지 트랜지션 지연
+        postponeEnterTransition()
+        binding.rvStamps.viewTreeObserver.addOnPreDrawListener {
+            startPostponedEnterTransition()
+            true
+        }
     }
 
     private fun setMissionInfo() {
@@ -58,28 +63,17 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         viewModel.setStampList(missionInfo.stampList)
     }
 
-    private fun setStampListObserver() {
-        viewModel.stampList.observe(viewLifecycleOwner, { stampList ->
-            adapter.submitList(stampList)
-            viewModel.fillEmptyStamps(missionInfo.totalStamp - stampList.size)
-        })
-    }
-
-    private fun setSelectedStampInfoObserver() {
-        viewModel.selectedStampInfo.observe(viewLifecycleOwner, EventObserver { stampInfo ->
-            this.findNavController()
-                .navigate(StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
-                    stampInfo, missionInfo.missionName))
-        })
-    }
-
     private fun setAdapter() {
         adapter = StampsAdapter(object : StampsAdapter.OnItemClickListener {
-            override fun itemClick(position: Int) {
-                // TODO: 포지션이 스탬프 리스트 사이즈보다 같거나 크면 무시
-                // TODO: 현재 선택된 스탬프 라이브데이터 변경 -> 옵저빙해서 네비게이션 이동
-                println("Stamp - ${adapter.currentList[position].stampInfo}")
-                viewModel.setSelectedStampInfo(position, missionInfo.curStamp)
+            override fun itemClick(position: Int, imageView: ImageView) {
+                val stampInfo = adapter.currentList[position].stampInfo
+                val extras = FragmentNavigatorExtras(
+                    imageView to stampInfo.pictureUrl
+                )
+                this@StampsFragment.findNavController()
+                    .navigate(StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
+                        stampInfo, missionInfo.missionName), extras)
+//                viewModel.setSelectedStampInfo(position, missionInfo.curStamp)
             }
         })
         binding.rvStamps.adapter = adapter
@@ -95,6 +89,19 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
                 .navigate(StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
                     StampInfo(), missionInfo.missionName))
         }
+    }
+
+    private fun setObserver() {
+        setBackBtnObserver()
+        setSpanCountObserver()
+        setStampListObserver()
+        setSelectedStampInfoObserver()
+    }
+
+    private fun setBackBtnObserver() {
+        viewModel.backBtnClick.observe(viewLifecycleOwner, EventObserver {
+            this.findNavController().navigateUp()
+        })
     }
 
     private fun setSpanCountObserver() {
@@ -120,9 +127,18 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         })
     }
 
-    private fun setBackBtnObserver() {
-        viewModel.backBtnClick.observe(viewLifecycleOwner, EventObserver {
-            this.findNavController().navigateUp()
+    private fun setStampListObserver() {
+        viewModel.stampList.observe(viewLifecycleOwner, { stampList ->
+            adapter.submitList(stampList)
+            viewModel.fillEmptyStamps(missionInfo.totalStamp - stampList.size)
+        })
+    }
+
+    private fun setSelectedStampInfoObserver() {
+        viewModel.selectedStampInfo.observe(viewLifecycleOwner, EventObserver { stampInfo ->
+            this.findNavController()
+                .navigate(StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
+                    stampInfo, missionInfo.missionName))
         })
     }
 }
