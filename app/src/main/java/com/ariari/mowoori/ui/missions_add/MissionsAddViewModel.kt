@@ -42,13 +42,19 @@ class MissionsAddViewModel @Inject constructor(
     private val _missionEndDate = MutableLiveData<Int>()
     val missionEndDate: LiveData<Int> = _missionEndDate
 
+    private val _inValidMissionNameEvent = MutableLiveData<Event<Unit>>()
+    val inValidMissionNameEvent: LiveData<Event<Unit>> = _inValidMissionNameEvent
+
+    private val _inValidMissionDateEvent = MutableLiveData<Event<Boolean>>()
+    val inValidMissionDateEvent: LiveData<Event<Boolean>> = _inValidMissionDateEvent
+
     // 테스트를 위한 객체
     var groupId: String = "testGroupId"
     val mission = Mission("mission74", MissionInfo("미완료 미션1", "user1", 30, 10, 211101, 211201))
 
     init {
         _missionStartDate.value = getCurrentDate()
-        _missionEndDate.value = getCurrentDatePlusMonths(2)
+        _missionEndDate.value = getCurrentDatePlusMonths(1)
         updateMissionCount(10)
     }
 
@@ -96,5 +102,22 @@ class MissionsAddViewModel @Inject constructor(
 
     fun updateMissionEndDate(year: Int, month: Int, date: Int) {
         _missionEndDate.value = getMissionIntFormatDate(year, month, date)
+    }
+
+    fun updateMissionInvalid() {
+        checkMissionDateInvalid()
+        checkMissionNameInvalid()
+    }
+
+    private fun checkMissionNameInvalid() {
+        _inValidMissionNameEvent.postValue(Event(Unit))
+    }
+
+    private fun checkMissionDateInvalid() {
+        if (missionStartDate.value!! > missionEndDate.value!!) {
+            _inValidMissionDateEvent.postValue(Event(false))
+        } else {
+            _inValidMissionDateEvent.postValue(Event(true))
+        }
     }
 }

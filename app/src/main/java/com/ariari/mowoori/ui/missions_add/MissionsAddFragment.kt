@@ -1,9 +1,13 @@
 package com.ariari.mowoori.ui.missions_add
 
+import android.animation.Animator
+import android.animation.AnimatorInflater
 import android.app.Activity
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -37,6 +41,7 @@ class MissionsAddFragment :
         setBackBtnClickObserver()
         setCompleteEventObserver()
         setCountEventObserver()
+        setValidationObserver()
     }
 
     private fun setClickListener() {
@@ -136,6 +141,41 @@ class MissionsAddFragment :
                 "EndDatePickerFragment"
             )
         }
+    }
+
+    private fun setValidationObserver() {
+        missionsAddViewModel.inValidMissionNameEvent.observe(viewLifecycleOwner, {
+            with(binding.tvMissionsAddWhatInvalid) {
+                if (binding.etMissionsAddWhat.text.length !in 1..10) {
+                    isVisible = true
+                    getVibrateAnimInstance().run {
+                        setTarget(binding.tvMissionsAddWhatInvalid)
+                        start()
+                    }
+                } else {
+                    binding.tvMissionsAddWhatInvalid.isInvisible = true
+                }
+            }
+        })
+        missionsAddViewModel.inValidMissionDateEvent.observe(
+            viewLifecycleOwner,
+            EventObserver { flag ->
+                with(binding.tvMissionsAddWhenInvalid) {
+                    if (!flag) {
+                        isVisible = true
+                        getVibrateAnimInstance().run {
+                            setTarget(binding.tvMissionsAddWhenInvalid)
+                            start()
+                        }
+                    } else {
+                        isInvisible = true
+                    }
+                }
+            })
+    }
+
+    private fun getVibrateAnimInstance(): Animator {
+        return AnimatorInflater.loadAnimator(requireContext(), R.animator.animator_invalid_vibrate)
     }
 }
 
