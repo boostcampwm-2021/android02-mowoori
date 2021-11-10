@@ -61,7 +61,8 @@
     <fragment
         android:id="@+id/notificationFragment"
         android:name="com.ariari.mowoori.ui.notification.NotificationFragment"
-        android:label="NotificationFragment" />
+        android:label="NotificationFragment"
+        tools:layout="@layout/fragment_notification" />
     <fragment
         android:id="@+id/missionsAddFragment"
         android:name="com.ariari.mowoori.ui.missions_add.MissionsAddFragment"
@@ -70,10 +71,26 @@
     <fragment
         android:id="@+id/stampsFragment"
         android:name="com.ariari.mowoori.ui.stamp.StampsFragment"
-        android:label="StampsFragment">
+        android:label="StampsFragment"
+        tools:layout="@layout/fragment_stamps">
         <argument
             android:name="missionInfo"
             app:argType="com.ariari.mowoori.ui.missions.entity.MissionInfo" />
+        <action
+            android:id="@+id/action_stampsFragment_to_stampDetailFragment"
+            app:destination="@id/stampDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/stampDetailFragment"
+        android:name="com.ariari.mowoori.ui.stamp_detail.StampDetailFragment"
+        android:label="StampDetailFragment"
+        tools:layout="@layout/fragment_stamp_detail">
+        <argument
+            android:name="stampInfo"
+            app:argType="com.ariari.mowoori.ui.stamp.entity.StampInfo" />
+        <argument
+            android:name="missionName"
+            app:argType="string" />
     </fragment>
 
 </navigation>

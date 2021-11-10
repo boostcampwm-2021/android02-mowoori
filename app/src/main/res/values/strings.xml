@@ -53,7 +53,8 @@
     <string name="stamps_mission">매일 잔디 채우기</string>
     <string name="stamps_number">1</string>
     <string name="stamps_complete">오늘도 완료!</string>
-    <string name="stamps_stamp">스탬프</string>
+    <string name="desc_item_stamps_stamp">스탬프</string>
+    <string name="desc_item_stamps_icon">스탬프 아이콘</string>
 
     <!-- DialogFragment -->
     <string name="dialog_yes">예</string>
