@@ -10,6 +10,15 @@ fun getCurrentDate(): Int {
     return dateFormat.format(today).toInt()
 }
 
+fun getCurrentDatePlusMonths(month: Int): Int {
+    val dateFormat = SimpleDateFormat("yyyyMMdd")
+    val calendar = Calendar.getInstance().apply {
+        time = Date()
+        add(Calendar.MONTH, month)
+    }
+    return dateFormat.format(calendar.time).toInt()
+}
+
 fun getMissionIntFormatDate(year: Int, month: Int, date: Int): Int {
     Timber.d("$year $month $date")
     val dateFormat = SimpleDateFormat("yyyyMMdd")
@@ -25,6 +34,12 @@ fun getIntFormatMonth(date: Int) = date / 100 % 100
 
 fun getIntFormatDate(date: Int) = date % 100
 
+// %2d가 안되는 이유 찾기
 fun getMissionStringFormatDate(date: Int): String {
-    return "${getIntFormatYear(date)}년 ${getIntFormatMonth(date)}월 ${getIntFormatDate(date)}일"
+    return String.format(
+        "%d년 %02d월 %02d일",
+        getIntFormatYear(date),
+        getIntFormatMonth(date),
+        getIntFormatDate(date)
+    )
 }

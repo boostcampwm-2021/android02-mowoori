@@ -10,6 +10,7 @@ import com.ariari.mowoori.ui.missions.entity.MissionInfo
 import com.ariari.mowoori.util.Event
 import com.ariari.mowoori.util.TimberUtil
 import com.ariari.mowoori.util.getCurrentDate
+import com.ariari.mowoori.util.getCurrentDatePlusMonths
 import com.ariari.mowoori.util.getMissionIntFormatDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -47,7 +48,7 @@ class MissionsAddViewModel @Inject constructor(
 
     init {
         _missionStartDate.value = getCurrentDate()
-        _missionEndDate.value = getCurrentDate()
+        _missionEndDate.value = getCurrentDatePlusMonths(2)
         updateMissionCount(10)
     }
 
@@ -85,12 +86,12 @@ class MissionsAddViewModel @Inject constructor(
     }
 
     fun updateMissionCount(count: Int) {
-        TimberUtil.timber("update", _missionCount.value.toString())
         _missionCount.value = count
     }
 
     fun updateMissionStartDate(year: Int, month: Int, date: Int) {
         _missionStartDate.value = getMissionIntFormatDate(year, month, date)
+        TimberUtil.timber("update", _missionStartDate.value.toString())
     }
 
     fun updateMissionEndDate(year: Int, month: Int, date: Int) {

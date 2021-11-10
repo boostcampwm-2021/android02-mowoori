@@ -71,12 +71,9 @@
     <string name="missions_add_what_mission_title">어떤 미션인가요?</string>
     <string name="missions_add_what_mission">미션제목을 입력하세요.</string>
     <string name="missions_add_how_mission_title">얼마동안 할건가요?</string>
-    <string name="missions_add_when">2021.10.26 ~ 2021.11.30</string>
     <string name="missions_add_count_front">미션을</string>
-    <string name="missions_add_count_middle">10</string>
     <string name="missions_add_count_back">번 수행할거에요.</string>
-    <string name="missions_add_when_start">%d년 %d월 %d일부터</string>
-    <string name="missions_add_when_end">%d년 %d월 %d일까지</string>
+    <string name="missions_add_when_start">부터</string>
 
     <!--members-->
     <string name="members_title">\'우리\'들</string>
