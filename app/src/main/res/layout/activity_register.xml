@@ -55,7 +55,7 @@
             android:gravity="center"
             android:inputType="text"
             android:lines="1"
-            android:maxLength="10"
+            android:maxLength="11"
             android:text="@={viewModel.profileText}"
             android:textColor="@color/black"
             android:textSize="36sp"
