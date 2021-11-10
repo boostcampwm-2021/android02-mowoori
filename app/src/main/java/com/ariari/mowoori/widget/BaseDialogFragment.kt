@@ -8,12 +8,11 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.DialogFragment
 import com.ariari.mowoori.R
-import com.ariari.mowoori.databinding.DialogConfirmBinding
 
 abstract class BaseDialogFragment<T : ViewDataBinding>(private val layoutId: Int) :
     DialogFragment() {
 
-    private var _binding: DialogConfirmBinding? = null
+    private var _binding: T? = null
     val binding get() = _binding ?: error(getString(R.string.binding_error))
 
     override fun onCreateView(
