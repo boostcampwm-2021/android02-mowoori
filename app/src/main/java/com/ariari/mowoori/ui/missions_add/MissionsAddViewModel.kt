@@ -9,6 +9,8 @@ import com.ariari.mowoori.ui.missions.entity.Mission
 import com.ariari.mowoori.ui.missions.entity.MissionInfo
 import com.ariari.mowoori.util.Event
 import com.ariari.mowoori.util.TimberUtil
+import com.ariari.mowoori.util.getCurrentDate
+import com.ariari.mowoori.util.getMissionIntFormatDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -33,9 +35,21 @@ class MissionsAddViewModel @Inject constructor(
     private val _missionCount = MutableLiveData<Int>()
     val missionCount: LiveData<Int> = _missionCount
 
+    private val _missionStartDate = MutableLiveData<Int>()
+    val missionStartDate: LiveData<Int> = _missionStartDate
+
+    private val _missionEndDate = MutableLiveData<Int>()
+    val missionEndDate: LiveData<Int> = _missionEndDate
+
     // 테스트를 위한 객체
     var groupId: String = "testGroupId"
     val mission = Mission("mission74", MissionInfo("미완료 미션1", "user1", 30, 10, 211101, 211201))
+
+    init {
+        _missionStartDate.value = getCurrentDate()
+        _missionEndDate.value = getCurrentDate()
+        updateMissionCount(10)
+    }
 
     fun setBackBtnClick() {
         _backBtnClick.value = Event(true)
@@ -73,5 +87,13 @@ class MissionsAddViewModel @Inject constructor(
     fun updateMissionCount(count: Int) {
         TimberUtil.timber("update", _missionCount.value.toString())
         _missionCount.value = count
+    }
+
+    fun updateMissionStartDate(year: Int, month: Int, date: Int) {
+        _missionStartDate.value = getMissionIntFormatDate(year, month, date)
+    }
+
+    fun updateMissionEndDate(year: Int, month: Int, date: Int) {
+        _missionEndDate.value = getMissionIntFormatDate(year, month, date)
     }
 }

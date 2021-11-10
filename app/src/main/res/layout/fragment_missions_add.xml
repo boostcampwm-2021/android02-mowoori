@@ -10,6 +10,8 @@
         <variable
             name="viewModel"
             type="com.ariari.mowoori.ui.missions_add.MissionsAddViewModel" />
+
+        <import type="com.ariari.mowoori.util.UtilKt" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -67,19 +69,56 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/et_missions_add_what" />
 
-        <EditText
-            android:id="@+id/et_missions_add_when"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tv_missions_add_when_start_title"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:autofillHints="no"
-            android:hint="@string/missions_add_when"
+            android:layout_marginTop="24dp"
+            android:text="시작일"
             android:textColor="@color/black"
             android:textSize="22sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_missions_add_when_title" />
+
+        <TextView
+            android:id="@+id/tv_missions_add_when_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="24dp"
+            android:autofillHints="no"
+            android:hint="2021년 10월 11일"
+            android:text="@{viewModel.missionStartDate.toString()}"
+            android:textColor="@color/sky_blue_2094FF"
+            android:textSize="22sp"
+            app:layout_constraintStart_toEndOf="@id/tv_missions_add_when_start_title"
+            app:layout_constraintTop_toBottomOf="@id/tv_missions_add_when_title" />
+
+        <TextView
+            android:id="@+id/tv_missions_add_when_end_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="24dp"
+            android:text="종료일"
+            android:textColor="@color/black"
+            android:textSize="22sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_missions_add_when_start_title" />
+
+        <TextView
+            android:id="@+id/tv_missions_add_when_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="24dp"
+            android:autofillHints="no"
+            android:text="@{viewModel.missionEndDate.toString()}"
+            android:textColor="@color/sky_blue_2094FF"
+            android:textSize="22sp"
+            app:layout_constraintStart_toEndOf="@id/tv_missions_add_when_end_title"
+            app:layout_constraintTop_toBottomOf="@id/tv_missions_add_when_start_title" />
 
         <LinearLayout
             android:id="@+id/container_missions_add_count_linear"
@@ -89,7 +128,7 @@
             android:layout_marginTop="24dp"
             android:orientation="horizontal"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/et_missions_add_when">
+            app:layout_constraintTop_toBottomOf="@id/tv_missions_add_when_end_title">
 
             <TextView
                 android:id="@+id/tv_missions_add_count_front"

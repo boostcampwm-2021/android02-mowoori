@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.ariari.mowoori.R
@@ -12,6 +13,8 @@ import com.ariari.mowoori.databinding.FragmentMissionsAddBinding
 import com.ariari.mowoori.ui.missions.entity.Mission
 import com.ariari.mowoori.ui.missions.entity.MissionInfo
 import com.ariari.mowoori.util.EventObserver
+import com.ariari.mowoori.widget.BaseDialogFragment
+import com.ariari.mowoori.widget.DatePickerDialogFragment
 import com.ariari.mowoori.widget.NumberPickerDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -25,12 +28,20 @@ class MissionsAddFragment :
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = missionsAddViewModel
         missionsAddViewModel.getGroupId()
-        missionsAddViewModel.updateMissionCount(10)
 
+        setObserver()
+        setClickListener()
+    }
+
+    private fun setObserver() {
         setBackBtnClickObserver()
         setCompleteEventObserver()
-        setRootClick()
         setCountEventObserver()
+    }
+
+    private fun setClickListener() {
+        setRootClick()
+        setButtonListener()
     }
 
     private fun setRootClick() {
@@ -70,4 +81,61 @@ class MissionsAddFragment :
             )
         })
     }
+
+    private fun setButtonListener() {
+        binding.tvMissionsAddWhenStart.setOnClickListener {
+            DatePickerDialogFragment(missionsAddViewModel.missionStartDate.value!!,
+                object : BaseDialogFragment.NoticeDialogListener {
+                    override fun onDialogPositiveClick(dialog: DialogFragment) {
+                        val dp = (dialog as DatePickerDialogFragment).binding.datePickerMissionDate
+                        missionsAddViewModel.updateMissionStartDate(
+                            dp.year,
+                            dp.month,
+                            dp.dayOfMonth
+                        )
+                        dialog.dismiss()
+                    }
+
+                    override fun onDialogNegativeClick(dialog: DialogFragment) {
+                        dialog.dismiss()
+                    }
+                })
+                .show(
+                    requireActivity().supportFragmentManager,
+                    "StartDatePickerFragment"
+                )
+        }
+        binding.tvMissionsAddWhenEnd.setOnClickListener {
+            DatePickerDialogFragment(
+                missionsAddViewModel.missionEndDate.value!!,
+                object : BaseDialogFragment.NoticeDialogListener {
+                    override fun onDialogPositiveClick(dialog: DialogFragment) {
+                        val dp = (dialog as DatePickerDialogFragment).binding.datePickerMissionDate
+                        missionsAddViewModel.updateMissionEndDate(dp.year, dp.month, dp.dayOfMonth)
+                        dialog.dismiss()
+                    }
+
+                    override fun onDialogNegativeClick(dialog: DialogFragment) {
+                        dialog.dismiss()
+                    }
+                }).show(
+                requireActivity().supportFragmentManager,
+                "EndDatePickerFragment"
+            )
+        }
+    }
+
+
+//    private fun setLayout() {
+//        requireNotNull(dialog).apply {
+//            requireNotNull(window).apply {
+//                setLayout(
+//                    (resources.displayMetrics.widthPixels * 0.8).toInt(),
+//                    ViewGroup.LayoutParams.WRAP_CONTENT
+//                )
+//                setBackgroundDrawableResource(R.drawable.border_white_fill_10)
+//            }
+//        }
+//    }
 }
+
