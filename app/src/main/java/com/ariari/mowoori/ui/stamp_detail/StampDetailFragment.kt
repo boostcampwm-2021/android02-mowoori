@@ -13,6 +13,7 @@ import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentStampDetailBinding
 import com.ariari.mowoori.ui.stamp.entity.DetailInfo
 import com.ariari.mowoori.util.EventObserver
+import com.ariari.mowoori.widget.PictureDialogFragment
 
 class StampDetailFragment :
     BaseFragment<FragmentStampDetailBinding>(R.layout.fragment_stamp_detail) {
@@ -37,6 +38,7 @@ class StampDetailFragment :
         setUserName()
         setMissionName()
         setPicture()
+        setPictureListener()
         setCloseBtnClickObserver()
         setIsCertifyObserver()
     }
@@ -64,6 +66,15 @@ class StampDetailFragment :
     private fun setPicture() {
         if (detailInfo.stampInfo.pictureUrl != "") {
             binding.ivStampDetail.setImageResource(R.drawable.ic_launcher_background)
+            binding.tvStampDetailIcon.isInvisible = true
+        }
+    }
+
+    private fun setPictureListener() {
+        binding.tvStampDetailIcon.setOnClickListener {
+            // TODO: 리스너 등록
+            PictureDialogFragment().show(requireActivity().supportFragmentManager,
+                "PictureDialogFragment")
         }
     }
 
