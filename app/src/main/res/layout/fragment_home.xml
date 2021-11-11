@@ -5,6 +5,9 @@
 
     <data>
 
+        <variable
+            name="viewModel"
+            type="com.ariari.mowoori.ui.home.HomeViewModel" />
     </data>
 
     <androidx.drawerlayout.widget.DrawerLayout
@@ -122,7 +125,8 @@
                     android:layout_height="?attr/actionBarSize"
                     android:background="@color/sky_blue_F1F5FF"
                     app:menu="@menu/tb_home_menu"
-                    app:navigationIcon="@drawable/ic_hamburger" />
+                    app:navigationIcon="@drawable/ic_hamburger"
+                    app:title="@{viewModel.currentGroupName}" />
 
             </com.google.android.material.appbar.AppBarLayout>
 
