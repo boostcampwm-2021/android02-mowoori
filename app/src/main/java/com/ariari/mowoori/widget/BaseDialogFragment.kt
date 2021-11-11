@@ -24,22 +24,26 @@ abstract class BaseDialogFragment<T : ViewDataBinding>(private val layoutId: Int
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        setDrawable()
-    }
-
-    private fun setDrawable() {
-        requireNotNull(dialog).apply {
-            requireNotNull(window).apply {
-                setBackgroundDrawableResource(R.drawable.border_white_fill_16)
-            }
-        }
+    override fun onResume() {
+        super.onResume()
+        setLayout()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun setLayout() {
+        requireNotNull(dialog).apply {
+            requireNotNull(window).apply {
+                setLayout(
+                    (resources.displayMetrics.widthPixels * 0.8).toInt(),
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                setBackgroundDrawableResource(R.drawable.border_white_fill_16)
+            }
+        }
     }
 
     interface NoticeDialogListener {
