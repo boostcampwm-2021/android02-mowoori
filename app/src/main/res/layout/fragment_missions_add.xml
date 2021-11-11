@@ -31,93 +31,164 @@
             android:id="@+id/tv_missions_add_what_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginStart="16dp"
             android:text="@string/missions_add_what_mission_title"
             android:textColor="@color/black"
-            android:textSize="22sp"
+            android:textSize="26sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/title_view_missions_add" />
 
         <EditText
             android:id="@+id/et_missions_add_what"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="16dp"
             android:autofillHints="no"
+            android:cursorVisible="false"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:hint="@string/missions_add_what_mission"
-            android:textColor="@color/black"
+            android:inputType="text"
+            android:textColor="@color/sky_blue_2094FF"
             android:textSize="22sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_missions_add_what_title" />
 
         <TextView
+            android:id="@+id/tv_missions_add_what_invalid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="2dp"
+            android:text="@string/missions_add_what_invalid"
+            android:textColor="@color/red_FF0000"
+            android:textSize="16sp"
+            android:visibility="invisible"
+            app:layout_constraintStart_toStartOf="@id/et_missions_add_what"
+            app:layout_constraintTop_toBottomOf="@id/et_missions_add_what" />
+
+        <TextView
             android:id="@+id/tv_missions_add_when_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="24dp"
             android:text="@string/missions_add_how_mission_title"
             android:textColor="@color/black"
-            android:textSize="22sp"
+            android:textSize="26sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/et_missions_add_what" />
+            app:layout_constraintTop_toBottomOf="@id/tv_missions_add_what_invalid" />
 
-        <EditText
-            android:id="@+id/et_missions_add_when"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tv_missions_add_when_start_title"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:autofillHints="no"
-            android:hint="@string/missions_add_when"
+            android:text="@string/missions_add_when_start_title"
             android:textColor="@color/black"
             android:textSize="22sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_missions_add_when_title" />
 
         <TextView
-            android:id="@+id/tv_missions_add_count_front"
+            android:id="@+id/tv_missions_add_when_start"
+            missionDate="@{viewModel.missionStartDate}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:autofillHints="no"
+            android:hint="@string/missions_add_when_start_hint"
+            android:textColor="@color/sky_blue_2094FF"
+            android:textSize="22sp"
+            app:layout_constraintStart_toEndOf="@id/tv_missions_add_when_start_title"
+            app:layout_constraintTop_toTopOf="@id/tv_missions_add_when_start_title" />
+
+        <TextView
+            android:id="@+id/tv_missions_add_when_end_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            android:text="@string/missions_add_when_end_title"
+            android:textColor="@color/black"
+            android:textSize="22sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_missions_add_when_start_title" />
+
+        <TextView
+            android:id="@+id/tv_missions_add_when_end"
+            missionDate="@{viewModel.missionEndDate}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:autofillHints="no"
+            android:hint="@string/missions_add_when_end_hint"
+            android:textColor="@color/sky_blue_2094FF"
+            android:textSize="22sp"
+            app:layout_constraintStart_toEndOf="@id/tv_missions_add_when_end_title"
+            app:layout_constraintTop_toTopOf="@id/tv_missions_add_when_end_title" />
+
+        <TextView
+            android:id="@+id/tv_missions_add_when_invalid"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:layout_marginTop="2dp"
+            android:text="@string/missions_add_when_invalid"
+            android:textColor="@color/red_FF0000"
+            android:textSize="16sp"
+            android:visibility="invisible"
+            app:layout_constraintStart_toStartOf="@id/tv_missions_add_when_end_title"
+            app:layout_constraintTop_toBottomOf="@id/tv_missions_add_when_end_title" />
+
+        <LinearLayout
+            android:id="@+id/container_missions_add_count_linear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="24dp"
-            android:text="@string/missions_add_count_front"
-            android:textColor="@color/black"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@id/tv_missions_add_count_middle"
-            app:layout_constraintHorizontal_chainStyle="packed"
+            android:orientation="horizontal"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/et_missions_add_when" />
+            app:layout_constraintTop_toBottomOf="@id/tv_missions_add_when_invalid">
 
-        <TextView
-            android:id="@+id/tv_missions_add_count_middle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/missions_add_count_middle"
-            android:textColor="@color/black"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@id/tv_missions_add_count_back"
-            app:layout_constraintStart_toEndOf="@id/tv_missions_add_count_front"
-            app:layout_constraintTop_toTopOf="@id/tv_missions_add_count_front" />
+            <TextView
+                android:id="@+id/tv_missions_add_count_front"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@string/missions_add_count_front"
+                android:textColor="@color/black"
+                android:textSize="26sp"
+                android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/tv_missions_add_count_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/missions_add_count_back"
-            android:textColor="@color/black"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@id/tv_missions_add_count_middle"
-            app:layout_constraintTop_toTopOf="@id/tv_missions_add_count_front" />
+            <TextView
+                android:id="@+id/tv_missions_add_count_middle"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="12dp"
+                android:gravity="center"
+                android:hint="@string/missions_add_count_hint"
+                android:onClick="@{()->viewModel.showNumberPicker()}"
+                android:text="@{viewModel.missionCount.toString()}"
+                android:textColor="@color/sky_blue_2094FF"
+                android:textSize="28sp" />
+
+            <TextView
+                android:id="@+id/tv_missions_add_count_back"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@string/missions_add_count_back"
+                android:textColor="@color/black"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_register_complete"
@@ -126,6 +197,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="32dp"
             android:layout_marginBottom="20dp"
+            android:onClick="@{()->viewModel.updateMissionInvalid()}"
             android:paddingHorizontal="24dp"
             android:paddingVertical="10dp"
             android:text="@string/all_complete"
@@ -133,7 +205,6 @@
             android:textSize="24sp"
             android:textStyle="bold"
             app:cornerRadius="30dp"
-            android:onClick="@{()->viewModel.postMission()}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:strokeColor="@color/sky_blue_2094FF"

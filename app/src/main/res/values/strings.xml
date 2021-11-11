@@ -62,6 +62,8 @@
     <string name="dialog_yes">예</string>
     <string name="dialog_no">아니오</string>
     <string name="dialog_message">계속 진행하시겠습니까?</string>
+    <string name="dialog_cancel">취소</string>
+    <string name="dialog_save">저장</string>
 
     <!--notification-->
     <string name="item_notification_title"><font color="#000000">모우리</font>님이 <b>매일 잔디채우기</b> 미션에 <b>2</b>번째 스탬프를 찍었어요!!!!!!!!!!!!!!!!!!!!!</string>
@@ -71,12 +73,18 @@
 
     <!--missionsAdd-->
     <string name="missions_add_what_mission_title">어떤 미션인가요?</string>
-    <string name="missions_add_what_mission">미션제목을 입력하세요.</string>
-    <string name="missions_add_how_mission_title">얼마동안 할건가요?</string>
-    <string name="missions_add_when">2021.10.26 ~ 2021.11.30</string>
+    <string name="missions_add_what_mission">미션명을 입력하세요.</string>
+    <string name="missions_add_how_mission_title">얼마나 오래 하시나요?</string>
     <string name="missions_add_count_front">미션을</string>
-    <string name="missions_add_count_middle">10</string>
-    <string name="missions_add_count_back">번 수행할거에요.</string>
+    <string name="missions_add_count_back">번 수행할거예요.</string>
+    <string name="missions_add_when_start">부터</string>
+    <string name="missions_add_what_invalid">1~10자 사이로 입력해주세요.</string>
+    <string name="missions_add_when_start_title">시작일</string>
+    <string name="missions_add_when_start_hint">2021년 10월 11일</string>
+    <string name="missions_add_when_end_title">종료일</string>
+    <string name="missions_add_when_end_hint">2021년 10월 11일</string>
+    <string name="missions_add_when_invalid">종료일이 시작일보다 빨라요.</string>
+    <string name="missions_add_count_hint">10</string>
 
     <!--members-->
     <string name="members_title">\'우리\'들</string>
