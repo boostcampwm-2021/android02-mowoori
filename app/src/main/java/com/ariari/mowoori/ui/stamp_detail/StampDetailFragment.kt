@@ -2,6 +2,7 @@ package com.ariari.mowoori.ui.stamp_detail
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -74,7 +75,8 @@ class StampDetailFragment :
 
     private fun setIsCertifyObserver() {
         viewModel.isCertify.observe(viewLifecycleOwner, EventObserver {
-            binding.btnStampDetailCertify.isVisible = it
+            if (it) binding.btnStampDetailCertify.isVisible = true
+            else binding.btnStampDetailCertify.isInvisible = true
         })
     }
 }

@@ -54,10 +54,20 @@ class StampsAdapter(private val listener: OnItemClickListener) :
         fun bind(stampInfo: StampInfo) {
             ViewCompat.setTransitionName(binding.ivItemStamps, stampInfo.pictureUrl)
             binding.tvItemStampsIndex.text = (adapterPosition + 1).toString()
-            if (stampInfo.pictureUrl != "") {
-                binding.ivItemStamps.setImageResource(R.drawable.ic_launcher_background)
-                binding.ivItemStamps.cropToPadding = true
-                binding.tvItemStampsIndex.isInvisible = true
+            // TODO: 이런 로직은 뷰모델에서 해야하는데, 어댑터에 대한 뷰모델을 만들어아 할까?
+            when {
+                stampInfo.pictureUrl.contains("default") -> {
+                    // TODO: 기본 이미지 적용
+                    binding.ivItemStamps.setImageResource(R.drawable.ic_launcher_background)
+                    binding.ivItemStamps.clipToOutline = true
+                    binding.tvItemStampsIndex.isInvisible = true
+                }
+                stampInfo.pictureUrl != "" -> {
+                    // TODO: 글라이드
+                }
+                else -> {
+                    // TODO: 번호만 표시
+                }
             }
         }
     }
