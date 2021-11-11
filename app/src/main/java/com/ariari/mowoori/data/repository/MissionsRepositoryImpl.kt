@@ -73,21 +73,4 @@ class MissionsRepositoryImpl @Inject constructor(
         val userInfo = snapshot.getValue(UserInfo::class.java)
         userInfo?.nickname ?: throw NullPointerException("getUserName is null")
     }
-
-//    override suspend fun addUserToGroup(groupId: String, user: User): Result<String> = kotlin.runCatching {
-//        val snapshot = Reference.child("groups/$groupId").get().await()
-//        val tmpGroup = snapshot.getValue(GroupInfo::class.java)
-//            ?: throw NullPointerException("group is Null")
-//        val tmpUserList = tmpGroup.userList.toMutableList().apply { add(user.userId) }
-//        val newGroupInfo = tmpGroup.copy(userList = tmpUserList)
-//
-//        val tmpGroupList = user.userInfo.groupList.toMutableList().apply { add(groupId) }
-//        val newUserInfo = user.userInfo.copy(groupList = tmpGroupList, currentGroupId = groupId)
-//        val childUpdates = hashMapOf(
-//            "/groups/$groupId" to newGroupInfo,
-//            "/users/${user.userId}" to newUserInfo
-//        )
-//        databaseReference.updateChildren(childUpdates)
-//        groupId
-//    }
 }
