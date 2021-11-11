@@ -1,7 +1,9 @@
 package com.ariari.mowoori.ui.stamp_detail
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -39,6 +41,7 @@ class StampDetailFragment :
         setMissionName()
         setPicture()
         setPictureListener()
+        setRootClick()
         setCloseBtnClickObserver()
         setIsCertifyObserver()
     }
@@ -76,6 +79,21 @@ class StampDetailFragment :
             PictureDialogFragment().show(requireActivity().supportFragmentManager,
                 "PictureDialogFragment")
         }
+    }
+
+    private fun setRootClick() {
+        binding.container.setOnClickListener {
+            hideKeyboard(it)
+            requireActivity().currentFocus?.clearFocus()
+        }
+    }
+
+    private fun hideKeyboard(v: View) {
+        // InputMethodManager 를 통해 가상 키보드를 숨길 수 있다.
+        // 현재 focus 되어있는 뷰의 windowToken 을 hideSoftInputFromWindow 메서드의 매개변수로 넘겨준다.
+        val inputMethodManager =
+            requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(v.windowToken, 0)
     }
 
     private fun setCloseBtnClickObserver() {
