@@ -6,7 +6,6 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
-import android.content.Context
 import android.graphics.Path
 import android.os.Bundle
 import android.util.TypedValue
@@ -19,7 +18,6 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -519,7 +517,7 @@ class HomeFragment : Fragment() {
         faceDisappearAnim.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 super.onAnimationEnd(animation)
-                binding?.ivHomeSnowmanFace.setImageResource(R.drawable.ic_snowman_face_3_done)
+                _binding?.ivHomeSnowmanFace?.setImageResource(R.drawable.ic_snowman_face_3_done)
                 showFace()
             }
         })

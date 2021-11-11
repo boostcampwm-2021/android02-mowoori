@@ -1,13 +1,10 @@
 package com.ariari.mowoori.data.repository
 
-import android.net.Uri
+import com.ariari.mowoori.ui.home.entity.GroupInfo
 import com.ariari.mowoori.ui.register.entity.UserInfo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.GenericTypeIndicator
-import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.tasks.await
-import java.lang.Exception
 import java.lang.NullPointerException
 import javax.inject.Inject
 
@@ -25,5 +22,10 @@ class HomeRepositoryImpl @Inject constructor(
         userInfo ?: throw NullPointerException("userInfo is Null")
     }
 
+    override suspend fun getGroupInfo(groupId: String): Result<GroupInfo> = kotlin.runCatching {
+        val snapshot = firebaseReference.child("groups/$groupId").get().await()
+        val groupInfo = snapshot.getValue(GroupInfo::class.java)
+        groupInfo ?: throw NullPointerException("groupInfo is Null")
+    }
 
 }
