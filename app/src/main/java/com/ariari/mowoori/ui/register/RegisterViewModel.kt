@@ -71,6 +71,6 @@ class RegisterViewModel @Inject constructor(
     }
 
     private fun checkNicknameValid(nickname: String): Boolean {
-        return (nickname.length <= 10 && nickname.isNotEmpty())
+        return (nickname.length <= 11 && nickname.isNotEmpty())
     }
 }

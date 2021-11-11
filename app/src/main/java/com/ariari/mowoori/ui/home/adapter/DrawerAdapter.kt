@@ -8,13 +8,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.ItemDrawerGroupBinding
 import com.ariari.mowoori.databinding.ItemDrawerHeaderBinding
+import com.ariari.mowoori.ui.home.entity.Group
 import com.ariari.mowoori.ui.home.entity.GroupInfo
 
 class DrawerAdapter(private val listener: OnItemClickListener) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     interface OnItemClickListener {
-        fun itemClick(position: Int)
+        fun itemClick(groupId: String)
     }
 
     companion object {
@@ -22,7 +23,7 @@ class DrawerAdapter(private val listener: OnItemClickListener) :
         private const val GROUP = 1
     }
 
-    var groups = listOf<GroupInfo>()
+    var groups = listOf<Group>()
 
     override fun getItemViewType(position: Int): Int {
         return when (position) {
@@ -33,12 +34,20 @@ class DrawerAdapter(private val listener: OnItemClickListener) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            HEADER -> HeaderViewHolder(ItemDrawerHeaderBinding.inflate(LayoutInflater.from(parent.context),
-                parent,
-                false))
-            else -> GroupViewHolder(ItemDrawerGroupBinding.inflate(LayoutInflater.from(parent.context),
-                parent,
-                false))
+            HEADER -> HeaderViewHolder(
+                ItemDrawerHeaderBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            )
+            else -> GroupViewHolder(
+                ItemDrawerGroupBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            )
         }
     }
 
@@ -65,17 +74,21 @@ class DrawerAdapter(private val listener: OnItemClickListener) :
 
         init {
             binding.root.setOnClickListener {
-                listener.itemClick(adapterPosition)
+                binding.group?.groupId?.let { id ->
+                    listener.itemClick(id)
+                }
             }
         }
 
-        fun bind(groupInfo: GroupInfo) {
-            binding.tvDrawerGroupName.text = groupInfo.groupName
-            if (groupInfo.selected) {
+        fun bind(group: Group) {
+            binding.group = group
+            binding.tvDrawerGroupName.text = group.groupInfo.groupName
+            if (group.selected) {
                 binding.root.setBackgroundResource(R.drawable.border_sky_blue_fill_16)
             } else {
                 binding.root.setBackgroundResource(R.drawable.border_transparent_fill)
             }
+            binding.executePendingBindings()
         }
     }
 }

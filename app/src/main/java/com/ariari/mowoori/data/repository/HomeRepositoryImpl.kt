@@ -1,5 +1,6 @@
 package com.ariari.mowoori.data.repository
 
+import com.ariari.mowoori.ui.home.entity.Group
 import com.ariari.mowoori.ui.home.entity.GroupInfo
 import com.ariari.mowoori.ui.register.entity.UserInfo
 import com.google.firebase.auth.FirebaseAuth
@@ -22,10 +23,18 @@ class HomeRepositoryImpl @Inject constructor(
         userInfo ?: throw NullPointerException("userInfo is Null")
     }
 
-    override suspend fun getGroupInfo(groupId: String): Result<GroupInfo> = kotlin.runCatching {
+    override suspend fun getGroup(groupId: String): Result<Group> = kotlin.runCatching {
         val snapshot = firebaseReference.child("groups/$groupId").get().await()
         val groupInfo = snapshot.getValue(GroupInfo::class.java)
-        groupInfo ?: throw NullPointerException("groupInfo is Null")
+            ?: throw NullPointerException("groupInfo is Null")
+        Group(groupId, groupInfo)
+    }
+
+    override fun setCurrentGroupId(groupId: String) {
+        val uid = getUserUid()
+        uid?.let { userId ->
+            firebaseReference.child("users/$userId/currentGroupId").setValue(groupId)
+        }
     }
 
 }

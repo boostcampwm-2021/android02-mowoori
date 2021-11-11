@@ -89,6 +89,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = homeViewModel
         setUserInfoObserver()
         setCurrentGroupInfoObserver()
         setGroupInfoListObserver()
@@ -109,7 +110,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun setUserInfo() {
-        // TODO: 유저아이디는 로컬에서 가져오기 (현재는 더미 데이터 사용)
         homeViewModel.setUserInfo()
     }
 
@@ -120,14 +120,14 @@ class HomeFragment : Fragment() {
     }
 
     private fun setCurrentGroupInfoObserver() {
-        homeViewModel.currentGroupInfo.observe(viewLifecycleOwner, { groupInfo ->
-            binding.tbHome.title = groupInfo.groupName
+        homeViewModel.currentGroupInfo.observe(viewLifecycleOwner, { group ->
+            adapter.notifyDataSetChanged()
         })
     }
 
     private fun setGroupInfoListObserver() {
-        homeViewModel.groupInfoList.observe(viewLifecycleOwner, { groupInfoList ->
-            adapter.groups = groupInfoList
+        homeViewModel.groupList.observe(viewLifecycleOwner, { groupList ->
+            adapter.groups = groupList
             adapter.notifyDataSetChanged()
         })
     }
@@ -164,8 +164,8 @@ class HomeFragment : Fragment() {
 
     private fun setDrawerAdapter() {
         adapter = DrawerAdapter(object : DrawerAdapter.OnItemClickListener {
-            override fun itemClick(position: Int) {
-                homeViewModel.setCurrentGroupInfo(position)
+            override fun itemClick(groupId: String) {
+                homeViewModel.setCurrentGroupInfo(groupId)
                 binding.drawerHome.close()
             }
         })
