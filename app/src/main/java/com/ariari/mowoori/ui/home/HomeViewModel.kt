@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.HomeRepository
-import com.ariari.mowoori.data.repository.IntroRepository
 import com.ariari.mowoori.ui.home.entity.GroupInfo
 import com.ariari.mowoori.ui.register.entity.UserInfo
 import com.ariari.mowoori.util.Event
@@ -15,6 +14,8 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -62,19 +63,11 @@ class HomeViewModel @Inject constructor(
     }
 
     fun setGroupInfoList(userInfo: UserInfo) {
-        val tempGroupList = mutableListOf<GroupInfo>()
-        userInfo.groupList.forEachIndexed { index, groupId ->
-            databaseReference.child("groups").child(groupId).get().addOnSuccessListener {
-                val groupInfo = it.getValue(GroupInfo::class.java) ?: return@addOnSuccessListener
-                if (index == 0) {
-                    groupInfo.selected = true
-                    _currentGroupInfo.value = groupInfo
-                }
-                tempGroupList.add(groupInfo)
-                _groupInfoList.value = tempGroupList
-            }.addOnFailureListener {
-                // TODO: 실패처리
-            }
+        viewModelScope.launch(Dispatchers.IO) {
+            val deferredList =
+                userInfo.groupList.map { groupId -> async { homeRepository.getGroupInfo(groupId) } }
+            val groupList = deferredList.awaitAll().mapNotNull { it.getOrNull() }
+            _groupInfoList.postValue(groupList)
         }
     }
 
@@ -94,7 +87,7 @@ class HomeViewModel @Inject constructor(
         _groupInfoList.value = tempGroupList.requireNoNulls()
     }
 
-    fun setIsFirstCycle(isFirst:Boolean){
+    fun setIsFirstCycle(isFirst: Boolean) {
         _isFirstCycle = isFirst
     }
 
@@ -111,7 +104,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun addSnowAnim(anim: Animator) {
-        if(!snowAnimList.contains(anim)){
+        if (!snowAnimList.contains(anim)) {
             snowAnimList.add(anim)
         }
     }
