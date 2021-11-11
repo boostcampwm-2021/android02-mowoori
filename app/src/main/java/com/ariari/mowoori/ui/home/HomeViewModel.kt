@@ -4,14 +4,24 @@ import android.animation.Animator
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.ariari.mowoori.data.repository.HomeRepository
+import com.ariari.mowoori.data.repository.IntroRepository
 import com.ariari.mowoori.ui.home.entity.GroupInfo
 import com.ariari.mowoori.ui.register.entity.UserInfo
 import com.ariari.mowoori.util.Event
 import com.ariari.mowoori.util.TimberUtil
 import com.google.firebase.database.FirebaseDatabase
 import com.google.gson.Gson
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class HomeViewModel : ViewModel() {
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    private val homeRepository: HomeRepository
+) : ViewModel() {
     // TODO: Hilt 인스턴스 주입
     private val firebaseDatabase = FirebaseDatabase.getInstance()
     private val databaseReference = firebaseDatabase.reference
@@ -38,14 +48,16 @@ class HomeViewModel : ViewModel() {
     private val snowAnimList: MutableList<Animator> = mutableListOf()
 
     fun setUserInfo() {
-        // TODO: 레포지토리에서 실행되는 코드
-        val tempUserId = "kldaji"
-        databaseReference.child("users").child(tempUserId).get().addOnSuccessListener {
-            val userInfoJson = it.value ?: return@addOnSuccessListener
-            val userInfo = gson.fromJson(userInfoJson.toString(), UserInfo::class.java)
-            _userInfo.value = Event(userInfo)
-        }.addOnFailureListener {
-            // TODO: 실패처리
+        val uid = homeRepository.getUserUid()
+        uid?.let {
+            viewModelScope.launch(Dispatchers.IO) {
+                val result = homeRepository.getUserInfo(it)
+                result.onSuccess { userInfo ->
+                    _userInfo.postValue(Event(userInfo))
+                }.onFailure {
+                    TimberUtil.timber("setUserInfo*()", "$it")// TODO: 실패처리
+                }
+            }
         }
     }
 
@@ -53,8 +65,7 @@ class HomeViewModel : ViewModel() {
         val tempGroupList = mutableListOf<GroupInfo>()
         userInfo.groupList.forEachIndexed { index, groupId ->
             databaseReference.child("groups").child(groupId).get().addOnSuccessListener {
-                val groupInfoJson = it.value ?: return@addOnSuccessListener
-                val groupInfo = gson.fromJson(groupInfoJson.toString(), GroupInfo::class.java)
+                val groupInfo = it.getValue(GroupInfo::class.java) ?: return@addOnSuccessListener
                 if (index == 0) {
                     groupInfo.selected = true
                     _currentGroupInfo.value = groupInfo

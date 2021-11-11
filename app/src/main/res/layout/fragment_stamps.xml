@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="com.ariari.mowoori.ui.custom.TitleViewMode" />
+
+        <variable
+            name="viewModel"
+            type="com.ariari.mowoori.ui.stamp.StampsViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.ariari.mowoori.ui.custom.CustomTitleView
+            android:id="@+id/title_view_stamps"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:onBackClick="@{viewModel::setBackBtnClick}"
+            app:titleViewMode="@{TitleViewMode.TITLE_VIEW_BACK_BUTTON}"
+            app:titleViewText="@{viewModel.missionName.peekContent()}" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_stamps"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="32dp"
+            android:padding="10dp"
+            app:layout_constraintBottom_toTopOf="@id/btn_stamps_complete"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title_view_stamps"
+            tools:listitem="@layout/item_stamps" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_stamps_complete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:background="@drawable/border_sky_blue_line_30"
+            android:padding="12dp"
+            android:text="@string/stamps_complete"
+            android:textColor="@color/sky_blue_2094FF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:visibility="@{viewModel.isMyMission().peekContent() ? 0 : 1}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rv_stamps" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

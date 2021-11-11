@@ -3,6 +3,7 @@
     <string name="binding_error">Binding not initialized to reference the view.</string>
     <string name="nothing">아무것도 없어요</string>
     <string name="desc_app_logo">앱 로고</string>
+    <string name="cancel">취소</string>
 
     <string name="bottom_nav_home">Home</string>
     <string name="bottom_nav_missions">Missions</string>
@@ -11,7 +12,7 @@
 
     <!-- Register -->
     <string name="register_please_enter_nickname">닉네임을\n입력해주세요</string>
-    <string name="register_nickname_hint">(1자 이상 10자 이하)</string>
+    <string name="register_nickname_hint">(1자 이상 11자 이하)</string>
     <string name="register_nickname_error_msg">닉네임을 확인해주세요</string>
     <string name="register_fail_msg">회원가입에 실패했습니다.</string>
     <string name="desc_profile_image">프로필 이미지</string>
@@ -50,10 +51,37 @@
     <string name="missions_done">완료</string>
     <string name="missions_fail">실패</string>
 
+    <!-- StampFragment -->
+    <string name="stamps_mission">매일 잔디 채우기</string>
+    <string name="stamps_number">1</string>
+    <string name="stamps_complete">오늘도 완료!</string>
+    <string name="desc_item_stamps_stamp">스탬프</string>
+    <string name="desc_item_stamps_icon">스탬프 아이콘</string>
+
+    <!-- DialogFragment -->
+    <string name="dialog_yes">예</string>
+    <string name="dialog_no">아니오</string>
+    <string name="dialog_message">계속 진행하시겠습니까?</string>
+
     <!--notification-->
     <string name="item_notification_title"><font color="#000000">모우리</font>님이 <b>매일 잔디채우기</b> 미션에 <b>2</b>번째 스탬프를 찍었어요!!!!!!!!!!!!!!!!!!!!!</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="desc_home_snowman_button">눈사람 단추</string>
+
+    <!--missionsAdd-->
+    <string name="missions_add_what_mission_title">어떤 미션인가요?</string>
+    <string name="missions_add_what_mission">미션제목을 입력하세요.</string>
+    <string name="missions_add_how_mission_title">얼마동안 할건가요?</string>
+    <string name="missions_add_when">2021.10.26 ~ 2021.11.30</string>
+    <string name="missions_add_count_front">미션을</string>
+    <string name="missions_add_count_middle">10</string>
+    <string name="missions_add_count_back">번 수행할거에요.</string>
+
+    <!--members-->
+    <string name="members_title">\'우리\'들</string>
+    <string name="members_share">공유하기</string>
+    <string name="members_invite_code_title">초대코드</string>
+    <string name="members_invite_code_copy_complete">초대코드가 클립보드에 복사되었습니다.</string>
 
 </resources>

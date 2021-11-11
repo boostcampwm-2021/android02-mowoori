@@ -2,35 +2,70 @@ package com.ariari.mowoori.ui.group
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.ariari.mowoori.data.repository.GroupRepository
+import com.ariari.mowoori.data.repository.IntroRepository
 import com.ariari.mowoori.ui.home.entity.GroupInfo
-import com.google.firebase.database.FirebaseDatabase
+import com.ariari.mowoori.util.Event
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class GroupViewModel : ViewModel() {
-    // TODO: Hilt 인스턴스 주입
-    private val firebaseDatabase = FirebaseDatabase.getInstance()
-    private val databaseReference = firebaseDatabase.reference
+@HiltViewModel
+class GroupViewModel @Inject constructor(
+    private val groupRepository: GroupRepository,
+    private val introRepository: IntroRepository
+) : ViewModel() {
 
-    private val _groupName = MutableLiveData<String>()
-    private val _isValid = Transformations.map(_groupName) { groupName ->
-        groupName.length in 1..8
+    val groupName = MutableLiveData<String>("")
+
+    private val _addGroupCompleteEvent = MutableLiveData<Event<String>>()
+    val addGroupCompleteEvent: LiveData<Event<String>> = _addGroupCompleteEvent
+
+    private val _inValidEvent = MutableLiveData<Event<Unit>>()
+    val inValidEvent: LiveData<Event<Unit>> = _inValidEvent
+
+    fun setGroupName() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val randomName = introRepository.getRandomNickName()
+            groupName.postValue(randomName + "들")
+        }
     }
-    val isValid: LiveData<Boolean> = _isValid
 
-    fun checkGroupNameValidation(name: String) {
-        _groupName.value = name
+    fun joinGroup() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val name = groupName.value ?: return@launch
+            val exist = groupRepository.isExistGroupId(name)
+            if (!exist) {
+                _inValidEvent.postValue(Event(Unit))
+            } else {
+                groupRepository.getUser().onSuccess {
+                    groupRepository.addUserToGroup(name, it).onSuccess { newGroupId ->
+                        _addGroupCompleteEvent.postValue(Event(newGroupId))
+                    }.onFailure {
+                        _addGroupCompleteEvent.postValue(Event(""))
+                    }
+                }.onFailure {
+                    _addGroupCompleteEvent.postValue(Event(""))
+                }
+            }
+        }
     }
 
-    // TODO: 레포지토리에 실행되어야할 코드
+
     fun addNewGroup() {
-        // TODO: 유저 아이디 가져오기
-
-        val name = _groupName.value ?: return
-        val groupInfo = GroupInfo(name)
-        val groupId = databaseReference.child("groups").push().key ?: return
-        databaseReference.child("groups").child(groupId).setValue(groupInfo)
-
-        // TODO: 가져온 유저의 그룹 리스트에 생성한 그룹 추가
+        viewModelScope.launch(Dispatchers.IO) {
+            groupRepository.getUser().onSuccess {
+                val name = groupName.value ?: return@launch
+                val groupInfo = GroupInfo(name, listOf(it.userId))
+                groupRepository.putGroupInfo(groupInfo, it).onSuccess { newGroupId ->
+                    _addGroupCompleteEvent.postValue(Event(newGroupId))
+                }.onFailure {
+                    _addGroupCompleteEvent.postValue(Event(""))
+                }
+            }
+        }
     }
 }

@@ -6,13 +6,16 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.ariari.mowoori.databinding.ItemMissionsBinding
+import com.ariari.mowoori.ui.missions.MissionsViewModel
 import com.ariari.mowoori.ui.missions.entity.Mission
 
-class MissionsAdapter : ListAdapter<Mission, MissionsAdapter.MissionsViewHolder>(missionsDiffUtil) {
+class MissionsAdapter(private val viewModel: MissionsViewModel) :
+    ListAdapter<Mission, MissionsAdapter.MissionsViewHolder>(missionsDiffUtil) {
     class MissionsViewHolder(private val binding: ItemMissionsBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(mission: Mission) {
+        fun bind(mission: Mission, viewModel: MissionsViewModel) {
             binding.missionInfo = mission.missionInfo
+            binding.viewModel = viewModel
         }
     }
 
@@ -22,7 +25,7 @@ class MissionsAdapter : ListAdapter<Mission, MissionsAdapter.MissionsViewHolder>
         )
 
     override fun onBindViewHolder(holder: MissionsViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position), viewModel)
     }
 
     companion object {
@@ -32,7 +35,6 @@ class MissionsAdapter : ListAdapter<Mission, MissionsAdapter.MissionsViewHolder>
 
             override fun areContentsTheSame(oldItem: Mission, newItem: Mission): Boolean =
                 oldItem == newItem
-
         }
     }
 }

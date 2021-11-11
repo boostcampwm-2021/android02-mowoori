@@ -12,11 +12,13 @@
         android:padding="30dp">
 
         <TextView
-            android:maxLines="1"
             android:id="@+id/tv_confirm_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="계속 진행하시겠습니까?"
+            android:gravity="center_horizontal"
+            android:maxLines="1"
+            android:text="@string/dialog_message"
+            android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
@@ -27,27 +29,29 @@
             android:id="@+id/btn_confirm_yes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            android:background="@drawable/border_sky_blue_line_64"
-            android:text="예"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/border_sky_blue_line_30"
+            android:text="@string/dialog_yes"
             android:textColor="@color/sky_blue_2094FF"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@id/btn_confirm_no"
-            app:layout_constraintStart_toStartOf="@+id/tv_confirm_message"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_confirm_message" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_confirm_no"
-
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/border_sky_blue_line_64"
-            android:text="아니오"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/border_sky_blue_line_30"
+            android:text="@string/dialog_no"
             android:textColor="@color/sky_blue_2094FF"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="@+id/tv_confirm_message"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/btn_confirm_yes"
             app:layout_constraintTop_toTopOf="@id/btn_confirm_yes" />
     </androidx.constraintlayout.widget.ConstraintLayout>

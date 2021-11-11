@@ -1,10 +1,15 @@
 package com.ariari.mowoori.ui.missions.entity
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class Mission(
     val missionId: String = "",
     val missionInfo: MissionInfo
-)
+) : Parcelable
 
+@Parcelize
 data class MissionInfo(
     val missionName: String = "",
     val userId: String = "",
@@ -13,4 +18,4 @@ data class MissionInfo(
     val startDate: Int = 0,
     val dueDate: Int = 0,
     val stampList: List<String> = emptyList()
-)
+) : Parcelable
