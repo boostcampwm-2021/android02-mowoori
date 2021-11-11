@@ -17,6 +17,7 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
     private val missionsAdapter: MissionsAdapter by lazy {
         MissionsAdapter(missionsViewModel)
     }
+    private lateinit var userName: String
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -27,6 +28,8 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
         setMissionsTypeObserver()
         setMissionsListObserver()
         setItemClickObserver()
+        getUserName()
+        setUserNameObserver()
     }
 
     private fun setMissionsRvAdapter() {
@@ -55,9 +58,20 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
         missionsViewModel.itemClick.observe(viewLifecycleOwner, EventObserver {
             findNavController().navigate(
                 MissionsFragmentDirections.actionMissionsFragmentToStampsFragment(
-                    it
+                    it, userName
                 )
             )
+        })
+    }
+
+    private fun getUserName() {
+        // TODO: userId 인자로 받아오기 (구성원 화면 구현 시)
+        missionsViewModel.getUserName("user1")
+    }
+
+    private fun setUserNameObserver() {
+        missionsViewModel.userName.observe(viewLifecycleOwner, EventObserver {
+            userName = it
         })
     }
 }

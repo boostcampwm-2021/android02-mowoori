@@ -2,6 +2,7 @@ package com.ariari.mowoori.data.repository
 
 import com.ariari.mowoori.ui.missions.entity.Mission
 import com.ariari.mowoori.ui.missions.entity.MissionInfo
+import com.ariari.mowoori.ui.register.entity.UserInfo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.GenericTypeIndicator
@@ -51,5 +52,11 @@ class MissionsRepositoryImpl @Inject constructor(
     override suspend fun postMissionIdList(groupId: String, missionIdList: List<String>) {
         firebaseReference.child("groups").child(groupId).child("missionList")
             .setValue(missionIdList).await()
+    }
+
+    override suspend fun getUserName(userId: String): Result<String> = kotlin.runCatching {
+        val snapshot = firebaseReference.child("users").child(userId).get().await()
+        val userInfo = snapshot.getValue(UserInfo::class.java)
+        userInfo?.nickname ?: throw NullPointerException("getUserName is null")
     }
 }

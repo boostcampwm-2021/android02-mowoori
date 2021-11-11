@@ -14,4 +14,5 @@ interface MissionsRepository {
     // mission 추가
     suspend fun postMissionIdList(groupId: String, missionIdList: List<String>)
     suspend fun postMission(mission: Mission)
+    suspend fun getUserName(userId: String): Result<String>
 }
