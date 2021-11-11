@@ -10,6 +10,7 @@ import com.ariari.mowoori.ui.missions.entity.MissionInfo
 import com.ariari.mowoori.util.Event
 import com.ariari.mowoori.util.getCurrentDate
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -29,6 +30,9 @@ class MissionsViewModel @Inject constructor(
 
     private val _missionsList = MutableLiveData<List<Mission>>()
     val missionsList: LiveData<List<Mission>> = _missionsList
+
+    private val _userName = MutableLiveData<Event<String>>()
+    val userName: LiveData<Event<String>> get() = _userName
 
 //    val tempNotDoneMissions = mutableListOf(
 //        Mission("mission1", MissionInfo("미완료 미션1", "user1", 30, 10, 211101, 211201)),
@@ -96,6 +100,18 @@ class MissionsViewModel @Inject constructor(
     fun setItemClick(missionInfo: MissionInfo) {
         Timber.d("item click")
         _itemClick.postValue(Event(missionInfo))
+    }
+
+    fun getUserName(userId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            missionsRepository.getUserName(userId)
+                .onSuccess {
+                    _userName.postValue(Event(it))
+                }
+                .onFailure {
+                    println("${it.message}")
+                }
+        }
     }
 
     companion object {

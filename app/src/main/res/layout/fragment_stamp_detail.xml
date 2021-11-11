@@ -11,36 +11,147 @@
             type="com.ariari.mowoori.ui.stamp_detail.StampDetailViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.ariari.mowoori.ui.custom.CustomTitleView
-            android:id="@+id/title_view_stamps"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:onCloseClick="@{viewModel::setCloseBtnClick}"
-            app:titleViewMode="@{TitleViewMode.TITLE_VIEW_CLOSE_BUTTON}" />
+            android:layout_height="0dp">
 
-        <TextView
-            android:id="@+id/tv_stamp_detail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            <com.ariari.mowoori.ui.custom.CustomTitleView
+                android:id="@+id/title_view_stamp_detail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:onCloseClick="@{viewModel::setCloseBtnClick}"
+                app:titleViewMode="@{TitleViewMode.TITLE_VIEW_CLOSE_BUTTON}" />
 
-        <ImageView
-            android:id="@+id/iv_stamp_detail"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_stamp_detail" />
+            <TextView
+                android:id="@+id/tv_stamp_detail_user"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:text="@{@string/stamp_detail_user(viewModel.userName.peekContent())}"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/title_view_stamp_detail" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/tv_stamp_detail_mission"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{viewModel.missionName.peekContent()}"
+                android:textColor="@color/black"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@id/tv_stamp_detail_user"
+                app:layout_constraintTop_toBottomOf="@id/tv_stamp_detail_user" />
+
+            <TextView
+                android:id="@+id/tv_stamp_detail_picture"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="@string/stamp_detail_picture"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@id/tv_stamp_detail_mission"
+                app:layout_constraintTop_toBottomOf="@id/tv_stamp_detail_mission" />
+
+            <ImageView
+                android:id="@+id/iv_stamp_detail"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/border_sky_blue_f2f6ff_fill_16"
+                android:contentDescription="@string/stamp_detail_picture"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_stamp_detail_picture" />
+
+            <TextView
+                android:id="@+id/tv_stamp_detail_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_picture"
+                app:layout_constraintBottom_toBottomOf="@id/iv_stamp_detail"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/iv_stamp_detail" />
+
+            <TextView
+                android:id="@+id/tv_stamp_detail_comment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="@string/stamp_detail_comment"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@id/tv_stamp_detail_picture"
+                app:layout_constraintTop_toBottomOf="@id/iv_stamp_detail" />
+
+            <EditText
+                android:id="@+id/et_stamp_detail_comment"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/border_sky_blue_f2f6ff_fill_16"
+                android:gravity="top|start"
+                android:hint="@string/stamp_detail_hint"
+                android:importantForAutofill="no"
+                android:inputType="textMultiLine|text"
+                android:maxLength="100"
+                android:maxLines="6"
+                android:minLines="6"
+                android:padding="12dp"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                app:layout_constraintEnd_toEndOf="@id/guideline_end"
+                app:layout_constraintStart_toStartOf="@id/tv_stamp_detail_comment"
+                app:layout_constraintTop_toBottomOf="@id/tv_stamp_detail_comment" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/stamp_detail_valid"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="@id/et_stamp_detail_comment"
+                app:layout_constraintTop_toBottomOf="@id/et_stamp_detail_comment" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_stamp_detail_certify"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="40dp"
+                android:background="@drawable/border_sky_blue_line_30"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/stamp_detail_complete"
+                android:textColor="@color/sky_blue_2094FF"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/et_stamp_detail_comment" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_end="24dp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
 </layout>

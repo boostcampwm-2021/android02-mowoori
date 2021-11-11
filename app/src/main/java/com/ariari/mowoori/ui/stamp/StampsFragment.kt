@@ -15,6 +15,8 @@ import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentStampsBinding
 import com.ariari.mowoori.ui.missions.entity.MissionInfo
 import com.ariari.mowoori.ui.stamp.adapter.StampsAdapter
+import com.ariari.mowoori.ui.stamp.entity.DetailInfo
+import com.ariari.mowoori.ui.stamp.entity.DetailMode
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
 import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.widget.ProgressDialogManager
@@ -27,6 +29,7 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
     private lateinit var adapter: StampsAdapter
     private val viewModel: StampsViewModel by viewModels()
     private lateinit var missionInfo: MissionInfo
+    private lateinit var userName: String
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -34,6 +37,7 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         binding.viewModel = viewModel
         setStartEnterTransition()
         setMissionInfo()
+        setUserName()
         setMissionName()
         setStampList()
         setAdapter()
@@ -56,6 +60,10 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         missionInfo = safeArgs.missionInfo
     }
 
+    private fun setUserName() {
+        userName = safeArgs.userName
+    }
+
     private fun setMissionName() {
         viewModel.setMissionName(missionInfo.missionName)
     }
@@ -74,7 +82,10 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
                 )
                 this@StampsFragment.findNavController()
                     .navigate(StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
-                        stampInfo, missionInfo.missionName), extras)
+                        DetailInfo(userName,
+                            missionInfo.missionName,
+                            DetailMode.INQUIRY,
+                            stampInfo)), extras)
 //                viewModel.setSelectedStampInfo(position, missionInfo.curStamp)
             }
         })
@@ -89,7 +100,10 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         binding.btnStampsComplete.setOnClickListener {
             it.findNavController()
                 .navigate(StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
-                    StampInfo(), missionInfo.missionName))
+                    DetailInfo(userName,
+                        missionInfo.missionName,
+                        DetailMode.CERTIFY,
+                        StampInfo())))
         }
     }
 
@@ -149,7 +163,10 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         viewModel.selectedStampInfo.observe(viewLifecycleOwner, EventObserver { stampInfo ->
             this.findNavController()
                 .navigate(StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
-                    stampInfo, missionInfo.missionName))
+                    DetailInfo(userName,
+                        missionInfo.missionName,
+                        DetailMode.INQUIRY,
+                        stampInfo)))
         })
     }
 }
