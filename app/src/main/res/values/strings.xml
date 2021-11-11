@@ -87,4 +87,8 @@
     <string name="stamp_detail_hint">한줄평을 작성해주세요</string>
     <string name="stamp_detail_valid">(5자 이상 100자 이하)</string>
     <string name="stamp_detail_complete">인증하기</string>
+
+    <!-- PictureDialogFragment -->
+    <string name="dialog_picture_gallery">GALLERY</string>
+    <string name="dialog_picture_camera">CAMERA</string>
 </resources>
