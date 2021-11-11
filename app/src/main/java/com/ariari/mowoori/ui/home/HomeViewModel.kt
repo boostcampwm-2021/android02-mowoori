@@ -42,6 +42,9 @@ class HomeViewModel @Inject constructor(
     private var _snowmanLevel = MutableLiveData<SnowmanLevel>()
     val snowmanLevel: LiveData<SnowmanLevel> = _snowmanLevel
 
+    private var _isFirstCycle = true
+    val isFirstCycle = _isFirstCycle
+
     private val snowAnimList: MutableList<Animator> = mutableListOf()
 
     fun setUserInfo() {
@@ -91,6 +94,10 @@ class HomeViewModel @Inject constructor(
         _groupInfoList.value = tempGroupList.requireNoNulls()
     }
 
+    fun setIsFirstCycle(isFirst:Boolean){
+        _isFirstCycle = isFirst
+    }
+
     fun updateIsSnowing() {
         if (isSnowing.value == null) {
             _isSnowing.postValue(true)
@@ -104,7 +111,9 @@ class HomeViewModel @Inject constructor(
     }
 
     fun addSnowAnim(anim: Animator) {
-        snowAnimList.add(anim)
+        if(!snowAnimList.contains(anim)){
+            snowAnimList.add(anim)
+        }
     }
 
     fun cancelSnowAnimList() {
