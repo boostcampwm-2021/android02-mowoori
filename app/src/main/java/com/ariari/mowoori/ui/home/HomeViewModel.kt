@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.ariari.mowoori.ui.home.entity.GroupInfo
 import com.ariari.mowoori.ui.register.entity.UserInfo
 import com.ariari.mowoori.util.Event
+import com.ariari.mowoori.util.TimberUtil
 import com.google.firebase.database.FirebaseDatabase
 import com.google.gson.Gson
 
@@ -30,6 +31,9 @@ class HomeViewModel : ViewModel() {
 
     private var _snowmanLevel = MutableLiveData<SnowmanLevel>()
     val snowmanLevel: LiveData<SnowmanLevel> = _snowmanLevel
+
+    private var _isFirstCycle = true
+    val isFirstCycle = _isFirstCycle
 
     private val snowAnimList: MutableList<Animator> = mutableListOf()
 
@@ -79,6 +83,10 @@ class HomeViewModel : ViewModel() {
         _groupInfoList.value = tempGroupList.requireNoNulls()
     }
 
+    fun setIsFirstCycle(isFirst:Boolean){
+        _isFirstCycle = isFirst
+    }
+
     fun updateIsSnowing() {
         if (isSnowing.value == null) {
             _isSnowing.postValue(true)
@@ -92,7 +100,9 @@ class HomeViewModel : ViewModel() {
     }
 
     fun addSnowAnim(anim: Animator) {
-        snowAnimList.add(anim)
+        if(!snowAnimList.contains(anim)){
+            snowAnimList.add(anim)
+        }
     }
 
     fun cancelSnowAnimList() {
