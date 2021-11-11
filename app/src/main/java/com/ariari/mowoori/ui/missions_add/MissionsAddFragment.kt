@@ -14,13 +14,13 @@ import androidx.navigation.fragment.findNavController
 import com.ariari.mowoori.R
 import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentMissionsAddBinding
-import com.ariari.mowoori.ui.missions.entity.Mission
-import com.ariari.mowoori.ui.missions.entity.MissionInfo
 import com.ariari.mowoori.util.EventObserver
+import com.ariari.mowoori.util.toastMessage
 import com.ariari.mowoori.widget.BaseDialogFragment
 import com.ariari.mowoori.widget.DatePickerDialogFragment
 import com.ariari.mowoori.widget.NumberPickerDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MissionsAddFragment :
@@ -31,8 +31,6 @@ class MissionsAddFragment :
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = missionsAddViewModel
-        missionsAddViewModel.getGroupId()
-
         setObserver()
         setClickListener()
     }
@@ -57,8 +55,6 @@ class MissionsAddFragment :
     }
 
     private fun hideKeyboard(v: View) {
-        // InputMethodManager 를 통해 가상 키보드를 숨길 수 있다.
-        // 현재 focus 되어있는 뷰의 windowToken 을 hideSoftInputFromWindow 메서드의 매개변수로 넘겨준다.
         val inputMethodManager =
             requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(v.windowToken, 0)
@@ -71,12 +67,11 @@ class MissionsAddFragment :
     }
 
     private fun setCompleteEventObserver() {
-        missionsAddViewModel.isPostMission.observe(viewLifecycleOwner, EventObserver {
+        missionsAddViewModel.isMissionPosted.observe(viewLifecycleOwner, EventObserver {
+            toastMessage("미션이 성공적으로 추가되었습니다.")
             this.findNavController().navigateUp()
         })
     }
-
-    val mission = Mission("mission74", MissionInfo("미완료 미션1", "user1", 30, 10, 211101, 211201))
 
     private fun setCountEventObserver() {
         missionsAddViewModel.numberCountClick.observe(viewLifecycleOwner, EventObserver {
@@ -97,6 +92,17 @@ class MissionsAddFragment :
                 requireActivity().supportFragmentManager,
                 "NumberPickerFragment"
             )
+        })
+    }
+
+    private fun setValidationObserver() {
+        missionsAddViewModel.checkMissionValidEvent.observe(viewLifecycleOwner, {
+            if (isMissionNameValid() && isMissionDateValid()) {
+                Timber.d("success")
+                missionsAddViewModel.postMission(binding.etMissionsAddWhat.text.toString())
+            } else {
+                Timber.d("fail")
+            }
         })
     }
 
@@ -143,35 +149,36 @@ class MissionsAddFragment :
         }
     }
 
-    private fun setValidationObserver() {
-        missionsAddViewModel.inValidMissionNameEvent.observe(viewLifecycleOwner, {
-            with(binding.tvMissionsAddWhatInvalid) {
-                if (binding.etMissionsAddWhat.text.length !in 1..10) {
-                    isVisible = true
-                    getVibrateAnimInstance().run {
-                        setTarget(binding.tvMissionsAddWhatInvalid)
-                        start()
-                    }
-                } else {
-                    binding.tvMissionsAddWhatInvalid.isInvisible = true
+    private fun isMissionNameValid(): Boolean {
+        with(binding.tvMissionsAddWhatInvalid) {
+            return@isMissionNameValid if (binding.etMissionsAddWhat.text.length !in 1..10) {
+                isVisible = true
+                getVibrateAnimInstance().run {
+                    setTarget(binding.tvMissionsAddWhatInvalid)
+                    start()
                 }
+                false
+            } else {
+                binding.tvMissionsAddWhatInvalid.isInvisible = true
+                true
             }
-        })
-        missionsAddViewModel.inValidMissionDateEvent.observe(
-            viewLifecycleOwner,
-            EventObserver { flag ->
-                with(binding.tvMissionsAddWhenInvalid) {
-                    if (!flag) {
-                        isVisible = true
-                        getVibrateAnimInstance().run {
-                            setTarget(binding.tvMissionsAddWhenInvalid)
-                            start()
-                        }
-                    } else {
-                        isInvisible = true
-                    }
+        }
+    }
+
+    private fun isMissionDateValid(): Boolean {
+        with(binding.tvMissionsAddWhenInvalid) {
+            return@isMissionDateValid if (missionsAddViewModel.missionStartDate.value!! > missionsAddViewModel.missionEndDate.value!!) {
+                isVisible = true
+                getVibrateAnimInstance().run {
+                    setTarget(binding.tvMissionsAddWhenInvalid)
+                    start()
                 }
-            })
+                false
+            } else {
+                isInvisible = true
+                true
+            }
+        }
     }
 
     private fun getVibrateAnimInstance(): Animator {
