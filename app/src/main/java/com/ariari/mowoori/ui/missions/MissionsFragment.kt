@@ -23,17 +23,23 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = missionsViewModel
+
         setMissionsRvAdapter()
+        setObserver()
+        getUserName()
+    }
+
+    private fun setObserver() {
         setPlusBtnClickObserver()
         setMissionsTypeObserver()
         setMissionsListObserver()
         setItemClickObserver()
-        getUserName()
         setUserNameObserver()
     }
 
     private fun setMissionsRvAdapter() {
         binding.rvMissions.adapter = missionsAdapter
+        missionsViewModel.loadMissionsList()
     }
 
     private fun setPlusBtnClickObserver() {
@@ -44,7 +50,7 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
 
     private fun setMissionsTypeObserver() {
         missionsViewModel.missionsType.observe(viewLifecycleOwner, EventObserver {
-            missionsViewModel.setMissionsList()
+            missionsViewModel.loadMissionsList()
         })
     }
 
@@ -65,8 +71,7 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
     }
 
     private fun getUserName() {
-        // TODO: userId 인자로 받아오기 (구성원 화면 구현 시)
-        missionsViewModel.getUserName("user1")
+        missionsViewModel.loadUserName()
     }
 
     private fun setUserNameObserver() {
