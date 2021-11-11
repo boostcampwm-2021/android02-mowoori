@@ -56,6 +56,7 @@ class StampsAdapter(private val listener: OnItemClickListener) :
             binding.tvItemStampsIndex.text = (adapterPosition + 1).toString()
             if (stampInfo.pictureUrl != "") {
                 binding.ivItemStamps.setImageResource(R.drawable.ic_launcher_background)
+                binding.ivItemStamps.cropToPadding = true
                 binding.tvItemStampsIndex.isInvisible = true
             }
         }

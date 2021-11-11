@@ -2,6 +2,7 @@ package com.ariari.mowoori.ui.stamp_detail
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -9,7 +10,7 @@ import androidx.transition.TransitionInflater
 import com.ariari.mowoori.R
 import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentStampDetailBinding
-import com.ariari.mowoori.ui.stamp.entity.StampInfo
+import com.ariari.mowoori.ui.stamp.entity.DetailInfo
 import com.ariari.mowoori.util.EventObserver
 
 class StampDetailFragment :
@@ -17,7 +18,7 @@ class StampDetailFragment :
 
     private val safeArgs: StampDetailFragmentArgs by navArgs()
     private val viewModel: StampDetailViewModel by viewModels()
-    private lateinit var stampInfo: StampInfo
+    private lateinit var detailInfo: DetailInfo
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,15 +30,40 @@ class StampDetailFragment :
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
-        setStampInfo()
-        setCloseBtnClickObserver()
+        setDetailInfo()
+        setBtnVisible()
         setDetailTransitionName()
-        setDetailText()
-        setDetailImageView()
+        setUserName()
+        setMissionName()
+        setPicture()
+        setCloseBtnClickObserver()
+        setIsCertifyObserver()
     }
 
-    private fun setStampInfo() {
-        stampInfo = safeArgs.stampInfo
+    private fun setDetailInfo() {
+        detailInfo = safeArgs.detailInfo
+    }
+
+    private fun setBtnVisible() {
+        viewModel.setIsCertify(detailInfo.detailMode)
+    }
+
+    private fun setDetailTransitionName() {
+        binding.ivStampDetail.transitionName = detailInfo.stampInfo.pictureUrl
+    }
+
+    private fun setUserName() {
+        viewModel.setUserName(detailInfo.userName)
+    }
+
+    private fun setMissionName() {
+        viewModel.setMissionName(detailInfo.missionName)
+    }
+
+    private fun setPicture() {
+        if (detailInfo.stampInfo.pictureUrl != "") {
+            binding.ivStampDetail.setImageResource(R.drawable.ic_launcher_background)
+        }
     }
 
     private fun setCloseBtnClickObserver() {
@@ -46,17 +72,9 @@ class StampDetailFragment :
         })
     }
 
-    private fun setDetailTransitionName() {
-        binding.ivStampDetail.transitionName = stampInfo.pictureUrl
-    }
-
-    private fun setDetailText() {
-        binding.tvStampDetail.text = safeArgs.stampInfo.comment
-    }
-
-    private fun setDetailImageView() {
-        if (stampInfo.pictureUrl != "") {
-            binding.ivStampDetail.setImageResource(R.drawable.ic_launcher_background)
-        }
+    private fun setIsCertifyObserver() {
+        viewModel.isCertify.observe(viewLifecycleOwner, EventObserver {
+            binding.btnStampDetailCertify.isVisible = it
+        })
     }
 }
