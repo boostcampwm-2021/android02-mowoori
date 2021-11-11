@@ -17,6 +17,9 @@ import javax.inject.Inject
 class StampsViewModel @Inject constructor(private val stampsRepository: StampsRepository) :
     ViewModel() {
 
+    private val _loadingEvent = MutableLiveData<Event<Boolean>>()
+    val loadingEvent: LiveData<Event<Boolean>> get() = _loadingEvent
+
     private val _spanCount = MutableLiveData<Event<Int>>()
     val spanCount: LiveData<Event<Int>> get() = _spanCount
 
@@ -34,6 +37,10 @@ class StampsViewModel @Inject constructor(private val stampsRepository: StampsRe
 
     private val _isMyMission = MutableLiveData<Event<Boolean>>()
     val isMyMission: LiveData<Event<Boolean>> get() = _isMyMission
+
+    fun setLoadingEvent(flag: Boolean) {
+        _loadingEvent.value = Event(flag)
+    }
 
     fun setSpanCount(result: Float) {
         _spanCount.value = Event(result.toInt())

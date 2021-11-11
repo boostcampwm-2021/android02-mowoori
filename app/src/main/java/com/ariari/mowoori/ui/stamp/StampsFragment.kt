@@ -17,6 +17,7 @@ import com.ariari.mowoori.ui.missions.entity.MissionInfo
 import com.ariari.mowoori.ui.stamp.adapter.StampsAdapter
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
 import com.ariari.mowoori.util.EventObserver
+import com.ariari.mowoori.widget.ProgressDialogManager
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -60,6 +61,7 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
     }
 
     private fun setStampList() {
+        viewModel.setLoadingEvent(true)
         viewModel.setStampList(missionInfo.stampList)
     }
 
@@ -92,10 +94,18 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
     }
 
     private fun setObserver() {
+        setLoadingObserver()
         setBackBtnObserver()
         setSpanCountObserver()
         setStampListObserver()
         setSelectedStampInfoObserver()
+    }
+
+    private fun setLoadingObserver() {
+        viewModel.loadingEvent.observe(viewLifecycleOwner, EventObserver {
+            if (it) ProgressDialogManager.instance.show(requireContext())
+            else ProgressDialogManager.instance.clear()
+        })
     }
 
     private fun setBackBtnObserver() {
@@ -131,6 +141,7 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         viewModel.stampList.observe(viewLifecycleOwner, { stampList ->
             adapter.submitList(stampList)
             viewModel.fillEmptyStamps(missionInfo.totalStamp - stampList.size)
+            viewModel.setLoadingEvent(false)
         })
     }
 
