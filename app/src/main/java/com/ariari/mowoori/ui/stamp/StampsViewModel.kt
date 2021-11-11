@@ -17,6 +17,9 @@ import javax.inject.Inject
 class StampsViewModel @Inject constructor(private val stampsRepository: StampsRepository) :
     ViewModel() {
 
+    private val _loadingEvent = MutableLiveData<Event<Boolean>>()
+    val loadingEvent: LiveData<Event<Boolean>> get() = _loadingEvent
+
     private val _spanCount = MutableLiveData<Event<Int>>()
     val spanCount: LiveData<Event<Int>> get() = _spanCount
 
@@ -34,6 +37,10 @@ class StampsViewModel @Inject constructor(private val stampsRepository: StampsRe
 
     private val _isMyMission = MutableLiveData<Event<Boolean>>()
     val isMyMission: LiveData<Event<Boolean>> get() = _isMyMission
+
+    fun setLoadingEvent(flag: Boolean) {
+        _loadingEvent.value = Event(flag)
+    }
 
     fun setSpanCount(result: Float) {
         _spanCount.value = Event(result.toInt())
@@ -56,7 +63,6 @@ class StampsViewModel @Inject constructor(private val stampsRepository: StampsRe
     }
 
     fun setStampList(stampIdList: List<String>) {
-        val currentStampList = _stampList.value ?: return
         // postValue 이슈 방지를 위해 for 문 밖에서 스코프 설정
         viewModelScope.launch(Dispatchers.IO) {
             val tempStampList = mutableListOf<Stamp>()
@@ -69,10 +75,21 @@ class StampsViewModel @Inject constructor(private val stampsRepository: StampsRe
                         println("${it.message}")
                     }
             }
-            // 리스트의 깊은 복사를 위한 addAll 처리
-            tempStampList.addAll(currentStampList.subList(stampIdList.size, currentStampList.size))
             _stampList.postValue(tempStampList)
         }
+    }
+
+    fun fillEmptyStamps(count: Int) {
+        val currentStampList = _stampList.value ?: return
+        if (count == 0) return
+
+        val tempEmptyStampList = mutableListOf<Stamp>()
+        // 리스트의 깊은 복사를 위한 addAll 처리
+        tempEmptyStampList.addAll(currentStampList)
+        repeat(count) {
+            tempEmptyStampList.add(Stamp(stampInfo = StampInfo()))
+        }
+        _stampList.value = tempEmptyStampList
     }
 
     fun setSelectedStampInfo(position: Int, currentStamp: Int) {

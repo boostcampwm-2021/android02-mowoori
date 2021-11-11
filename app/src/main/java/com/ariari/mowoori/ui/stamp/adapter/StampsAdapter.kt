@@ -2,6 +2,9 @@ package com.ariari.mowoori.ui.stamp.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.core.view.ViewCompat
+import androidx.core.view.isInvisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -26,7 +29,7 @@ class StampsAdapter(private val listener: OnItemClickListener) :
     }
 
     interface OnItemClickListener {
-        fun itemClick(position: Int)
+        fun itemClick(position: Int, imageView: ImageView)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StampViewHolder {
@@ -44,13 +47,16 @@ class StampsAdapter(private val listener: OnItemClickListener) :
 
         init {
             binding.root.setOnClickListener {
-                listener.itemClick(adapterPosition)
+                listener.itemClick(adapterPosition, binding.ivItemStamps)
             }
         }
 
         fun bind(stampInfo: StampInfo) {
+            ViewCompat.setTransitionName(binding.ivItemStamps, stampInfo.pictureUrl)
+            binding.tvItemStampsIndex.text = (adapterPosition + 1).toString()
             if (stampInfo.pictureUrl != "") {
                 binding.ivItemStamps.setImageResource(R.drawable.ic_launcher_background)
+                binding.tvItemStampsIndex.isInvisible = true
             }
         }
     }
