@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.NumberPicker" parent="android:Widget.Material.NumberPicker">
+        <item name="android:textSize">40sp</item>
+        <item name="android:textColorPrimary">@color/sky_blue_2094FF</item>
+        <item name="android:selectionDividerHeight">0dp</item>
+    </style>
+
+</resources>

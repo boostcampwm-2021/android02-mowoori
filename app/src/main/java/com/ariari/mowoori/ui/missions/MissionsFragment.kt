@@ -1,70 +1,82 @@
 package com.ariari.mowoori.ui.missions
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.ariari.mowoori.R
+import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentMissionsBinding
 import com.ariari.mowoori.ui.missions.adapter.MissionsAdapter
 import com.ariari.mowoori.util.EventObserver
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MissionsFragment : Fragment() {
-    private var _binding: FragmentMissionsBinding? = null
-    private val binding get() = _binding ?: error(getString(R.string.binding_error))
-    private val missionsViewModel by viewModels<MissionsViewModel>()
-    private val missionsAdapter = MissionsAdapter()
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_missions, container, false)
-        return binding.root
+class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment_missions) {
+    private val missionsViewModel: MissionsViewModel by viewModels()
+    private val missionsAdapter: MissionsAdapter by lazy {
+        MissionsAdapter(missionsViewModel)
     }
+    private lateinit var userName: String
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = missionsViewModel
+
         setMissionsRvAdapter()
-        setPlusBtnClickObserve()
-        setMissionsTypeObserve()
-        setMissionsListObserve()
+        setObserver()
+        getUserName()
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    private fun setObserver() {
+        setPlusBtnClickObserver()
+        setMissionsTypeObserver()
+        setMissionsListObserver()
+        setItemClickObserver()
+        setUserNameObserver()
     }
 
     private fun setMissionsRvAdapter() {
         binding.rvMissions.adapter = missionsAdapter
+        missionsViewModel.loadMissionsList()
     }
 
-    private fun setPlusBtnClickObserve() {
+    private fun setPlusBtnClickObserver() {
         missionsViewModel.plusBtnClick.observe(viewLifecycleOwner, EventObserver {
             this.findNavController().navigate(R.id.action_missionsFragment_to_missionsAddFragment)
         })
     }
 
-    private fun setMissionsTypeObserve() {
-        missionsViewModel.missionsType.observe(viewLifecycleOwner, EventObserver { type ->
-            binding.missionsMode = type
-            missionsViewModel.setMissionsList()
+    private fun setMissionsTypeObserver() {
+        missionsViewModel.missionsType.observe(viewLifecycleOwner, EventObserver {
+            missionsViewModel.loadMissionsList()
         })
     }
 
-    private fun setMissionsListObserve() {
+    private fun setMissionsListObserver() {
         missionsViewModel.missionsList.observe(viewLifecycleOwner) { missionsList ->
             missionsAdapter.submitList(missionsList)
         }
+    }
+
+    private fun setItemClickObserver() {
+        missionsViewModel.itemClick.observe(viewLifecycleOwner, EventObserver {
+            findNavController().navigate(
+                MissionsFragmentDirections.actionMissionsFragmentToStampsFragment(
+                    it, userName
+                )
+            )
+        })
+    }
+
+    private fun getUserName() {
+        missionsViewModel.loadUserName()
+    }
+
+    private fun setUserNameObserver() {
+        missionsViewModel.userName.observe(viewLifecycleOwner, EventObserver {
+            userName = it
+        })
     }
 }

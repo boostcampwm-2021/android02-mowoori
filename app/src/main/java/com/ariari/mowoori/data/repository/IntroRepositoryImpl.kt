@@ -1,5 +1,6 @@
 package com.ariari.mowoori.data.repository
 
+import android.net.Uri
 import com.ariari.mowoori.ui.register.entity.UserInfo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
@@ -32,11 +33,18 @@ class IntroRepositoryImpl @Inject constructor(
         return firebaseAuth.currentUser?.uid
     }
 
-    override suspend fun userRegister(nickname: String): Boolean {
+    override suspend fun userRegister(userInfo: UserInfo): Boolean {
         getUserUid()?.let {
-            val userInfo = UserInfo(nickname)
             firebaseReference.child("users").child(it).setValue(userInfo)
             return true
         } ?: run { return false }
+    }
+
+    override suspend fun putUserProfile(uri: Uri): String {
+        val uid = getUserUid()
+        val ref = storageReference.child("images/$uid/${uri.lastPathSegment}")
+        val task = ref.putFile(uri).await()
+        val uploadUrl = task.storage.downloadUrl.await()
+        return uploadUrl.toString()
     }
 }

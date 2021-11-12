@@ -1,8 +1,7 @@
 package com.ariari.mowoori.data.repository
 
-import androidx.lifecycle.LiveData
-import com.ariari.mowoori.util.Event
-import com.google.firebase.database.DataSnapshot
+import android.net.Uri
+import com.ariari.mowoori.ui.register.entity.UserInfo
 
 interface IntroRepository {
     suspend fun checkUserRegistered(userUid: String): Boolean
@@ -11,5 +10,7 @@ interface IntroRepository {
 
     fun getUserUid(): String?
 
-    suspend fun userRegister(nickname: String): Boolean
+    suspend fun userRegister(userInfo: UserInfo): Boolean
+
+    suspend fun putUserProfile(uri: Uri): String
 }

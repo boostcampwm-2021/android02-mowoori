@@ -14,7 +14,6 @@ import com.ariari.mowoori.ui.main.MainActivity
 import com.ariari.mowoori.ui.register.RegisterActivity
 import com.ariari.mowoori.util.EventObserver
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -26,7 +25,12 @@ class IntroActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivityIntroBinding.inflate(layoutInflater)
     }
-    private lateinit var signLauncher: ActivityResultLauncher<String>
+    private val signLauncher =
+        registerForActivityResult(SignInIntentContract()) { tokenId: String? ->
+            tokenId?.let {
+                firebaseAuthWithGoogle(it)
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +40,6 @@ class IntroActivity : AppCompatActivity() {
 
         setListeners()
         setObservers()
-        setSignLauncher()
         if (auth.currentUser == null) {
             showSignInButton()
         }
@@ -49,6 +52,7 @@ class IntroActivity : AppCompatActivity() {
     }
 
     private fun setObservers() {
+        // TODO: 로그인 액티비티 백스택에서 제거
         viewModel.isUserRegistered.observe(this, EventObserver {
             if (it) {
                 moveToMain()
@@ -56,14 +60,6 @@ class IntroActivity : AppCompatActivity() {
                 moveToRegister()
             }
         })
-    }
-
-    private fun setSignLauncher() {
-        signLauncher = registerForActivityResult(SignInIntentContract()) { tokenId: String? ->
-            tokenId?.let {
-                firebaseAuthWithGoogle(it)
-            }
-        }
     }
 
     override fun onStart() {
@@ -76,7 +72,6 @@ class IntroActivity : AppCompatActivity() {
         binding.btnSplashSignIn.animation = animation
         binding.btnSplashSignIn.isVisible = true
     }
-
 
     private fun signIn() {
         signLauncher.launch(getString(R.string.default_web_client_id))
@@ -101,10 +96,10 @@ class IntroActivity : AppCompatActivity() {
     }
 
     private fun moveToMain() {
-        startActivity(
-            Intent(
-                this,
-                MainActivity::class.java
-            ).apply { Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK })
+        val intent = Intent(this,MainActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        }
+        startActivity(intent)
     }
 }

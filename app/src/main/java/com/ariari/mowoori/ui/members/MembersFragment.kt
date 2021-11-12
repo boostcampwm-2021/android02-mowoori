@@ -1,35 +1,70 @@
 package com.ariari.mowoori.ui.members
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context.CLIPBOARD_SERVICE
+import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import com.ariari.mowoori.R
+import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentMembersBinding
+import com.ariari.mowoori.util.toastMessage
+import com.ariari.mowoori.widget.InviteDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MembersFragment : Fragment() {
-    private var _binding: FragmentMembersBinding? = null
-    private val binding get() = _binding ?: error(getString(R.string.binding_error))
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentMembersBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+class MembersFragment : BaseFragment<FragmentMembersBinding>(R.layout.fragment_members) {
+    private val viewModel: MembersViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
+        viewModel.fetchGroupInfo()
+        setOpenDialogEventObserver()
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    private fun setOpenDialogEventObserver() {
+        viewModel.openInviteDialogEvent.observe(viewLifecycleOwner, {
+            it.peekContent()?.let { groupId ->
+                showInviteDialog(groupId)
+            }
+        })
     }
+
+    private fun showInviteDialog(groupId: String) {
+        InviteDialogFragment(
+            groupId, object : InviteDialogFragment.InviteDialogListener {
+                override fun onPositiveClick(dialog: DialogFragment) {
+                    shareText(groupId)
+                    dialog.dismiss()
+                }
+
+                override fun onNegativeClick(dialog: DialogFragment) {
+                    dialog.dismiss()
+                }
+
+                override fun onCopyClick(dialog: DialogFragment, inviteCode: String) {
+                    val clipboard: ClipboardManager =
+                        requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+                    val clip: ClipData = ClipData.newPlainText("MoWoori_Invite_Code", inviteCode)
+                    clipboard.setPrimaryClip(clip)
+
+                    requireContext().toastMessage(R.string.members_invite_code_copy_complete)
+                }
+            }).show(parentFragmentManager, this.javaClass.name)
+    }
+
+    private fun shareText(text: String) {
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, text)
+        }
+        startActivity(shareIntent)
+
+    }
+
 }

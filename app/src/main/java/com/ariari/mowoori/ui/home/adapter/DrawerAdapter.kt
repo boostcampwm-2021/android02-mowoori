@@ -8,13 +8,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.ItemDrawerGroupBinding
 import com.ariari.mowoori.databinding.ItemDrawerHeaderBinding
+import com.ariari.mowoori.ui.home.entity.Group
 import com.ariari.mowoori.ui.home.entity.GroupInfo
 
 class DrawerAdapter(private val listener: OnItemClickListener) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     interface OnItemClickListener {
-        fun itemClick(position: Int)
+        fun itemClick(groupId: String)
     }
 
     companion object {
@@ -22,13 +23,7 @@ class DrawerAdapter(private val listener: OnItemClickListener) :
         private const val GROUP = 1
     }
 
-    private val groups = listOf(
-        GroupInfo("정직한 코박쥐들"),
-        GroupInfo("못생긴 원숭이들"),
-        GroupInfo("고약한 거북이들"),
-        GroupInfo("귀여운 개구리들"),
-        GroupInfo("행복한 캥거루들")
-    )
+    var groups = listOf<Group>()
 
     override fun getItemViewType(position: Int): Int {
         return when (position) {
@@ -39,23 +34,27 @@ class DrawerAdapter(private val listener: OnItemClickListener) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            HEADER -> HeaderViewHolder(ItemDrawerHeaderBinding.inflate(LayoutInflater.from(parent.context),
-                parent,
-                false))
-            else -> GroupViewHolder(ItemDrawerGroupBinding.inflate(LayoutInflater.from(parent.context),
-                parent,
-                false))
+            HEADER -> HeaderViewHolder(
+                ItemDrawerHeaderBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            )
+            else -> GroupViewHolder(
+                ItemDrawerGroupBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            )
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
-            is HeaderViewHolder -> {
-                // nothing to bind
-            }
-            else -> {
-                (holder as GroupViewHolder).bind(groups[position - 1])
-            }
+            is HeaderViewHolder -> Unit // nothing to bind
+            else -> (holder as GroupViewHolder).bind(groups[position - 1])
         }
     }
 
@@ -75,18 +74,21 @@ class DrawerAdapter(private val listener: OnItemClickListener) :
 
         init {
             binding.root.setOnClickListener {
-                listener.itemClick(adapterPosition)
+                binding.group?.groupId?.let { id ->
+                    listener.itemClick(id)
+                }
             }
         }
 
-        fun bind(groupInfo: GroupInfo) {
-            binding.tvDrawerGroupName.text = groupInfo.groupName
+        fun bind(group: Group) {
+            binding.group = group
+            binding.tvDrawerGroupName.text = group.groupInfo.groupName
+            if (group.selected) {
+                binding.root.setBackgroundResource(R.drawable.border_sky_blue_fill_16)
+            } else {
+                binding.root.setBackgroundResource(R.drawable.border_transparent_fill)
+            }
+            binding.executePendingBindings()
         }
-    }
-
-    fun getHeaderLayoutView(recyclerView: RecyclerView): View {
-        return ItemDrawerHeaderBinding.inflate(LayoutInflater.from(recyclerView.context),
-            recyclerView,
-            false).root
     }
 }
