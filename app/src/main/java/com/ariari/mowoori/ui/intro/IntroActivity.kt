@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import com.ariari.mowoori.BuildConfig
 import com.ariari.mowoori.R
+import com.ariari.mowoori.data.preference.MoWooriPreference
 import com.ariari.mowoori.databinding.ActivityIntroBinding
 import com.ariari.mowoori.ui.main.MainActivity
 import com.ariari.mowoori.ui.register.RegisterActivity
@@ -16,6 +17,7 @@ import com.ariari.mowoori.util.EventObserver
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class IntroActivity : AppCompatActivity() {
@@ -31,18 +33,18 @@ class IntroActivity : AppCompatActivity() {
                 firebaseAuthWithGoogle(it)
             }
         }
+    @Inject
+    lateinit var preference: MoWooriPreference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        binding.viewModel = viewModel
         auth = FirebaseAuth.getInstance()
+//        autoLogin()
+        binding.viewModel = viewModel
 
         setListeners()
         setObservers()
-        if (auth.currentUser != null) {
-            moveToMain()
-        }
 
         //For Test
         if (BuildConfig.DEBUG) {
@@ -62,9 +64,9 @@ class IntroActivity : AppCompatActivity() {
     }
 
     private fun setObservers() {
-        // TODO: 로그인 액티비티 백스택에서 제거
         viewModel.isUserRegistered.observe(this, EventObserver {
             if (it) {
+                preference.setUserRegistered(true)
                 moveToMain()
             } else {
                 moveToRegister()
@@ -124,5 +126,11 @@ class IntroActivity : AppCompatActivity() {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
         }
         startActivity(intent)
+    }
+
+    private fun autoLogin(){
+        if (auth.currentUser != null && preference.getUserRegistered()) {
+            moveToMain()
+        }
     }
 }
