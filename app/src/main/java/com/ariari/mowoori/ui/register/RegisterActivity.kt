@@ -10,6 +10,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import com.ariari.mowoori.R
+import com.ariari.mowoori.data.preference.MoWooriPreference
 import com.ariari.mowoori.databinding.ActivityRegisterBinding
 import com.ariari.mowoori.ui.main.MainActivity
 import com.ariari.mowoori.util.EventObserver
@@ -18,6 +19,7 @@ import com.ariari.mowoori.widget.BaseDialogFragment
 import com.ariari.mowoori.widget.ConfirmDialogFragment
 import com.ariari.mowoori.widget.ProgressDialogManager
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class RegisterActivity : AppCompatActivity() {
@@ -31,6 +33,8 @@ class RegisterActivity : AppCompatActivity() {
             viewModel.setProfileImage(it)
         }
     }
+    @Inject
+    lateinit var preference: MoWooriPreference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,6 +94,7 @@ class RegisterActivity : AppCompatActivity() {
         viewModel.registerSuccessEvent.observe(this, EventObserver {
             ProgressDialogManager.instance.clear()
             if (it) {
+                preference.setUserRegistered(true)
                 moveToMain()
             } else {
                 toastMessage(getString(R.string.register_fail_msg))

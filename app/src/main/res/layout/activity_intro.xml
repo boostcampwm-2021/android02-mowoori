@@ -24,11 +24,11 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/desc_app_logo"
             android:src="@drawable/ic_logo"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/guideline_splash_horizontal"
-            android:contentDescription="@string/desc_app_logo" />
+            app:layout_constraintTop_toBottomOf="@id/guideline_splash_horizontal" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_splash_horizontal2"
@@ -47,6 +47,53 @@
             app:layout_constraintBottom_toBottomOf="@id/guideline_splash_horizontal2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/ll_test"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/btn_splash_sign_in">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/test1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="testId1" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/test2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="testId2" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/test3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="testId3" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/test4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="testId4" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/test"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Debug"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
