@@ -76,7 +76,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         setRecyclerViewDecoration()
         setObserver()
         setSnowmanLevel(SnowmanLevel.SNOW_FACE)
-        homeViewModel.updateIsSnowing()
         setClickListener()
         setMenuListener()
     }
