@@ -10,7 +10,7 @@ import android.widget.ImageView
 import com.ariari.mowoori.R
 import com.ariari.mowoori.ui.home.HomeViewModel
 
-class WinterAnimatorLv2(
+class SnowmanLv2Animator(
     private var face: ImageView,
     private val homeViewModel: HomeViewModel,
     private val context: Context

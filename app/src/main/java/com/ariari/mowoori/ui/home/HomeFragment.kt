@@ -2,12 +2,8 @@ package com.ariari.mowoori.ui.home
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.view.View
-import android.view.animation.AccelerateInterpolator
-import android.widget.ImageView
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -17,18 +13,17 @@ import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentHomeBinding
 import com.ariari.mowoori.ui.home.adapter.DrawerAdapter
 import com.ariari.mowoori.ui.home.adapter.DrawerAdapterDecoration
-import com.ariari.mowoori.ui.home.animator.WinterAnimatorLv2
-import com.ariari.mowoori.ui.home.animator.WinterAnimatorLv3
+import com.ariari.mowoori.ui.home.animator.SnowAnimator
+import com.ariari.mowoori.ui.home.animator.SnowmanLv2Animator
+import com.ariari.mowoori.ui.home.animator.SnowmanLv3Animator
 import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.util.TimberUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import kotlin.random.Random
 
 @AndroidEntryPoint
 class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
@@ -38,10 +33,17 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
     // 1단계 눈내리는 애니메이션
     private var snowJob: Job? = null
+    private val snowAnimator by lazy {
+        SnowAnimator(
+            binding.containerHome,
+            homeViewModel,
+            requireContext()
+        )
+    }
 
     // 2단계 눈사람 얼굴 애니메이션
-    private val winterAnimatorLv2 by lazy {
-        WinterAnimatorLv2(
+    private val snowmanLv2Animator by lazy {
+        SnowmanLv2Animator(
             binding.ivHomeSnowmanFaceLv2,
             homeViewModel,
             requireContext()
@@ -49,8 +51,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     }
 
     // 3단계 눈사람 얼굴, 몸통 애니메이션
-    private val winterAnimatorLv3 by lazy {
-        WinterAnimatorLv3(
+    private val snowmanLv3Animator by lazy {
+        SnowmanLv3Animator(
             binding.ivHomeSnowmanFaceLv3,
             binding.ivHomeSnowmanBody,
             arrayOf(
@@ -79,7 +81,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         setDrawerAdapter()
         setRecyclerViewDecoration()
         setObserver()
-        setSnowmanLevel(AnimLevel.LV3)
+        // 임시로 3단계로 설정 추후에 단계별 애니메이션 나오도록 설정 필요
+        setSnowmanLevel(SnowmanLevel.LV3)
         setClickListener()
         setMenuListener()
     }
@@ -162,8 +165,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         homeViewModel.isSnowing.observe(viewLifecycleOwner) {
             updateSnowAnimation(it)
         }
-        homeViewModel.animLevel.observe(viewLifecycleOwner) {
-            updateSnowmanAnimation(it)
+        homeViewModel.snowmanLevel.observe(viewLifecycleOwner) {
+            updateWinterAnimation(it)
         }
     }
 
@@ -173,8 +176,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         }
     }
 
-    private fun setSnowmanLevel(level: AnimLevel) {
-        homeViewModel.updateAnimLevel(level)
+    private fun setSnowmanLevel(level: SnowmanLevel) {
+        homeViewModel.updateSnowmanLevel(level)
     }
 
     private fun updateSnowAnimation(isSnowing: Boolean) {
@@ -183,7 +186,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
                 TimberUtil.timber("start", snowJob.toString())
                 snowJob = launch {
                     while (isActive) {
-                        dropSnow(100L)
+                        snowAnimator.dropSnow(100L)
                     }
                 }
             } else {
@@ -193,69 +196,23 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         }
     }
 
-    private fun makeSnow() = ImageView(requireContext()).apply {
-        setImageResource(R.drawable.ic_snow)
-        // snow 크기 설정
-        scaleX = Random.nextFloat() * .3f + .2f
-        scaleY = scaleX
-    }
-
-    private suspend fun dropSnow(delayTime: Long) {
-        val snow = makeSnow()
-        binding.containerHome.addView(snow)
-
-        // snow 좌표 설정
-        val snowStartHeight = snow.scaleY + 100f
-        val startX = Random.nextFloat() * binding.containerHome.width
-        val endX = Random.nextFloat() * binding.containerHome.width
-
-        val moverX = ObjectAnimator.ofFloat(snow, View.TRANSLATION_X, startX, endX)
-        val moverY = ObjectAnimator.ofFloat(
-            snow,
-            View.TRANSLATION_Y,
-            -snowStartHeight,
-            binding.containerHome.height + snowStartHeight
-        ).apply {
-            interpolator = AccelerateInterpolator(1f)
-        }
-
-        val snowAnimSet = AnimatorSet().apply {
-            playTogether(moverX, moverY)
-            duration = (Math.random() * 3000 + 3000).toLong()
-            addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationCancel(animation: Animator?) {
-                    super.onAnimationCancel(animation)
-                }
-
-                override fun onAnimationEnd(animation: Animator?) {
-                    // Timber.d("End")
-                    super.onAnimationEnd(animation)
-                    binding.containerHome.removeView(snow)
-                }
-            })
-        }
-        homeViewModel.addAnimator(snowAnimSet)
-        snowAnimSet.start()
-        delay(delayTime)
-    }
-
-    private fun updateSnowmanAnimation(animLevel: AnimLevel) {
+    private fun updateWinterAnimation(snowmanLevel: SnowmanLevel) {
         viewLifecycleOwner.lifecycleScope.launch {
-            when (animLevel) {
-                AnimLevel.LV1 -> {
+            when (snowmanLevel) {
+                SnowmanLevel.LV1 -> {
                     // TODO: 눈사람이 녹아버리는 애니메이션 추가
                 }
-                AnimLevel.LV2 -> {
+                SnowmanLevel.LV2 -> {
                     // 2단계 눈사람 - 얼굴 통통 애니메이션
                     binding.ivHomeSnowmanFaceLv2.isVisible = true
-                    winterAnimatorLv2.start()
+                    snowmanLv2Animator.start()
                 }
-                AnimLevel.LV3 -> {
+                SnowmanLevel.LV3 -> {
                     // 3단계 눈사람 - 얼굴 몸통 합체 애니메이션
                     binding.ivHomeSnowmanFaceLv3.setImageResource(R.drawable.ic_snowman_face_3_rotate)
-                    winterAnimatorLv3.start()
+                    snowmanLv3Animator.start()
                 }
-                AnimLevel.LV4 -> {
+                SnowmanLevel.LV4 -> {
                     // TODO: 4단계(최종) 눈사람 - 팔 등 추가 장식
                 }
             }

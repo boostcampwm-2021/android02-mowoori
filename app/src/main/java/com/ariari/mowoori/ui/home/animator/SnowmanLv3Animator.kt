@@ -17,7 +17,7 @@ import com.ariari.mowoori.R
 import com.ariari.mowoori.ui.home.HomeViewModel
 import com.ariari.mowoori.ui.home.entity.ViewInfo
 
-class WinterAnimatorLv3(
+class SnowmanLv3Animator(
     private var face: ImageView,
     private var body: ImageView,
     private var buttons: Array<ImageView>,

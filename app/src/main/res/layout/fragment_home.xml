@@ -5,7 +5,7 @@
 
     <data>
 
-        <import type="com.ariari.mowoori.ui.home.AnimLevel" />
+        <import type="com.ariari.mowoori.ui.home.SnowmanLevel" />
 
         <import type="android.view.View" />
 
@@ -40,7 +40,7 @@
                 android:layout_height="100dp"
                 android:background="@drawable/ic_snowman_face_2"
                 android:contentDescription="@string/desc_home_snowman_face"
-                android:visibility="@{viewModel.animLevel == AnimLevel.LV2 ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewModel.snowmanLevel == SnowmanLevel.LV2 ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
@@ -51,7 +51,7 @@
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/desc_home_snowman_body"
                 android:src="@drawable/ic_snowman_body"
-                android:visibility="@{viewModel.animLevel == AnimLevel.LV3 ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewModel.snowmanLevel == SnowmanLevel.LV3 ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
@@ -62,7 +62,7 @@
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/desc_home_snowman_face"
                 android:src="@drawable/ic_snowman_face_3_rotate"
-                android:visibility="@{viewModel.animLevel == AnimLevel.LV3 ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewModel.snowmanLevel == SnowmanLevel.LV3 ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/iv_home_snowman_body"
                 app:layout_constraintStart_toStartOf="parent" />
@@ -75,7 +75,7 @@
                 android:alpha="0"
                 android:contentDescription="@string/desc_home_snowman_button"
                 android:src="@drawable/ic_snowman_button"
-                android:visibility="@{viewModel.animLevel == AnimLevel.LV3 ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewModel.snowmanLevel == SnowmanLevel.LV3 ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toTopOf="@id/iv_home_snowman_button_middle"
                 app:layout_constraintEnd_toEndOf="@id/iv_home_snowman_body"
                 app:layout_constraintStart_toStartOf="@id/iv_home_snowman_body"
@@ -89,7 +89,7 @@
                 android:alpha="0"
                 android:contentDescription="@string/desc_home_snowman_button"
                 android:src="@drawable/ic_snowman_button"
-                android:visibility="@{viewModel.animLevel == AnimLevel.LV3 ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewModel.snowmanLevel == SnowmanLevel.LV3 ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toTopOf="@id/iv_home_snowman_button_bottom"
                 app:layout_constraintEnd_toEndOf="@id/iv_home_snowman_body"
                 app:layout_constraintStart_toStartOf="@id/iv_home_snowman_body"
@@ -104,7 +104,7 @@
                 android:alpha="0"
                 android:contentDescription="@string/desc_home_snowman_button"
                 android:src="@drawable/ic_snowman_button"
-                android:visibility="@{viewModel.animLevel == AnimLevel.LV3 ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewModel.snowmanLevel == SnowmanLevel.LV3 ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toBottomOf="@id/iv_home_snowman_body"
                 app:layout_constraintEnd_toEndOf="@id/iv_home_snowman_button_top"
                 app:layout_constraintStart_toStartOf="@id/iv_home_snowman_button_top"

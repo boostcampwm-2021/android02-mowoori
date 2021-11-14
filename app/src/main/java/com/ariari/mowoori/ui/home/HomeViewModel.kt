@@ -36,8 +36,8 @@ class HomeViewModel @Inject constructor(
     private var _isSnowing = MutableLiveData(true)
     val isSnowing: LiveData<Boolean> = _isSnowing
 
-    private var _animLevel = MutableLiveData<AnimLevel>()
-    val animLevel: LiveData<AnimLevel> = _animLevel
+    private var _snowmanLevel = MutableLiveData<SnowmanLevel>()
+    val snowmanLevel: LiveData<SnowmanLevel> = _snowmanLevel
 
     private val animatorList: MutableList<Animator> = mutableListOf()
 
@@ -90,8 +90,8 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun updateAnimLevel(animLevel: AnimLevel) {
-        _animLevel.postValue(animLevel)
+    fun updateSnowmanLevel(snowmanLevel: SnowmanLevel) {
+        _snowmanLevel.postValue(snowmanLevel)
     }
 
     fun addAnimator(anim: Animator) {
