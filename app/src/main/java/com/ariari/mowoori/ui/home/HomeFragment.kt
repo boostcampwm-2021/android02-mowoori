@@ -17,7 +17,7 @@ import com.ariari.mowoori.ui.home.animator.SnowAnimator
 import com.ariari.mowoori.ui.home.animator.SnowmanLv2Animator
 import com.ariari.mowoori.ui.home.animator.SnowmanLv3Animator
 import com.ariari.mowoori.util.EventObserver
-import com.ariari.mowoori.util.TimberUtil
+import com.ariari.mowoori.util.LogUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
@@ -123,7 +123,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
                     findNavController().navigate(R.id.action_homeFragment_to_notificationFragment)
                 }
                 R.id.menu_tb_home_sun -> {
-                    TimberUtil.timber("lottie", "sun")
+                    LogUtil.log("lottie", "sun")
                     binding.lottieHomeSun.apply {
                         isVisible = true
                         addAnimatorListener(object : AnimatorListenerAdapter() {
@@ -183,14 +183,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     private fun updateSnowAnimation(isSnowing: Boolean) {
         viewLifecycleOwner.lifecycleScope.launch {
             if (isSnowing) {
-                TimberUtil.timber("start", snowJob.toString())
+                LogUtil.log("start", snowJob.toString())
                 snowJob = launch {
                     while (isActive) {
                         snowAnimator.dropSnow(100L)
                     }
                 }
             } else {
-                TimberUtil.timber("cancel", snowJob.toString())
+                LogUtil.log("cancel", snowJob.toString())
                 snowJob!!.cancelAndJoin()
             }
         }

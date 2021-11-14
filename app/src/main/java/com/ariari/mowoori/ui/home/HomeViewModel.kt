@@ -10,7 +10,7 @@ import com.ariari.mowoori.data.repository.HomeRepository
 import com.ariari.mowoori.ui.home.entity.Group
 import com.ariari.mowoori.ui.register.entity.UserInfo
 import com.ariari.mowoori.util.Event
-import com.ariari.mowoori.util.TimberUtil
+import com.ariari.mowoori.util.LogUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -49,7 +49,7 @@ class HomeViewModel @Inject constructor(
                 result.onSuccess { userInfo ->
                     _userInfo.postValue(Event(userInfo))
                 }.onFailure {
-                    TimberUtil.timber("setUserInfo*()", "$it")// TODO: 실패처리
+                    LogUtil.log("setUserInfo*()", "$it")// TODO: 실패처리
                 }
             }
         }
