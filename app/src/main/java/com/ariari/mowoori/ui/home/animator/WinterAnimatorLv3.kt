@@ -16,9 +16,6 @@ import android.widget.ImageView
 import com.ariari.mowoori.R
 import com.ariari.mowoori.ui.home.HomeViewModel
 import com.ariari.mowoori.ui.home.entity.ViewInfo
-import com.ariari.mowoori.util.TimberUtil
-import com.ariari.mowoori.util.getAnimatorFromProperty
-import com.ariari.mowoori.util.getAnimatorFromResource
 
 class WinterAnimatorLv3(
     private var face: ImageView,
@@ -43,11 +40,12 @@ class WinterAnimatorLv3(
     private lateinit var bodyButtonMiddleAnim: Animator
     private lateinit var bodyButtonBottomAnim: Animator
 
-    private var _isFirstCycle = true
-    val isFirstCycle = _isFirstCycle
+    var isFirstCycle = true
 
-    fun setIsFirstCycle(isFirst: Boolean) {
-        _isFirstCycle = isFirst
+    fun start() {
+        initShapeAnimator()
+        initSnowInfo()
+        isFirstCycle = true
     }
 
     private fun dpToPx(dp: Int) =
@@ -57,17 +55,20 @@ class WinterAnimatorLv3(
             context.resources.displayMetrics
         )
 
-    private fun getAnimator(animatorResId: Int, target: View): Animator {
-        val anim = AnimatorInflater
+    private fun getAnimatorFromResource(animatorResId: Int, target: View): Animator =AnimatorInflater
             .loadAnimator(
                 context,
                 animatorResId
             ).apply {
                 setTarget(target)
+            homeViewModel.addSnowAnim(this)
             }
-        homeViewModel.addSnowAnim(anim)
-        return anim
-    }
+
+    private fun getAnimatorFromProperty(view: View, property: PropertyValuesHolder, duration: Long) =
+        ObjectAnimator.ofPropertyValuesHolder(view, property).apply {
+            this.duration = duration
+            homeViewModel.addSnowAnim(this)
+        }
 
     private fun getFaceHorizontalAnimator(goRightNext: Boolean, goUpNext: Boolean, path: Path) =
         ObjectAnimator.ofFloat(face, View.X, View.Y, path).apply {
@@ -90,7 +91,7 @@ class WinterAnimatorLv3(
                                     faceRightUpAnim.start()
                                 }
                                 false -> { // Next : RightDown
-                                    setFaceDownToBodyAnim(goRightNext = true)
+                                    updateFaceDownToBodyAnim(goRightNext = true)
                                 }
                             }
                         }
@@ -101,7 +102,7 @@ class WinterAnimatorLv3(
                                     faceLeftUpAnim.start()
                                 }
                                 false -> { // Next : LeftDown
-                                    setFaceDownToBodyAnim(goRightNext = false)
+                                    updateFaceDownToBodyAnim(goRightNext = false)
                                 }
                             }
                         }
@@ -110,25 +111,27 @@ class WinterAnimatorLv3(
             })
         }
 
-    fun setSnowmanInfo() {
+    private fun initSnowInfo() {
         face.post {
             faceInfo = ViewInfo(face.x, face.y, face.width.toFloat(), face.height.toFloat())
             body.post {
                 bodyInfo = ViewInfo(body.x, body.y, body.width.toFloat(), body.height.toFloat())
-                setHorizontalAnimator()
-                AnimatorSet().apply {
-                    playTogether(faceRightUpAnim, faceUpShapeAnim)
-                }.start()
+                initHorizontalAnimator()
+                startFirstAnimation()
             }
         }
     }
 
-    fun setShapeAnimator() {
-        faceDownShapeAnim =
-            context.getAnimatorFromResource(R.animator.animator_face_shape_down, face)
-        faceUpShapeAnim = context.getAnimatorFromResource(R.animator.animator_face_shape_up, face)
-        faceResetShapeAnim =
-            context.getAnimatorFromResource(R.animator.animator_face_shape_reset, face)
+    private fun startFirstAnimation() {
+        AnimatorSet().apply {
+            playTogether(faceRightUpAnim, faceUpShapeAnim)
+        }.start()
+    }
+
+    private fun initShapeAnimator() {
+        faceDownShapeAnim =getAnimatorFromResource(R.animator.animator_face_shape_down, face)
+        faceUpShapeAnim = getAnimatorFromResource(R.animator.animator_face_shape_up, face)
+        faceResetShapeAnim =getAnimatorFromResource(R.animator.animator_face_shape_reset, face)
 
         val showProperty = PropertyValuesHolder.ofFloat(View.ALPHA, 0f, 1f)
         val disappearProperty = PropertyValuesHolder.ofFloat(View.ALPHA, 1f, 0f)
@@ -137,56 +140,9 @@ class WinterAnimatorLv3(
         bodyButtonTopAnim = getAnimatorFromProperty(face, showProperty, 600)
         bodyButtonMiddleAnim = getAnimatorFromProperty(face, showProperty, 600)
         bodyButtonBottomAnim = getAnimatorFromProperty(face, showProperty, 600)
-
-        homeViewModel.addSnowAnim(
-            listOf(
-                faceDownShapeAnim,
-                faceUpShapeAnim,
-                faceResetShapeAnim,
-                faceDisappearAnim,
-                faceShowAnim,
-                bodyButtonTopAnim,
-                bodyButtonMiddleAnim,
-                bodyButtonBottomAnim
-            )
-        )
     }
 
-    private fun setFaceDownToBodyAnim(goRightNext: Boolean) {
-        faceDownToBodyAnim.removeAllListeners()
-        faceDownToBodyAnim.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                super.onAnimationEnd(animation)
-                when (goRightNext) {
-                    true -> {
-                        if (isFirstCycle) {
-                            setFaceUpFromBodyAnim()
-                            _isFirstCycle = false
-                        }
-                    }
-                    false -> {
-                        faceResetShapeAnim.start()
-                        disappearFace()
-                    }
-                }
-            }
-        })
-        faceDownToBodyAnim.start()
-    }
-
-    private fun setFaceUpFromBodyAnim() {
-        faceUpFromBodyAnim.removeAllListeners()
-        faceUpFromBodyAnim.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                super.onAnimationEnd(animation)
-                faceRightDownAnim.start()
-                faceDownShapeAnim.start()
-            }
-        })
-        faceUpFromBodyAnim.start()
-    }
-
-    private fun setHorizontalAnimator() {
+    private fun initHorizontalAnimator() {
         val margin = bodyInfo.x - faceInfo.x - faceInfo.width
         val left = faceInfo.x
         val top = bodyInfo.y - faceInfo.height - dpToPx(80)
@@ -237,35 +193,66 @@ class WinterAnimatorLv3(
             )
         }
 
-        faceDownToBodyAnim =
-            getAnimator(R.animator.animator_face_down_to_body, face)
-        faceUpFromBodyAnim =
-            getAnimator(R.animator.animator_face_up_from_body, face)
+        faceDownToBodyAnim = getAnimatorFromResource(R.animator.animator_face_down_to_body, face)
+        faceUpFromBodyAnim = getAnimatorFromResource(R.animator.animator_face_up_from_body, face)
     }
 
-    private fun disappearFace() {
+    private fun updateFaceDownToBodyAnim(goRightNext: Boolean) {
+        faceDownToBodyAnim.removeAllListeners()
+        faceDownToBodyAnim.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                super.onAnimationEnd(animation)
+                when (goRightNext) {
+                    true -> {
+                        if (isFirstCycle) {
+                            updateFaceUpFromBodyAnim()
+                            isFirstCycle = false
+                        }
+                    }
+                    false -> {
+                        faceResetShapeAnim.start()
+                        updateDisappearFace()
+                    }
+                }
+            }
+        })
+        faceDownToBodyAnim.start()
+    }
+
+    private fun updateFaceUpFromBodyAnim() {
+        faceUpFromBodyAnim.removeAllListeners()
+        faceUpFromBodyAnim.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                super.onAnimationEnd(animation)
+                faceRightDownAnim.start()
+                faceDownShapeAnim.start()
+            }
+        })
+        faceUpFromBodyAnim.start()
+    }
+
+    private fun updateDisappearFace() {
         faceDisappearAnim.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 super.onAnimationEnd(animation)
-                TimberUtil.timber("anim", "destroy")
-                face?.setImageResource(R.drawable.ic_snowman_face_3_done)
-                showFace()
+                face.setImageResource(R.drawable.ic_snowman_face_3_done)
+                updateShowFace()
             }
         })
         faceDisappearAnim.start()
     }
 
-    private fun showFace() {
+    private fun updateShowFace() {
         faceShowAnim.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
                 super.onAnimationEnd(animation)
-                showButtons()
+                updateShowButtons()
             }
         })
         faceShowAnim.start()
     }
 
-    private fun showButtons() {
+    private fun updateShowButtons() {
         AnimatorSet().apply {
             play(bodyButtonTopAnim).before(AnimatorSet().apply {
                 play(bodyButtonMiddleAnim).before(
