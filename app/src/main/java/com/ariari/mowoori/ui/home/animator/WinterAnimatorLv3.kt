@@ -20,6 +20,7 @@ import com.ariari.mowoori.ui.home.entity.ViewInfo
 class WinterAnimatorLv3(
     private var face: ImageView,
     private var body: ImageView,
+    private var buttons: Array<ImageView>,
     private val homeViewModel: HomeViewModel,
     private val context: Context
 ) {
@@ -55,24 +56,28 @@ class WinterAnimatorLv3(
             context.resources.displayMetrics
         )
 
-    private fun getAnimatorFromResource(animatorResId: Int, view: View): Animator =AnimatorInflater
-            .loadAnimator(
-                context,
-                animatorResId
-            ).apply {
-                setTarget(view)
-            homeViewModel.addSnowAnim(this)
-            }
+    private fun getAnimatorFromResource(animatorResId: Int, view: View): Animator = AnimatorInflater
+        .loadAnimator(
+            context,
+            animatorResId
+        ).apply {
+            setTarget(view)
+            homeViewModel.addAnimator(this)
+        }
 
-    private fun getAnimatorFromProperty(view: View, property: PropertyValuesHolder, duration: Long) =
+    private fun getAnimatorFromProperty(
+        view: View,
+        property: PropertyValuesHolder,
+        duration: Long
+    ) =
         ObjectAnimator.ofPropertyValuesHolder(view, property).apply {
             this.duration = duration
-            homeViewModel.addSnowAnim(this)
+            homeViewModel.addAnimator(this)
         }
 
     private fun getFaceHorizontalAnimator(goRightNext: Boolean, goUpNext: Boolean, path: Path) =
         ObjectAnimator.ofFloat(face, View.X, View.Y, path).apply {
-            homeViewModel.addSnowAnim(this)
+            homeViewModel.addAnimator(this)
             if (goUpNext) {
                 duration = 2000
                 interpolator = BounceInterpolator()
@@ -129,17 +134,17 @@ class WinterAnimatorLv3(
     }
 
     private fun initShapeAnimator() {
-        faceDownShapeAnim =getAnimatorFromResource(R.animator.animator_face_shape_down, face)
+        faceDownShapeAnim = getAnimatorFromResource(R.animator.animator_face_shape_down, face)
         faceUpShapeAnim = getAnimatorFromResource(R.animator.animator_face_shape_up, face)
-        faceResetShapeAnim =getAnimatorFromResource(R.animator.animator_face_shape_reset, face)
+        faceResetShapeAnim = getAnimatorFromResource(R.animator.animator_face_shape_reset, face)
 
         val showProperty = PropertyValuesHolder.ofFloat(View.ALPHA, 0f, 1f)
         val disappearProperty = PropertyValuesHolder.ofFloat(View.ALPHA, 1f, 0f)
         faceDisappearAnim = getAnimatorFromProperty(face, disappearProperty, 600)
         faceShowAnim = getAnimatorFromProperty(face, showProperty, 600)
-        bodyButtonTopAnim = getAnimatorFromProperty(face, showProperty, 600)
-        bodyButtonMiddleAnim = getAnimatorFromProperty(face, showProperty, 600)
-        bodyButtonBottomAnim = getAnimatorFromProperty(face, showProperty, 600)
+        bodyButtonTopAnim = getAnimatorFromProperty(buttons[0], showProperty, 600)
+        bodyButtonMiddleAnim = getAnimatorFromProperty(buttons[1], showProperty, 600)
+        bodyButtonBottomAnim = getAnimatorFromProperty(buttons[2], showProperty, 600)
     }
 
     private fun initHorizontalAnimator() {

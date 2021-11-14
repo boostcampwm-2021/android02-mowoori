@@ -1,7 +1,6 @@
 package com.ariari.mowoori.ui.home
 
 import android.animation.Animator
-import android.animation.AnimatorInflater
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
@@ -43,7 +42,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     // 2단계 눈사람 얼굴 애니메이션
     private val winterAnimatorLv2 by lazy {
         WinterAnimatorLv2(
-            binding.ivHomeSnowFace,
+            binding.ivHomeSnowmanFaceLv2,
             homeViewModel,
             requireContext()
         )
@@ -52,8 +51,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     // 3단계 눈사람 얼굴, 몸통 애니메이션
     private val winterAnimatorLv3 by lazy {
         WinterAnimatorLv3(
-            binding.ivHomeSnowmanFace,
+            binding.ivHomeSnowmanFaceLv3,
             binding.ivHomeSnowmanBody,
+            arrayOf(
+                binding.ivHomeSnowmanButtonTop,
+                binding.ivHomeSnowmanButtonMiddle,
+                binding.ivHomeSnowmanButtonBottom
+            ),
             homeViewModel,
             requireContext()
         )
@@ -75,14 +79,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         setDrawerAdapter()
         setRecyclerViewDecoration()
         setObserver()
-        setSnowmanLevel(SnowmanLevel.SNOW_FACE)
+        setSnowmanLevel(AnimLevel.LV3)
         setClickListener()
         setMenuListener()
     }
 
     override fun onDestroyView() {
         Timber.d("destroy")
-        homeViewModel.cancelSnowAnimList()
+        homeViewModel.cancelAnimator()
         super.onDestroyView()
     }
 
@@ -158,7 +162,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         homeViewModel.isSnowing.observe(viewLifecycleOwner) {
             updateSnowAnimation(it)
         }
-        homeViewModel.snowmanLevel.observe(viewLifecycleOwner) {
+        homeViewModel.animLevel.observe(viewLifecycleOwner) {
             updateSnowmanAnimation(it)
         }
     }
@@ -169,8 +173,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         }
     }
 
-    private fun setSnowmanLevel(level: SnowmanLevel) {
-        homeViewModel.updateSnowmanLevel(level)
+    private fun setSnowmanLevel(level: AnimLevel) {
+        homeViewModel.updateAnimLevel(level)
     }
 
     private fun updateSnowAnimation(isSnowing: Boolean) {
@@ -230,28 +234,28 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
                 }
             })
         }
-        homeViewModel.addSnowAnim(snowAnimSet)
+        homeViewModel.addAnimator(snowAnimSet)
         snowAnimSet.start()
         delay(delayTime)
     }
 
-    private fun updateSnowmanAnimation(snowmanLevel: SnowmanLevel) {
+    private fun updateSnowmanAnimation(animLevel: AnimLevel) {
         viewLifecycleOwner.lifecycleScope.launch {
-            when (snowmanLevel) {
-                SnowmanLevel.SNOW_NO -> {
+            when (animLevel) {
+                AnimLevel.LV1 -> {
                     // TODO: 눈사람이 녹아버리는 애니메이션 추가
                 }
-                SnowmanLevel.SNOW_FACE -> {
+                AnimLevel.LV2 -> {
                     // 2단계 눈사람 - 얼굴 통통 애니메이션
-                    binding.ivHomeSnowFace.isVisible = true
+                    binding.ivHomeSnowmanFaceLv2.isVisible = true
                     winterAnimatorLv2.start()
                 }
-                SnowmanLevel.SNOW_BODY -> {
+                AnimLevel.LV3 -> {
                     // 3단계 눈사람 - 얼굴 몸통 합체 애니메이션
-                    binding.ivHomeSnowmanFace.setImageResource(R.drawable.ic_snowman_face_3_rotate)
+                    binding.ivHomeSnowmanFaceLv3.setImageResource(R.drawable.ic_snowman_face_3_rotate)
                     winterAnimatorLv3.start()
                 }
-                SnowmanLevel.SNOW_CLOTHES -> {
+                AnimLevel.LV4 -> {
                     // TODO: 4단계(최종) 눈사람 - 팔 등 추가 장식
                 }
             }

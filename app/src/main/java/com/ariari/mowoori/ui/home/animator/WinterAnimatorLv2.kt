@@ -32,7 +32,7 @@ class WinterAnimatorLv2(
                 animatorResId
             ).apply {
                 setTarget(view)
-                homeViewModel.addSnowAnim(this)
+                homeViewModel.addAnimator(this)
             }
 
     private fun initAnimator() {
