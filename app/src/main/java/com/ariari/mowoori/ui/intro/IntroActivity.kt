@@ -33,6 +33,7 @@ class IntroActivity : AppCompatActivity() {
                 firebaseAuthWithGoogle(it)
             }
         }
+
     @Inject
     lateinit var preference: MoWooriPreference
 
@@ -90,6 +91,7 @@ class IntroActivity : AppCompatActivity() {
     }
 
     private fun signInTester(num: Int) {
+        binding.llTest.isVisible = false
         auth.signInWithEmailAndPassword("testid$num@test.com", "testid$num")
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -98,6 +100,7 @@ class IntroActivity : AppCompatActivity() {
                     }
                 } else {
                     Toast.makeText(this, "로그인 할 수 없습니다.", Toast.LENGTH_SHORT).show()
+                    binding.llTest.isVisible = true
                 }
             }
     }
@@ -128,7 +131,7 @@ class IntroActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun autoLogin(){
+    private fun autoLogin() {
         if (auth.currentUser != null && preference.getUserRegistered()) {
             moveToMain()
         }
