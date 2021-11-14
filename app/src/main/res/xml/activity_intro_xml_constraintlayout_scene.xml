@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<MotionScene 
+<MotionScene
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:motion="http://schemas.android.com/apk/res-auto">
 
@@ -8,36 +8,36 @@
         motion:constraintSetEnd="@+id/end"
         motion:constraintSetStart="@id/start"
         motion:duration="1000">
-       <KeyFrameSet>
-           <KeyAttribute
-               motion:motionTarget="@+id/iv_intro_stamp"
-               motion:framePosition="0"
-               android:scaleX="6.0" />
+        <KeyFrameSet>
+            <KeyAttribute
+                motion:motionTarget="@+id/iv_intro_stamp"
+                motion:framePosition="0"
+                android:scaleX="6.0" />
 
-           <KeyAttribute
-               motion:motionTarget="@+id/iv_intro_stamp"
-               motion:framePosition="70"
-               android:scaleX="6.0" />
-           <KeyAttribute
-               motion:motionTarget="@+id/iv_intro_stamp"
-               motion:framePosition="0"
-               android:scaleY="6.0" />
+            <KeyAttribute
+                motion:motionTarget="@+id/iv_intro_stamp"
+                motion:framePosition="70"
+                android:scaleX="6.0" />
+            <KeyAttribute
+                motion:motionTarget="@+id/iv_intro_stamp"
+                motion:framePosition="0"
+                android:scaleY="6.0" />
 
-           <KeyAttribute
-               motion:motionTarget="@+id/iv_intro_stamp"
-               motion:framePosition="70"
-               android:scaleY="6.0" />
-           <KeyAttribute
-               motion:motionTarget="@+id/iv_intro_stamp"
-               motion:framePosition="0"
-               android:alpha="0.0" />
+            <KeyAttribute
+                motion:motionTarget="@+id/iv_intro_stamp"
+                motion:framePosition="70"
+                android:scaleY="6.0" />
+            <KeyAttribute
+                motion:motionTarget="@+id/iv_intro_stamp"
+                motion:framePosition="0"
+                android:alpha="0.0" />
 
-           <KeyAttribute
-               motion:motionTarget="@+id/iv_intro_stamp"
-               motion:framePosition="70"
-               android:alpha="0.0" />
+            <KeyAttribute
+                motion:motionTarget="@+id/iv_intro_stamp"
+                motion:framePosition="70"
+                android:alpha="0.0" />
 
-       </KeyFrameSet>
+        </KeyFrameSet>
     </Transition>
 
     <ConstraintSet android:id="@+id/start">

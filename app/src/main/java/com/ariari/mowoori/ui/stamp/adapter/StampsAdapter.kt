@@ -12,6 +12,7 @@ import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.ItemStampsBinding
 import com.ariari.mowoori.ui.stamp.entity.Stamp
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
+import com.bumptech.glide.Glide
 
 class StampsAdapter(private val listener: OnItemClickListener) :
     ListAdapter<Stamp, StampsAdapter.StampViewHolder>(stampsDiffUtil) {
@@ -58,8 +59,13 @@ class StampsAdapter(private val listener: OnItemClickListener) :
             when {
                 stampInfo.pictureUrl.contains("default") -> {
                     // TODO: 기본 이미지 적용
-                    binding.ivItemStamps.setImageResource(R.drawable.ic_launcher_background)
-                    binding.ivItemStamps.clipToOutline = true
+                    Glide.with(binding.ivItemStamps)
+                        .load(R.drawable.ic_launcher_background)
+                        .circleCrop()
+                        .into(binding.ivItemStamps)
+
+//                    binding.ivItemStamps.setImageResource(R.drawable.ic_launcher_background)
+//                    binding.ivItemStamps.clipToOutline = true
                     binding.tvItemStampsIndex.isInvisible = true
                 }
                 stampInfo.pictureUrl != "" -> {
