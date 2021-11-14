@@ -1,5 +1,5 @@
 package com.ariari.mowoori.ui.home
 
 enum class SnowmanLevel {
-    SNOW_NO, SNOW_FACE, SNOW_BODY, SNOW_CLOTHES
+    LV1, LV2, LV3, LV4
 }

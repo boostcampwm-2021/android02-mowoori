@@ -5,6 +5,13 @@
 
     <data>
 
+        <import type="com.ariari.mowoori.ui.home.SnowmanLevel" />
+
+        <import type="android.view.View" />
+
+        <variable
+            name="viewModel"
+            type="com.ariari.mowoori.ui.home.HomeViewModel" />
     </data>
 
     <androidx.drawerlayout.widget.DrawerLayout
@@ -28,12 +35,12 @@
                 tools:layout_editor_absoluteX="0dp" />
 
             <ImageView
-                android:id="@+id/iv_home_snow_face"
+                android:id="@+id/iv_home_snowman_face_lv2"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:background="@drawable/ic_snowman_face_2"
                 android:contentDescription="@string/desc_home_snowman_face"
-                android:visibility="gone"
+                android:visibility="@{viewModel.snowmanLevel == SnowmanLevel.LV2 ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
@@ -44,16 +51,18 @@
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/desc_home_snowman_body"
                 android:src="@drawable/ic_snowman_body"
+                android:visibility="@{viewModel.snowmanLevel == SnowmanLevel.LV3 ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <ImageView
-                android:id="@+id/iv_home_snowman_face"
+                android:id="@+id/iv_home_snowman_face_lv3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/desc_home_snowman_face"
                 android:src="@drawable/ic_snowman_face_3_rotate"
+                android:visibility="@{viewModel.snowmanLevel == SnowmanLevel.LV3 ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/iv_home_snowman_body"
                 app:layout_constraintStart_toStartOf="parent" />
@@ -66,6 +75,7 @@
                 android:alpha="0"
                 android:contentDescription="@string/desc_home_snowman_button"
                 android:src="@drawable/ic_snowman_button"
+                android:visibility="@{viewModel.snowmanLevel == SnowmanLevel.LV3 ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toTopOf="@id/iv_home_snowman_button_middle"
                 app:layout_constraintEnd_toEndOf="@id/iv_home_snowman_body"
                 app:layout_constraintStart_toStartOf="@id/iv_home_snowman_body"
@@ -79,6 +89,7 @@
                 android:alpha="0"
                 android:contentDescription="@string/desc_home_snowman_button"
                 android:src="@drawable/ic_snowman_button"
+                android:visibility="@{viewModel.snowmanLevel == SnowmanLevel.LV3 ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toTopOf="@id/iv_home_snowman_button_bottom"
                 app:layout_constraintEnd_toEndOf="@id/iv_home_snowman_body"
                 app:layout_constraintStart_toStartOf="@id/iv_home_snowman_body"
@@ -93,6 +104,7 @@
                 android:alpha="0"
                 android:contentDescription="@string/desc_home_snowman_button"
                 android:src="@drawable/ic_snowman_button"
+                android:visibility="@{viewModel.snowmanLevel == SnowmanLevel.LV3 ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toBottomOf="@id/iv_home_snowman_body"
                 app:layout_constraintEnd_toEndOf="@id/iv_home_snowman_button_top"
                 app:layout_constraintStart_toStartOf="@id/iv_home_snowman_button_top"
@@ -122,7 +134,8 @@
                     android:layout_height="?attr/actionBarSize"
                     android:background="@color/sky_blue_F1F5FF"
                     app:menu="@menu/tb_home_menu"
-                    app:navigationIcon="@drawable/ic_hamburger" />
+                    app:navigationIcon="@drawable/ic_hamburger"
+                    app:title="@{viewModel.currentGroupName}" />
 
             </com.google.android.material.appbar.AppBarLayout>
 

@@ -3,15 +3,14 @@ package com.ariari.mowoori.ui.home
 import android.animation.Animator
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.HomeRepository
-import com.ariari.mowoori.ui.home.entity.GroupInfo
+import com.ariari.mowoori.ui.home.entity.Group
 import com.ariari.mowoori.ui.register.entity.UserInfo
 import com.ariari.mowoori.util.Event
-import com.ariari.mowoori.util.TimberUtil
-import com.google.firebase.database.FirebaseDatabase
-import com.google.gson.Gson
+import com.ariari.mowoori.util.LogUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -23,30 +22,24 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val homeRepository: HomeRepository
 ) : ViewModel() {
-    // TODO: Hilt 인스턴스 주입
-    private val firebaseDatabase = FirebaseDatabase.getInstance()
-    private val databaseReference = firebaseDatabase.reference
-    private val gson = Gson()
-
     private val _userInfo = MutableLiveData<Event<UserInfo>>()
     val userInfo: LiveData<Event<UserInfo>> = _userInfo
 
-    private val _currentGroupInfo = MutableLiveData<GroupInfo>()
-    val currentGroupInfo: LiveData<GroupInfo> = _currentGroupInfo
+    private val _currentGroupInfo = MutableLiveData<Group>()
+    val currentGroupInfo: LiveData<Group> = _currentGroupInfo
+    val currentGroupName: LiveData<String> =
+        Transformations.map(currentGroupInfo) { group -> group.groupInfo.groupName }
 
-    private val _groupInfoList = MutableLiveData<List<GroupInfo>>()
-    val groupInfoList: LiveData<List<GroupInfo>> = _groupInfoList
+    private val _groupList = MutableLiveData<List<Group>>()
+    val groupList: LiveData<List<Group>> = _groupList
 
-    private var _isSnowing = MutableLiveData<Boolean>()
+    private var _isSnowing = MutableLiveData(true)
     val isSnowing: LiveData<Boolean> = _isSnowing
 
     private var _snowmanLevel = MutableLiveData<SnowmanLevel>()
     val snowmanLevel: LiveData<SnowmanLevel> = _snowmanLevel
 
-    private var _isFirstCycle = true
-    val isFirstCycle = _isFirstCycle
-
-    private val snowAnimList: MutableList<Animator> = mutableListOf()
+    private val animatorList: MutableList<Animator> = mutableListOf()
 
     fun setUserInfo() {
         val uid = homeRepository.getUserUid()
@@ -56,7 +49,7 @@ class HomeViewModel @Inject constructor(
                 result.onSuccess { userInfo ->
                     _userInfo.postValue(Event(userInfo))
                 }.onFailure {
-                    TimberUtil.timber("setUserInfo*()", "$it")// TODO: 실패처리
+                    LogUtil.log("setUserInfo*()", "$it")// TODO: 실패처리
                 }
             }
         }
@@ -65,30 +58,28 @@ class HomeViewModel @Inject constructor(
     fun setGroupInfoList(userInfo: UserInfo) {
         viewModelScope.launch(Dispatchers.IO) {
             val deferredList =
-                userInfo.groupList.map { groupId -> async { homeRepository.getGroupInfo(groupId) } }
-            val groupList = deferredList.awaitAll().mapNotNull { it.getOrNull() }
-            _groupInfoList.postValue(groupList)
-        }
-    }
-
-    fun setCurrentGroupInfo(position: Int) {
-        val tempGroupList = _groupInfoList.value?.mapIndexed { index, groupInfo ->
-            when (index) {
-                // 헤더를 포함한 위치 값이기 떄문에 -1 을 해주어야 한다.
-                position - 1 -> {
-                    groupInfo.selected = true
-                    _currentGroupInfo.value = groupInfo
+                userInfo.groupList.map { groupId -> async { homeRepository.getGroup(groupId) } }
+            val groupList = deferredList.awaitAll().mapNotNull { result ->
+                val group = result.getOrNull()
+                group?.apply {
+                    if (this.groupId == userInfo.currentGroupId) {
+                        this.selected = true
+                        _currentGroupInfo.postValue(this)
+                    }
                 }
-                else -> groupInfo.selected = false
             }
-            groupInfo
+            _groupList.postValue(groupList)
         }
-        tempGroupList ?: return
-        _groupInfoList.value = tempGroupList.requireNoNulls()
     }
 
-    fun setIsFirstCycle(isFirst: Boolean) {
-        _isFirstCycle = isFirst
+    fun setCurrentGroupInfo(groupId: String) {
+        _groupList.value?.let { groupList ->
+            groupList.forEach {
+                it.selected = it.groupId == groupId
+                if (it.selected) _currentGroupInfo.postValue(it)
+            }
+        }
+        homeRepository.setCurrentGroupId(groupId)
     }
 
     fun updateIsSnowing() {
@@ -103,14 +94,15 @@ class HomeViewModel @Inject constructor(
         _snowmanLevel.postValue(snowmanLevel)
     }
 
-    fun addSnowAnim(anim: Animator) {
-        if (!snowAnimList.contains(anim)) {
-            snowAnimList.add(anim)
+    fun addAnimator(anim: Animator) {
+        if (!animatorList.contains(anim)) {
+            animatorList.add(anim)
         }
     }
 
-    fun cancelSnowAnimList() {
-        snowAnimList.forEach {
+    fun cancelAnimator() {
+        animatorList.forEach {
+            it.removeAllListeners()
             it.cancel()
         }
     }

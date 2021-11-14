@@ -1,6 +1,9 @@
 package com.ariari.mowoori.data.repository
 
+import com.ariari.mowoori.ui.home.entity.GroupInfo
 import com.ariari.mowoori.ui.missions.entity.Mission
+import com.ariari.mowoori.ui.register.entity.User
+import kotlinx.coroutines.tasks.await
 
 interface MissionsRepository {
     // groups에서 해당 group에 있는 missionList get
@@ -10,6 +13,9 @@ interface MissionsRepository {
     suspend fun getMissions(userId: String): List<Mission>
 
     // get group
+    suspend fun getUser(): Result<User>
+
+    suspend fun isExistGroupId(groupId: String): Boolean
 
     // mission 추가
     suspend fun postMissionIdList(groupId: String, missionIdList: List<String>)

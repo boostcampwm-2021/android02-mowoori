@@ -3,6 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+        <variable
+            name="group"
+            type="com.ariari.mowoori.ui.home.entity.Group" />
 
     </data>
 

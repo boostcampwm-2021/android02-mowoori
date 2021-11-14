@@ -12,7 +12,6 @@ import com.ariari.mowoori.util.getCurrentDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,23 +33,12 @@ class MissionsViewModel @Inject constructor(
     private val _userName = MutableLiveData<Event<String>>()
     val userName: LiveData<Event<String>> get() = _userName
 
-//    val tempNotDoneMissions = mutableListOf(
-//        Mission("mission1", MissionInfo("미완료 미션1", "user1", 30, 10, 211101, 211201)),
-//        Mission("mission2", MissionInfo("미완료 미션2", "user1", 20, 8, 211101, 211201))
-//    )
-//
-//    val tempDoneMissions = mutableListOf(
-//        Mission("mission3", MissionInfo("완료 미션1", "user1", 30, 30, 211101, 211201)),
-//        Mission("mission4", MissionInfo("완료 미션2", "user1", 20, 20, 211101, 211201)),
-//        Mission("mission5", MissionInfo("완료 미션3", "user1", 10, 10, 211101, 211201))
-//    )
-//
-//    val tempFailMissions = mutableListOf(
-//        Mission("mission6", MissionInfo("실패 미션1", "user1", 20, 8, 211101, 211001))
-//    )
-
     fun setPlusBtnClick() {
         _plusBtnClick.value = Event(true)
+    }
+
+    fun setItemClick(missionInfo: MissionInfo) {
+        _itemClick.postValue(Event(missionInfo))
     }
 
     fun setNotDoneType() {
@@ -65,48 +53,47 @@ class MissionsViewModel @Inject constructor(
         _missionsType.value = Event(FAIL_TYPE)
     }
 
-    fun setMissionsList() {
-        viewModelScope.launch {
-            // TODO: groudId, userId 받아서 넣기
-            val missionIdList = missionsRepository.getMissionIdList("groupId1")
-            val missions = missionsRepository.getMissions("user1")
-            _missionsList.value = when (requireNotNull(missionsType.value).peekContent()) {
-                NOT_DONE_TYPE -> {
-                    missions.filter {
-                        (missionIdList.contains(it.missionId)) &&
-                                (getCurrentDate() <= it.missionInfo.dueDate) &&
-                                (it.missionInfo.curStamp < it.missionInfo.totalStamp)
-                    }
-                }
-                DONE_TYPE -> {
-                    missions.filter {
-                        (missionIdList.contains(it.missionId)) &&
-                                (it.missionInfo.curStamp == it.missionInfo.totalStamp)
-                    }
-                }
-                FAIL_TYPE -> {
-                    Timber.d(getCurrentDate().toString())
-                    missions.filter {
-                        (missionIdList.contains(it.missionId)) &&
-                                (getCurrentDate() > it.missionInfo.dueDate) &&
-                                (it.missionInfo.curStamp < it.missionInfo.totalStamp)
-                    }
-                }
-                else -> throw IllegalStateException()
+    fun loadMissionsList() {
+        viewModelScope.launch(Dispatchers.IO) {
+            missionsRepository.getUser().onSuccess { user ->
+                val missionIdList =
+                    missionsRepository.getMissionIdList(user.userInfo.currentGroupId)
+                val missions = missionsRepository.getMissions(user.userId)
+                _missionsList.postValue(
+                    when (requireNotNull(missionsType.value).peekContent()) {
+                        NOT_DONE_TYPE -> {
+                            missions.filter {
+                                (missionIdList.contains(it.missionId)) &&
+                                        (getCurrentDate() <= it.missionInfo.dueDate) &&
+                                        (it.missionInfo.curStamp < it.missionInfo.totalStamp)
+                            }
+                        }
+                        DONE_TYPE -> {
+                            missions.filter {
+                                (missionIdList.contains(it.missionId)) &&
+                                        (it.missionInfo.curStamp == it.missionInfo.totalStamp)
+                            }
+                        }
+                        FAIL_TYPE -> {
+                            missions.filter {
+                                (missionIdList.contains(it.missionId)) &&
+                                        (getCurrentDate() > it.missionInfo.dueDate) &&
+                                        (it.missionInfo.curStamp < it.missionInfo.totalStamp)
+                            }
+                        }
+                        else -> throw IllegalStateException()
+                    })
+            }.onFailure {
+                throw Exception("get User Exception!!")
             }
         }
     }
 
-    fun setItemClick(missionInfo: MissionInfo) {
-        Timber.d("item click")
-        _itemClick.postValue(Event(missionInfo))
-    }
-
-    fun getUserName(userId: String) {
+    fun loadUserName() {
         viewModelScope.launch(Dispatchers.IO) {
-            missionsRepository.getUserName(userId)
+            missionsRepository.getUser()
                 .onSuccess {
-                    _userName.postValue(Event(it))
+                    _userName.postValue(Event(it.userInfo.nickname))
                 }
                 .onFailure {
                     println("${it.message}")
