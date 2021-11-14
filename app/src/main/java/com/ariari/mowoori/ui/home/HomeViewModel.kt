@@ -108,6 +108,7 @@ class HomeViewModel @Inject constructor(
 
     fun cancelSnowAnimList() {
         snowAnimList.forEach {
+            it.removeAllListeners()
             it.cancel()
         }
     }

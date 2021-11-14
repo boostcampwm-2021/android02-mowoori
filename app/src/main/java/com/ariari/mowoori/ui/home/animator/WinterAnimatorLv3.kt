@@ -55,12 +55,12 @@ class WinterAnimatorLv3(
             context.resources.displayMetrics
         )
 
-    private fun getAnimatorFromResource(animatorResId: Int, target: View): Animator =AnimatorInflater
+    private fun getAnimatorFromResource(animatorResId: Int, view: View): Animator =AnimatorInflater
             .loadAnimator(
                 context,
                 animatorResId
             ).apply {
-                setTarget(target)
+                setTarget(view)
             homeViewModel.addSnowAnim(this)
             }
 
