@@ -8,7 +8,7 @@ import com.ariari.mowoori.data.repository.MissionsRepository
 import com.ariari.mowoori.ui.missions.entity.Mission
 import com.ariari.mowoori.ui.missions.entity.MissionInfo
 import com.ariari.mowoori.util.Event
-import com.ariari.mowoori.util.TimberUtil
+import com.ariari.mowoori.util.LogUtil
 import com.ariari.mowoori.util.getCurrentDate
 import com.ariari.mowoori.util.getCurrentDatePlusMonths
 import com.ariari.mowoori.util.getMissionIntFormatDate
@@ -98,7 +98,7 @@ class MissionsAddViewModel @Inject constructor(
 
     fun updateMissionStartDate(year: Int, month: Int, date: Int) {
         _missionStartDate.value = getMissionIntFormatDate(year, month, date)
-        TimberUtil.timber("update", _missionStartDate.value.toString())
+        LogUtil.log("update", _missionStartDate.value.toString())
     }
 
     fun updateMissionEndDate(year: Int, month: Int, date: Int) {

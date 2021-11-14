@@ -10,7 +10,7 @@ import com.ariari.mowoori.data.repository.HomeRepository
 import com.ariari.mowoori.ui.home.entity.Group
 import com.ariari.mowoori.ui.register.entity.UserInfo
 import com.ariari.mowoori.util.Event
-import com.ariari.mowoori.util.TimberUtil
+import com.ariari.mowoori.util.LogUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -33,16 +33,13 @@ class HomeViewModel @Inject constructor(
     private val _groupList = MutableLiveData<List<Group>>()
     val groupList: LiveData<List<Group>> = _groupList
 
-    private var _isSnowing = MutableLiveData<Boolean>()
+    private var _isSnowing = MutableLiveData(true)
     val isSnowing: LiveData<Boolean> = _isSnowing
 
     private var _snowmanLevel = MutableLiveData<SnowmanLevel>()
     val snowmanLevel: LiveData<SnowmanLevel> = _snowmanLevel
 
-    private var _isFirstCycle = true
-    val isFirstCycle = _isFirstCycle
-
-    private val snowAnimList: MutableList<Animator> = mutableListOf()
+    private val animatorList: MutableList<Animator> = mutableListOf()
 
     fun setUserInfo() {
         val uid = homeRepository.getUserUid()
@@ -52,7 +49,7 @@ class HomeViewModel @Inject constructor(
                 result.onSuccess { userInfo ->
                     _userInfo.postValue(Event(userInfo))
                 }.onFailure {
-                    TimberUtil.timber("setUserInfo*()", "$it")// TODO: 실패처리
+                    LogUtil.log("setUserInfo*()", "$it")// TODO: 실패처리
                 }
             }
         }
@@ -85,10 +82,6 @@ class HomeViewModel @Inject constructor(
         homeRepository.setCurrentGroupId(groupId)
     }
 
-    fun setIsFirstCycle(isFirst: Boolean) {
-        _isFirstCycle = isFirst
-    }
-
     fun updateIsSnowing() {
         if (isSnowing.value == null) {
             _isSnowing.postValue(true)
@@ -101,14 +94,15 @@ class HomeViewModel @Inject constructor(
         _snowmanLevel.postValue(snowmanLevel)
     }
 
-    fun addSnowAnim(anim: Animator) {
-        if (!snowAnimList.contains(anim)) {
-            snowAnimList.add(anim)
+    fun addAnimator(anim: Animator) {
+        if (!animatorList.contains(anim)) {
+            animatorList.add(anim)
         }
     }
 
-    fun cancelSnowAnimList() {
-        snowAnimList.forEach {
+    fun cancelAnimator() {
+        animatorList.forEach {
+            it.removeAllListeners()
             it.cancel()
         }
     }
