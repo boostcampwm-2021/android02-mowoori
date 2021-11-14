@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        motion:constraintSetEnd="@+id/end"
+        motion:constraintSetStart="@id/start"
+        motion:autoTransition="animateToEnd"
+        motion:duration="800">
+        <KeyFrameSet>
+            <KeyAttribute
+                motion:motionTarget="@+id/tv_missions_add_what_title"
+                motion:framePosition="0"
+                android:translationX="-350dp" />
+            <KeyAttribute
+                motion:motionTarget="@+id/et_missions_add_what"
+                motion:framePosition="0"
+                android:translationX="-350dp" />
+            <KeyAttribute
+                motion:motionTarget="@+id/et_missions_add_what"
+                motion:framePosition="15"
+                android:translationX="-350dp" />
+
+            <KeyAttribute
+                motion:motionTarget="@+id/tv_missions_add_when_title"
+                motion:framePosition="0"
+                android:translationX="-350dp" />
+            <KeyAttribute
+                motion:motionTarget="@+id/tv_missions_add_when_title"
+                motion:framePosition="30"
+                android:translationX="-350dp" />
+            <KeyAttribute
+                motion:motionTarget="@+id/tv_missions_add_when_start_title"
+                motion:framePosition="0"
+                android:translationX="-350dp" />
+            <KeyAttribute
+                motion:motionTarget="@+id/tv_missions_add_when_start_title"
+                motion:framePosition="45"
+                android:translationX="-350dp" />
+            <KeyAttribute
+                motion:motionTarget="@+id/tv_missions_add_when_start"
+                motion:framePosition="0"
+                android:translationX="-350dp" />
+            <KeyAttribute
+                motion:motionTarget="@+id/tv_missions_add_when_start"
+                motion:framePosition="45"
+                android:translationX="-350dp" />
+            <KeyAttribute
+                motion:motionTarget="@+id/tv_missions_add_when_end_title"
+                motion:framePosition="0"
+                android:translationX="-350dp" />
+            <KeyAttribute
+                motion:motionTarget="@+id/tv_missions_add_when_end_title"
+                motion:framePosition="60"
+                android:translationX="-350dp" />
+            <KeyAttribute
+                motion:motionTarget="@+id/tv_missions_add_when_end"
+                motion:framePosition="0"
+                android:translationX="-350dp" />
+            <KeyAttribute
+                motion:motionTarget="@+id/tv_missions_add_when_end"
+                motion:framePosition="60"
+                android:translationX="-350dp" />
+            <KeyAttribute
+                motion:motionTarget="@+id/container_missions_add_count_linear"
+                motion:framePosition="0"
+                android:translationX="-350dp" />
+            <KeyAttribute
+                motion:motionTarget="@+id/container_missions_add_count_linear"
+                motion:framePosition="75"
+                android:translationX="-350dp" />
+            <KeyAttribute
+                motion:motionTarget="@+id/btn_register_complete"
+                motion:framePosition="0"
+                android:alpha="0.0" />
+            <KeyAttribute
+                motion:motionTarget="@+id/btn_register_complete"
+                motion:framePosition="50"
+                android:alpha="0.0" />
+        </KeyFrameSet>
+    </Transition>
+
+    <ConstraintSet android:id="@+id/start"></ConstraintSet>
+
+    <ConstraintSet android:id="@+id/end"></ConstraintSet>
+</MotionScene>
