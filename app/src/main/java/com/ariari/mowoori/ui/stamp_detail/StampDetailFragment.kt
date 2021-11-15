@@ -15,8 +15,11 @@ import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentStampDetailBinding
 import com.ariari.mowoori.ui.stamp.entity.DetailInfo
 import com.ariari.mowoori.util.EventObserver
+import com.ariari.mowoori.util.LogUtil
 import com.ariari.mowoori.widget.PictureDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class StampDetailFragment :
     BaseFragment<FragmentStampDetailBinding>(R.layout.fragment_stamp_detail) {
 
@@ -38,12 +41,16 @@ class StampDetailFragment :
         setBtnVisible()
         setDetailTransitionName()
         setUserName()
+        setMissionId()
         setMissionName()
         setPicture()
         setPictureListener()
         setRootClick()
+        setIsMissionPostedObserver()
         setCloseBtnClickObserver()
         setIsCertifyObserver()
+        setBtnCertifyListener()
+        setPictureUrlObserver()
     }
 
     private fun setDetailInfo() {
@@ -62,6 +69,10 @@ class StampDetailFragment :
         viewModel.setUserName(detailInfo.userName)
     }
 
+    private fun setMissionId() {
+        viewModel.setMissionId(detailInfo.missionId)
+    }
+
     private fun setMissionName() {
         viewModel.setMissionName(detailInfo.missionName)
     }
@@ -76,8 +87,10 @@ class StampDetailFragment :
     private fun setPictureListener() {
         binding.tvStampDetailIcon.setOnClickListener {
             // TODO: 리스너 등록
-            PictureDialogFragment().show(requireActivity().supportFragmentManager,
-                "PictureDialogFragment")
+            PictureDialogFragment().show(
+                requireActivity().supportFragmentManager,
+                "PictureDialogFragment"
+            )
         }
     }
 
@@ -114,8 +127,24 @@ class StampDetailFragment :
         })
     }
 
+    private fun setPictureUrlObserver() {
+        viewModel.pictureUrl.observe(viewLifecycleOwner) {
+            LogUtil.log("setPictureUrl", it.toString())
+            viewModel.postStamp()
+        }
+    }
+
     private fun setBtnCertifyListener() {
         binding.btnStampDetailCertify.setOnClickListener {
+            viewModel.setComment(binding.etStampDetailComment.text.toString())
+            viewModel.setPictureUrl("default")
         }
+    }
+
+    private fun setIsMissionPostedObserver() {
+        viewModel.isStampPosted.observe(viewLifecycleOwner, EventObserver {
+            // TODO: 알림 발생
+            this.findNavController().popBackStack()
+        })
     }
 }

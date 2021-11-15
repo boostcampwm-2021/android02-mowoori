@@ -69,6 +69,4 @@ object RepositoryModule {
         databaseReference: DatabaseReference,
         firebaseAuth: FirebaseAuth
     ): MembersRepository = MembersRepositoryImpl(databaseReference,firebaseAuth)
-
-
 }
