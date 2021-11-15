@@ -104,8 +104,18 @@ class StampDetailFragment :
 
     private fun setIsCertifyObserver() {
         viewModel.isCertify.observe(viewLifecycleOwner, EventObserver {
-            if (it) binding.btnStampDetailCertify.isVisible = true
-            else binding.btnStampDetailCertify.isInvisible = true
+            if (it) {
+                binding.btnStampDetailCertify.isVisible = true
+                binding.tvStampDetailComment.isFocusable = true
+            } else {
+                binding.btnStampDetailCertify.isInvisible = true
+                binding.tvStampDetailComment.isFocusable = false
+            }
         })
+    }
+
+    private fun setBtnCertifyListener() {
+        binding.btnStampDetailCertify.setOnClickListener {
+        }
     }
 }

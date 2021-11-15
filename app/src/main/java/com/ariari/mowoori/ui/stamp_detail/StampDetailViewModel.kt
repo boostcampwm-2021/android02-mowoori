@@ -19,6 +19,8 @@ class StampDetailViewModel : ViewModel() {
     private val _missionName = MutableLiveData<Event<String>>()
     val missionName: LiveData<Event<String>> get() = _missionName
 
+
+
     fun setCloseBtnClick() {
         _closeBtnClick.value = Event(true)
     }

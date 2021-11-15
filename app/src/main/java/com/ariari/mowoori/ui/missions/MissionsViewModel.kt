@@ -21,8 +21,8 @@ class MissionsViewModel @Inject constructor(
     private val _plusBtnClick = MutableLiveData<Event<Boolean>>()
     val plusBtnClick: LiveData<Event<Boolean>> = _plusBtnClick
 
-    private val _itemClick = MutableLiveData<Event<MissionInfo>>()
-    val itemClick: LiveData<Event<MissionInfo>> = _itemClick
+    private val _itemClick = MutableLiveData<Event<Mission>>()
+    val itemClick: LiveData<Event<Mission>> = _itemClick
 
     private val _missionsType = MutableLiveData(Event(NOT_DONE_TYPE))
     val missionsType: LiveData<Event<Int>> = _missionsType
@@ -37,8 +37,8 @@ class MissionsViewModel @Inject constructor(
         _plusBtnClick.value = Event(true)
     }
 
-    fun setItemClick(missionInfo: MissionInfo) {
-        _itemClick.postValue(Event(missionInfo))
+    fun setItemClick(mission: Mission) {
+        _itemClick.postValue(Event(mission))
     }
 
     fun setNotDoneType() {
