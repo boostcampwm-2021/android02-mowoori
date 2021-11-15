@@ -58,14 +58,24 @@ class MissionsRepositoryImpl @Inject constructor(
         return snapshot.exists()
     }
 
-    override suspend fun postMission(mission: Mission) {
-        firebaseReference.child("missions").child(mission.missionId)
-            .setValue(mission.missionInfo).await()
-    }
+    override suspend fun postMission(missionInfo: MissionInfo, groupId:String, missionIdList: List<String>) {
+        val missionId = firebaseReference.child("missions").push().key
+        missionId?.let {
+            val updatedMissionList = missionIdList.toMutableList().apply {
+                    add(missionId)
+                }
 
-    override suspend fun postMissionIdList(groupId: String, missionIdList: List<String>) {
-        firebaseReference.child("groups").child(groupId).child("missionList")
-            .setValue(missionIdList).await()
+            val childUpdates = hashMapOf(
+                "missions/$missionId" to missionInfo,
+                "groups/$groupId/missionList" to updatedMissionList
+            )
+            firebaseReference.updateChildren(childUpdates)
+
+//            firebaseReference.child("missions").child(mission.missionId)
+//                .setValue(mission.missionInfo).await()
+
+            missionId
+        }
     }
 
     override suspend fun getUserName(userId: String): Result<String> = kotlin.runCatching {
