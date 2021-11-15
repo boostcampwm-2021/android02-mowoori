@@ -103,4 +103,7 @@
     <!-- PictureDialogFragment -->
     <string name="dialog_picture_gallery">GALLERY</string>
     <string name="dialog_picture_camera">CAMERA</string>
+
+    <!-- MembersFragment -->
+    <string name="desc_members_profile">구성원 프로필 이미지</string>
 </resources>
