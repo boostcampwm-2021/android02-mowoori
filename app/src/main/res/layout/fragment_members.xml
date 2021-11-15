@@ -20,9 +20,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
-            app:onPlusClick="@{viewModel::clickPlusButton}"
+            app:onInviteClick="@{viewModel::clickPlusButton}"
             app:text="@string/members_title"
-            app:titleViewMode="@{TitleViewMode.TITLE_VIEW_PLUS_BUTTON}" />
+            app:titleViewMode="@{TitleViewMode.TITLE_VIEW_INVITE_BUTTON}" />
 
         <TextView
             android:layout_width="match_parent"

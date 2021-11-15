@@ -24,6 +24,7 @@
     <string name="desc_title_view_back">뒤로가기 버튼</string>
     <string name="desc_title_view_close">창 끄기 버튼</string>
     <string name="desc_title_view_plus">정보 추가 버튼</string>
+    <string name="desc_title_view_plus_members">구성원 추가 버튼</string>
     <string name="title_view_text">View Title</string>
 
     <!--invite_check-->
@@ -106,4 +107,5 @@
 
     <!-- MembersFragment -->
     <string name="desc_members_profile">구성원 프로필 이미지</string>
+    <string name="tv_title_view_invite">초대하기</string>
 </resources>
