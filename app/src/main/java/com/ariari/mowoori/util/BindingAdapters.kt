@@ -24,15 +24,22 @@ object BindingAdapters {
         }
     }
 
-    @BindingAdapter("setSrcFromUrl")
+    @BindingAdapter(value = ["imageUrl", "isCircle"], requireAll = false)
     @JvmStatic
-    fun setSrcFromUrl(imageView: ImageView, url: String?) {
+    fun ImageView.bindImageUrl(url: String?, isCircle: Boolean) {
         if (url.isNullOrEmpty()) {
-            imageView.setImageResource(R.drawable.ic_empty)
+            this.setImageResource(R.drawable.ic_empty)
         } else {
-            Glide.with(imageView.context)
-                .load(url)
-                .into(imageView)
+            if (isCircle) {
+                Glide.with(this.context)
+                    .load(url)
+                    .circleCrop()
+                    .into(this)
+            } else {
+                Glide.with(this.context)
+                    .load(url)
+                    .into(this)
+            }
         }
     }
 
