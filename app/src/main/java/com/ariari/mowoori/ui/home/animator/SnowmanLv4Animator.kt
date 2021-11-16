@@ -7,6 +7,7 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.content.Context
+import android.util.Property
 import android.view.View
 import androidx.core.view.isInvisible
 import androidx.lifecycle.LifecycleOwner
@@ -40,6 +41,8 @@ class SnowmanLv4Animator(
     private lateinit var showBigHeartAnimator: Animator
     private lateinit var showLeftEyeHeartAnimator: Animator
     private lateinit var showRightEyeHeartAnimator: Animator
+    private lateinit var disappearFirstExclamationAnimator: Animator
+    private lateinit var disappearSecondExclamationAnimator: Animator
 
     fun start() {
         homeViewModel.addSources()
@@ -65,8 +68,10 @@ class SnowmanLv4Animator(
                     override fun onAnimationEnd(animation: Animator?) {
                         super.onAnimationEnd(animation)
                         setEyesInvisible()
-                        component.exclamations[0].isInvisible = true
-                        component.exclamations[1].isInvisible = true
+                        showUpFirstExclamationAnimator.cancel()
+                        showUpSecondExclamationAnimator.cancel()
+                        disappearFirstExclamationAnimator.start()
+                        disappearSecondExclamationAnimator.start()
                         showBigHeartAnimator.start()
                         showUpLeftHeartAnimator.start()
                         showUpRightHeartAnimator.start()
@@ -97,7 +102,7 @@ class SnowmanLv4Animator(
 
         showUpLeftHeartAnimator = getAnimatorFromResource(R.animator.animator_show_up,
             component.hearts[0]).apply {
-            startDelay = 150L
+            startDelay = 180L
             addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator?) {
                     super.onAnimationEnd(animation)
@@ -107,7 +112,7 @@ class SnowmanLv4Animator(
         }
         showUpRightHeartAnimator = getAnimatorFromResource(R.animator.animator_show_up,
             component.hearts[1]).apply {
-            startDelay = 150L
+            startDelay = 180L
             addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator?) {
                     super.onAnimationEnd(animation)
@@ -127,7 +132,7 @@ class SnowmanLv4Animator(
 
         showLeftEyeHeartAnimator = getAnimatorFromResource(R.animator.animator_show_up,
             component.face.ivHomeSnowmanLeftEyeHeartLv4).apply {
-            startDelay = 150L
+            startDelay = 180L
             addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator?) {
                     super.onAnimationEnd(animation)
@@ -138,11 +143,31 @@ class SnowmanLv4Animator(
 
         showRightEyeHeartAnimator = getAnimatorFromResource(R.animator.animator_show_up,
             component.face.ivHomeSnowmanRightEyeHeartLv4).apply {
-            startDelay = 150L
+            startDelay = 180L
             addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator?) {
                     super.onAnimationEnd(animation)
                     showRightEyeHeartAnimator.removeAllListeners()
+                }
+            })
+        }
+
+        disappearFirstExclamationAnimator = getAnimatorFromResource(R.animator.animator_disappear,
+            component.exclamations[0]).apply {
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    super.onAnimationEnd(animation)
+                    disappearFirstExclamationAnimator.removeAllListeners()
+                }
+            })
+        }
+
+        disappearSecondExclamationAnimator = getAnimatorFromResource(R.animator.animator_disappear,
+            component.exclamations[1]).apply {
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    super.onAnimationEnd(animation)
+                    disappearSecondExclamationAnimator.removeAllListeners()
                 }
             })
         }
@@ -219,8 +244,15 @@ class SnowmanLv4Animator(
     private fun setObjectAnimators() {
         setMoveLeftEyeToLeftAnimator()
         setMoveRightEyeToLeftAnimator()
-        setMoveLeftEyeToRightAnimator()
-        setMoveRightEyeToRightAnimator()
+        moveLeftEyeToRightAnimator = getAnimatorOfFloat(component.face.ivHomeSnowmanLeftEyeWhiteLv4,
+            View.TRANSLATION_X,
+            leftWhiteEyeInfo.x - leftBlackEyeInfo.x - leftWhiteEyeInfo.width,
+            600)
+        moveRightEyeToRightAnimator =
+            getAnimatorOfFloat(component.face.ivHomeSnowmanRightEyeWhiteLv4,
+                View.TRANSLATION_X,
+                rightWhiteEyeInfo.x - rightBlackEyeInfo.x - rightWhiteEyeInfo.width,
+                600)
         setAnimationSet()
         startAnimation()
     }
@@ -231,11 +263,10 @@ class SnowmanLv4Animator(
         val moveLeftEyePropertyY = PropertyValuesHolder.ofFloat(View.TRANSLATION_Y,
             leftBlackEyeInfo.height - leftWhiteEyeInfo.height - (leftWhiteEyeInfo.y - leftBlackEyeInfo.y))
         moveLeftEyeToLeftAnimator =
-            ObjectAnimator.ofPropertyValuesHolder(component.face.ivHomeSnowmanLeftEyeWhiteLv4,
+            getAnimatorFromProperties(component.face.ivHomeSnowmanLeftEyeWhiteLv4,
                 moveLeftEyePropertyX,
-                moveLeftEyePropertyY).apply {
-                duration = 600
-            }
+                moveLeftEyePropertyY,
+                600)
     }
 
     private fun setMoveRightEyeToLeftAnimator() {
@@ -244,32 +275,33 @@ class SnowmanLv4Animator(
         val moveRightEyePropertyY = PropertyValuesHolder.ofFloat(View.TRANSLATION_Y,
             rightBlackEyeInfo.height - rightWhiteEyeInfo.height - (rightWhiteEyeInfo.y - rightBlackEyeInfo.y))
         moveRightEyeToLeftAnimator =
-            ObjectAnimator.ofPropertyValuesHolder(component.face.ivHomeSnowmanRightEyeWhiteLv4,
+            getAnimatorFromProperties(component.face.ivHomeSnowmanRightEyeWhiteLv4,
                 moveRightEyePropertyX,
-                moveRightEyePropertyY).apply {
-                duration = 600
-            }
+                moveRightEyePropertyY,
+                600)
     }
 
-    private fun setMoveLeftEyeToRightAnimator() {
-        moveLeftEyeToRightAnimator =
-            ObjectAnimator.ofFloat(component.face.ivHomeSnowmanLeftEyeWhiteLv4,
-                View.TRANSLATION_X,
-                leftWhiteEyeInfo.x - leftBlackEyeInfo.x - leftWhiteEyeInfo.width)
-                .apply {
-                    duration = 600
-                }
-    }
+    private fun getAnimatorFromProperties(
+        view: View,
+        property1: PropertyValuesHolder,
+        property2: PropertyValuesHolder,
+        duration: Long,
+    ) =
+        ObjectAnimator.ofPropertyValuesHolder(view, property1, property2).apply {
+            this.duration = duration
+            homeViewModel.addAnimator(this)
+        }
 
-    private fun setMoveRightEyeToRightAnimator() {
-        moveRightEyeToRightAnimator =
-            ObjectAnimator.ofFloat(component.face.ivHomeSnowmanRightEyeWhiteLv4,
-                View.TRANSLATION_X,
-                rightWhiteEyeInfo.x - rightBlackEyeInfo.x - rightWhiteEyeInfo.width)
-                .apply {
-                    duration = 600
-                }
-    }
+    private fun getAnimatorOfFloat(
+        view: View,
+        property: Property<View, Float>,
+        value: Float,
+        duration: Long,
+    ) =
+        ObjectAnimator.ofFloat(view, property, value).apply {
+            this.duration = duration
+            homeViewModel.addAnimator(this)
+        }
 
     private fun setAnimationSet() {
         moveEyeToLeftAnimatorSet = AnimatorSet().apply {
