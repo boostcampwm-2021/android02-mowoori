@@ -9,6 +9,7 @@ import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentMissionsBinding
 import com.ariari.mowoori.ui.missions.adapter.MissionsAdapter
 import com.ariari.mowoori.util.EventObserver
+import com.ariari.mowoori.widget.ProgressDialogManager
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -23,18 +24,26 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = missionsViewModel
-
+        missionsViewModel.setLoadingEvent(true)
         setMissionsRvAdapter()
         setObserver()
         getUserName()
     }
 
     private fun setObserver() {
+        setLoadingObserver()
         setPlusBtnClickObserver()
         setMissionsTypeObserver()
         setMissionsListObserver()
         setItemClickObserver()
         setUserNameObserver()
+    }
+
+    private fun setLoadingObserver() {
+        missionsViewModel.loadingEvent.observe(viewLifecycleOwner, EventObserver { isLoading ->
+            if (isLoading) ProgressDialogManager.instance.show(requireContext())
+            else ProgressDialogManager.instance.clear()
+        })
     }
 
     private fun setMissionsRvAdapter() {
@@ -57,6 +66,7 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
     private fun setMissionsListObserver() {
         missionsViewModel.missionsList.observe(viewLifecycleOwner) { missionsList ->
             missionsAdapter.submitList(missionsList)
+            missionsViewModel.setLoadingEvent(false)
         }
     }
 

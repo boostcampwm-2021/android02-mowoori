@@ -18,6 +18,9 @@ import javax.inject.Inject
 class MissionsViewModel @Inject constructor(
     private val missionsRepository: MissionsRepository
 ) : ViewModel() {
+    private val _loadingEvent = MutableLiveData<Event<Boolean>>()
+    val loadingEvent: LiveData<Event<Boolean>> get() = _loadingEvent
+
     private val _plusBtnClick = MutableLiveData<Event<Boolean>>()
     val plusBtnClick: LiveData<Event<Boolean>> = _plusBtnClick
 
@@ -33,6 +36,10 @@ class MissionsViewModel @Inject constructor(
     private val _userName = MutableLiveData<Event<String>>()
     val userName: LiveData<Event<String>> get() = _userName
 
+    fun setLoadingEvent(isLoading: Boolean) {
+        _loadingEvent.value = Event(isLoading)
+    }
+
     fun setPlusBtnClick() {
         _plusBtnClick.value = Event(true)
     }
@@ -43,14 +50,17 @@ class MissionsViewModel @Inject constructor(
 
     fun setNotDoneType() {
         _missionsType.value = Event(NOT_DONE_TYPE)
+        setLoadingEvent(true)
     }
 
     fun setDoneType() {
         _missionsType.value = Event(DONE_TYPE)
+        setLoadingEvent(true)
     }
 
     fun setFailType() {
         _missionsType.value = Event(FAIL_TYPE)
+        setLoadingEvent(true)
     }
 
     fun loadMissionsList() {

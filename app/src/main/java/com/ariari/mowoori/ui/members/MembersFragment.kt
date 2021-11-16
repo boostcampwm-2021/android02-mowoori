@@ -41,8 +41,8 @@ class MembersFragment : BaseFragment<FragmentMembersBinding>(R.layout.fragment_m
     }
 
     private fun setLoadingObserver() {
-        membersViewModel.loadingEvent.observe(viewLifecycleOwner, EventObserver {
-            if (it) ProgressDialogManager.instance.show(requireContext())
+        membersViewModel.loadingEvent.observe(viewLifecycleOwner, EventObserver { isLoading ->
+            if (isLoading) ProgressDialogManager.instance.show(requireContext())
             else ProgressDialogManager.instance.clear()
         })
     }
