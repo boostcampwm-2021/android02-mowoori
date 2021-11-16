@@ -103,4 +103,14 @@
     <!-- PictureDialogFragment -->
     <string name="dialog_picture_gallery">GALLERY</string>
     <string name="dialog_picture_camera">CAMERA</string>
+    <string name="desc_home_snowman_o_mouth">눈사람 오 모양 입술</string>
+    <string name="desc_home_snowman_left_eye">눈사람 왼쪽 눈</string>
+    <string name="desc_home_snowman_right_eye">눈사람 오른쪽 눈</string>
+    <string name="desc_home_snowman_left_pupil">눈사람 왼쪽 동공</string>
+    <string name="desc_home_snowman_right_pupil">눈사람 오른쪽 동공</string>
+    <string name="desc_home_snowman_left_hand">눈사람 왼손</string>
+    <string name="desc_home_exclamation">느낌표</string>
+    <string name="desc_home_heart">하트</string>
+    <string name="desc_home_snowman_right_hand">눈사람 오른손</string>
+    <string name="desc_home_big_heart">왕 하트</string>
 </resources>
