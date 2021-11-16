@@ -83,7 +83,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
             binding.ivHomeSnowmanRightEyeBlackLv4,
             binding.ivHomeSnowmanRightEyeWhiteLv4,
             binding.ivHomeSnowmanLeftHand,
-            binding.ivHomeSnowmanRightHand, binding.ivHomeSnowmanBody), homeViewModel, viewLifecycleOwner, requireContext())
+            binding.ivHomeSnowmanRightHand,
+            binding.ivHomeSnowmanBody,
+            binding.ivHomeFirstExclamation,
+            binding.ivHomeSecondExclamation,
+            binding.ivHomeLeftHeart,
+            binding.ivHomeLeftHeart), homeViewModel, viewLifecycleOwner, requireContext())
         ani.start()
         setUserInfoObserver()
         setCurrentGroupInfoObserver()

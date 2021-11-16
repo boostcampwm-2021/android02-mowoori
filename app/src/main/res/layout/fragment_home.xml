@@ -48,6 +48,27 @@
                 app:layout_constraintStart_toStartOf="parent" />
 
             <ImageView
+                android:visibility="invisible"
+                android:id="@+id/iv_home_first_exclamation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/desc_home_exclamation"
+                android:src="@drawable/ic_exclamation"
+                app:layout_constraintBottom_toTopOf="@+id/iv_home_snowman_face_lv4"
+                app:layout_constraintStart_toEndOf="@id/iv_home_snowman_face_lv4" />
+
+            <ImageView
+                android:visibility="invisible"
+
+                android:id="@+id/iv_home_second_exclamation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/desc_home_exclamation"
+                android:src="@drawable/ic_exclamation"
+                app:layout_constraintBottom_toTopOf="@+id/iv_home_snowman_face_lv4"
+                app:layout_constraintStart_toEndOf="@id/iv_home_first_exclamation" />
+
+            <ImageView
                 android:id="@+id/iv_home_snowman_left_eye_black_lv4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -99,6 +120,15 @@
                 app:layout_constraintEnd_toEndOf="@id/iv_home_snowman_face_lv4"
                 app:layout_constraintStart_toStartOf="@id/iv_home_snowman_face_lv4"
                 app:layout_constraintTop_toBottomOf="@id/iv_home_snowman_left_eye_black_lv4" />
+
+            <ImageView
+                android:visibility="invisible"
+                android:id="@+id/iv_home_left_heart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_heart"
+                app:layout_constraintBottom_toTopOf="@id/iv_home_snowman_left_hand"
+                app:layout_constraintStart_toStartOf="@id/iv_home_snowman_left_hand" />
 
             <ImageView
                 android:id="@+id/iv_home_snowman_left_hand"

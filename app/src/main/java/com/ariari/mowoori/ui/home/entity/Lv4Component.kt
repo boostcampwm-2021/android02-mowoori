@@ -10,4 +10,8 @@ data class Lv4Component(
     val leftHand: ImageView,
     val rightHand: ImageView,
     val body: ImageView,
+    val firstExclamation: ImageView,
+    val secondExclamation: ImageView,
+    val leftHeart: ImageView,
+    val rightHeart: ImageView,
 )

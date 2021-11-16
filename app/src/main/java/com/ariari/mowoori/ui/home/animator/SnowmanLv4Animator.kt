@@ -8,6 +8,7 @@ import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.content.Context
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import com.ariari.mowoori.R
 import com.ariari.mowoori.ui.home.HomeViewModel
@@ -32,6 +33,8 @@ class SnowmanLv4Animator(
     private lateinit var moveEyeToRightAnimatorSet: AnimatorSet
     private lateinit var showLeftHandAnimator: Animator
     private lateinit var showRightHandAnimator: Animator
+    private lateinit var showUpFirstExclamationAnimator: Animator
+    private lateinit var showUpSecondExclamationAnimator: Animator
 
     fun start() {
         homeViewModel.addSources()
@@ -47,6 +50,8 @@ class SnowmanLv4Animator(
                 override fun onAnimationEnd(animation: Animator?) {
                     super.onAnimationEnd(animation)
                     showLeftHandAnimator.start()
+                    component.firstExclamation.isVisible = true
+                    showUpFirstExclamationAnimator.start()
                     moveLeftEyeToLeftAnimator.removeAllListeners()
                 }
             })
@@ -57,6 +62,8 @@ class SnowmanLv4Animator(
                 override fun onAnimationEnd(animation: Animator?) {
                     super.onAnimationEnd(animation)
                     showRightHandAnimator.start()
+                    component.secondExclamation.isVisible = true
+                    showUpSecondExclamationAnimator.start()
                     moveEyeToRightAnimatorSet.removeAllListeners()
                 }
             })
@@ -83,6 +90,24 @@ class SnowmanLv4Animator(
                     }
                 })
             }
+        showUpFirstExclamationAnimator =
+            getAnimatorFromResource(R.animator.animator_show_up, component.firstExclamation).apply {
+                addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
+                        showUpFirstExclamationAnimator.removeAllListeners()
+                    }
+                })
+            }
+        showUpSecondExclamationAnimator = getAnimatorFromResource(R.animator.animator_show_up,
+            component.secondExclamation).apply {
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    super.onAnimationEnd(animation)
+                    showUpFirstExclamationAnimator.removeAllListeners()
+                }
+            })
+        }
     }
 
     private fun getAnimatorFromResource(animatorResId: Int, view: View): Animator = AnimatorInflater
