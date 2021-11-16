@@ -2,6 +2,8 @@ package com.ariari.mowoori.ui.home
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
@@ -16,6 +18,9 @@ import com.ariari.mowoori.ui.home.adapter.DrawerAdapterDecoration
 import com.ariari.mowoori.ui.home.animator.SnowAnimator
 import com.ariari.mowoori.ui.home.animator.SnowmanLv2Animator
 import com.ariari.mowoori.ui.home.animator.SnowmanLv3Animator
+import com.ariari.mowoori.ui.home.animator.SnowmanLv4Animator
+import com.ariari.mowoori.ui.home.entity.Lv4Component
+import com.ariari.mowoori.ui.home.entity.ViewInfo
 import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.util.LogUtil
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,7 +33,6 @@ import timber.log.Timber
 @AndroidEntryPoint
 class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     private val homeViewModel: HomeViewModel by viewModels()
-
     private lateinit var adapter: DrawerAdapter
 
     // 1단계 눈내리는 애니메이션
@@ -74,6 +78,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = homeViewModel
+        val ani = SnowmanLv4Animator(Lv4Component(binding.ivHomeSnowmanLeftEyeBlackLv4,
+            binding.ivHomeSnowmanLeftEyeWhiteLv4,
+            binding.ivHomeSnowmanRightEyeBlackLv4,
+            binding.ivHomeSnowmanRightEyeWhiteLv4,
+            binding.ivHomeSnowmanLeftHand,
+            binding.ivHomeSnowmanRightHand, binding.ivHomeSnowmanBody), homeViewModel, viewLifecycleOwner)
+        ani.start()
         setUserInfoObserver()
         setCurrentGroupInfoObserver()
         setGroupInfoListObserver()
@@ -82,7 +93,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         setRecyclerViewDecoration()
         setObserver()
         // 임시로 3단계로 설정 추후에 단계별 애니메이션 나오도록 설정 필요
-        setSnowmanLevel(SnowmanLevel.LV3)
+        setSnowmanLevel(SnowmanLevel.LV4)
         setClickListener()
         setMenuListener()
     }

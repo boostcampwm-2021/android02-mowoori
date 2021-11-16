@@ -2,6 +2,7 @@ package com.ariari.mowoori.ui.home
 
 import android.animation.Animator
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
@@ -20,7 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val homeRepository: HomeRepository
+    private val homeRepository: HomeRepository,
 ) : ViewModel() {
     private val _userInfo = MutableLiveData<Event<UserInfo>>()
     val userInfo: LiveData<Event<UserInfo>> = _userInfo
@@ -106,4 +107,55 @@ class HomeViewModel @Inject constructor(
             it.cancel()
         }
     }
+
+    private val _isBodyMeasured = MutableLiveData<Boolean>()
+    val isBodyMeasured: LiveData<Boolean> get() = _isBodyMeasured
+    private val _isLeftBlackViewInfoDone = MutableLiveData<Boolean>()
+    private val _isLeftWhiteViewInfoDone = MutableLiveData<Boolean>()
+    private val _isRightBlackViewInfoDone = MutableLiveData<Boolean>()
+    private val _isRightWhiteViewInfoDone = MutableLiveData<Boolean>()
+    private val _viewInfoMediator = MediatorLiveData<Boolean>()
+    val viewInfoMediator: LiveData<Boolean> = _viewInfoMediator
+
+    fun addSources() {
+        with(_viewInfoMediator) {
+            addSource(_isLeftBlackViewInfoDone) {
+                this.value = isViewInfoDone()
+            }
+            addSource(_isLeftWhiteViewInfoDone) {
+                this.value = isViewInfoDone()
+            }
+            addSource(_isRightBlackViewInfoDone) {
+                this.value = isViewInfoDone()
+            }
+            addSource(_isRightWhiteViewInfoDone) {
+                this.value = isViewInfoDone()
+            }
+        }
+    }
+
+    fun bodyMeasured() {
+        _isBodyMeasured.value = true
+    }
+
+    private fun isViewInfoDone(): Boolean {
+        return _isLeftBlackViewInfoDone.value == true && _isLeftWhiteViewInfoDone.value == true && _isRightBlackViewInfoDone.value == true && _isRightWhiteViewInfoDone.value == true
+    }
+
+    fun leftBlackViewInfoDone() {
+        _isLeftBlackViewInfoDone.value = true
+    }
+
+    fun leftWhiteViewInfoDone() {
+        _isLeftWhiteViewInfoDone.value = true
+    }
+
+    fun rightBlackViewInfoDone() {
+        _isRightBlackViewInfoDone.value = true
+    }
+
+    fun rightWhiteViewInfoDone() {
+        _isRightWhiteViewInfoDone.value = true
+    }
+
 }
