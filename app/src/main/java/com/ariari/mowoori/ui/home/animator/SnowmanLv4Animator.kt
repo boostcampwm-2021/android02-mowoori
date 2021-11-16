@@ -1,10 +1,15 @@
 package com.ariari.mowoori.ui.home.animator
 
+import android.animation.Animator
+import android.animation.AnimatorInflater
+import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
+import android.content.Context
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
+import com.ariari.mowoori.R
 import com.ariari.mowoori.ui.home.HomeViewModel
 import com.ariari.mowoori.ui.home.entity.Lv4Component
 import com.ariari.mowoori.ui.home.entity.ViewInfo
@@ -13,6 +18,7 @@ class SnowmanLv4Animator(
     private val component: Lv4Component,
     private val homeViewModel: HomeViewModel,
     private val lifecycleOwner: LifecycleOwner,
+    private val context: Context,
 ) {
     private lateinit var leftBlackEyeInfo: ViewInfo
     private lateinit var rightBlackEyeInfo: ViewInfo
@@ -22,12 +28,71 @@ class SnowmanLv4Animator(
     private lateinit var moveRightEyeToLeftAnimator: ObjectAnimator
     private lateinit var moveLeftEyeToRightAnimator: ObjectAnimator
     private lateinit var moveRightEyeToRightAnimator: ObjectAnimator
+    private lateinit var moveEyeToLeftAnimatorSet: AnimatorSet
+    private lateinit var moveEyeToRightAnimatorSet: AnimatorSet
+    private lateinit var showLeftHandAnimator: Animator
+    private lateinit var showRightHandAnimator: Animator
 
     fun start() {
         homeViewModel.addSources()
+        setXMLAnimators()
         initViewInfo()
         setObservers()
     }
+
+    private fun setAnimationSet() {
+        moveEyeToLeftAnimatorSet = AnimatorSet().apply {
+            playTogether(moveLeftEyeToLeftAnimator, moveRightEyeToLeftAnimator)
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    super.onAnimationEnd(animation)
+                    showLeftHandAnimator.start()
+                    moveLeftEyeToLeftAnimator.removeAllListeners()
+                }
+            })
+        }
+        moveEyeToRightAnimatorSet = AnimatorSet().apply {
+            playTogether(moveLeftEyeToRightAnimator, moveRightEyeToRightAnimator)
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    super.onAnimationEnd(animation)
+                    showRightHandAnimator.start()
+                    moveEyeToRightAnimatorSet.removeAllListeners()
+                }
+            })
+        }
+    }
+
+    private fun setXMLAnimators() {
+        showLeftHandAnimator =
+            getAnimatorFromResource(R.animator.animator_hand_show, component.leftHand).apply {
+                addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
+                        moveEyeToRightAnimatorSet.start()
+                        showLeftHandAnimator.removeAllListeners()
+                    }
+                })
+            }
+        showRightHandAnimator =
+            getAnimatorFromResource(R.animator.animator_hand_show, component.rightHand).apply {
+                addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
+                        showRightHandAnimator.removeAllListeners()
+                    }
+                })
+            }
+    }
+
+    private fun getAnimatorFromResource(animatorResId: Int, view: View): Animator = AnimatorInflater
+        .loadAnimator(
+            context,
+            animatorResId
+        ).apply {
+            setTarget(view)
+            homeViewModel.addAnimator(this)
+        }
 
     private fun initViewInfo() {
         with(component.body) {
@@ -84,10 +149,14 @@ class SnowmanLv4Animator(
     private fun setObjectAnimators() {
         setMoveLeftEyeToLeftAnimator()
         setMoveRightEyeToLeftAnimator()
-        AnimatorSet().apply {
-            playTogether(moveLeftEyeToLeftAnimator, moveRightEyeToLeftAnimator)
-            start()
-        }
+        setMoveLeftEyeToRightAnimator()
+        setMoveRightEyeToRightAnimator()
+        setAnimationSet()
+        startAnimation()
+    }
+
+    private fun startAnimation() {
+        moveEyeToLeftAnimatorSet.start()
     }
 
     private fun setMoveLeftEyeToLeftAnimator() {
@@ -98,9 +167,8 @@ class SnowmanLv4Animator(
         moveLeftEyeToLeftAnimator = ObjectAnimator.ofPropertyValuesHolder(component.leftWhiteEye,
             moveLeftEyePropertyX,
             moveLeftEyePropertyY).apply {
-            duration = 1000
+            duration = 600
         }
-
     }
 
     private fun setMoveRightEyeToLeftAnimator() {
@@ -111,7 +179,25 @@ class SnowmanLv4Animator(
         moveRightEyeToLeftAnimator = ObjectAnimator.ofPropertyValuesHolder(component.rightWhiteEye,
             moveRightEyePropertyX,
             moveRightEyePropertyY).apply {
-            duration = 1000
+            duration = 600
         }
+    }
+
+    private fun setMoveLeftEyeToRightAnimator() {
+        moveLeftEyeToRightAnimator = ObjectAnimator.ofFloat(component.leftWhiteEye,
+            View.TRANSLATION_X,
+            leftWhiteEyeInfo.x - leftBlackEyeInfo.x - leftWhiteEyeInfo.width)
+            .apply {
+                duration = 600
+            }
+    }
+
+    private fun setMoveRightEyeToRightAnimator() {
+        moveRightEyeToRightAnimator = ObjectAnimator.ofFloat(component.rightWhiteEye,
+            View.TRANSLATION_X,
+            rightWhiteEyeInfo.x - rightBlackEyeInfo.x - rightWhiteEyeInfo.width)
+            .apply {
+                duration = 600
+            }
     }
 }

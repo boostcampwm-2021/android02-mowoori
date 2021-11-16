@@ -23,7 +23,7 @@
             android:id="@+id/container_home"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/sky_blue_F2F6FF" >
+            android:background="@color/sky_blue_F2F6FF">
 
             <ImageView
                 android:id="@+id/iv_home_snowman_face_lv2"
@@ -104,9 +104,9 @@
                 android:id="@+id/iv_home_snowman_left_hand"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:alpha="0.0"
                 android:contentDescription="@string/desc_home_snowman_left_hand"
                 android:src="@drawable/ic_snowman_left_hand_4"
-                android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="@id/iv_home_snowman_button_top"
                 app:layout_constraintEnd_toStartOf="@id/iv_home_snowman_button_top" />
 
@@ -114,9 +114,9 @@
                 android:id="@+id/iv_home_snowman_right_hand"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:alpha="0.0"
                 android:contentDescription="@string/desc_home_snowman_left_hand"
                 android:src="@drawable/ic_snowman_right_hand_4"
-                android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="@id/iv_home_snowman_button_top"
                 app:layout_constraintStart_toEndOf="@id/iv_home_snowman_button_top" />
 
