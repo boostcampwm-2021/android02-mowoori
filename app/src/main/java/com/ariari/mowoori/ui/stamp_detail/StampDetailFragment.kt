@@ -16,12 +16,15 @@ import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentStampDetailBinding
 import com.ariari.mowoori.ui.stamp.entity.DetailInfo
 import com.ariari.mowoori.ui.stamp.entity.DetailMode
+import com.ariari.mowoori.ui.stamp_detail.entity.PictureType
 import com.ariari.mowoori.util.EventObserver
+import com.ariari.mowoori.util.LogUtil
 import com.ariari.mowoori.widget.PictureDialogFragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 @AndroidEntryPoint
 class StampDetailFragment :
@@ -32,10 +35,12 @@ class StampDetailFragment :
 
     private val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) {
         it?.run {
+            LogUtil.log("getContent", it.toString())
             viewModel.setPictureUri(it)
             Glide.with(requireContext())
                 .load(it)
-                .placeholder(R.drawable.border_sky_blue_f2f6ff_fill_16)
+                .override(300, 300)
+                .transform(CenterCrop(), RoundedCorners(16))
                 .into(binding.ivStampDetail)
             binding.tvStampDetailIcon.isVisible = false
         }
@@ -119,8 +124,15 @@ class StampDetailFragment :
         }
     }
 
-    private val onClick: () -> Unit = {
-        getContent.launch("image/*")
+    private val onClick: (pictureType: PictureType) -> Unit = {
+        when (it) {
+            PictureType.CAMERA -> {
+                Timber.d(it.toString())
+            }
+            else -> {
+                getContent.launch("image/*")
+            }
+        }
     }
 
     private fun setRootClick() {
