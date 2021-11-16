@@ -27,7 +27,7 @@ object BindingAdapters {
     @BindingAdapter("setSrcFromUrl")
     @JvmStatic
     fun setSrcFromUrl(imageView: ImageView, url: String?) {
-        if (url == null) {
+        if (url.isNullOrEmpty()) {
             imageView.setImageResource(R.drawable.ic_empty)
         } else {
             Glide.with(imageView.context)

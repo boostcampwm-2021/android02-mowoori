@@ -11,6 +11,9 @@ import androidx.fragment.app.viewModels
 import com.ariari.mowoori.R
 import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentMembersBinding
+import com.ariari.mowoori.ui.members.adapter.MembersAdapter
+import com.ariari.mowoori.ui.register.entity.User
+import com.ariari.mowoori.ui.register.entity.UserInfo
 import com.ariari.mowoori.util.toastMessage
 import com.ariari.mowoori.widget.InviteDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -18,6 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MembersFragment : BaseFragment<FragmentMembersBinding>(R.layout.fragment_members) {
     private val viewModel: MembersViewModel by viewModels()
+    private val membersAdapter = MembersAdapter()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -25,6 +29,7 @@ class MembersFragment : BaseFragment<FragmentMembersBinding>(R.layout.fragment_m
         binding.viewModel = viewModel
         viewModel.fetchGroupInfo()
         setOpenDialogEventObserver()
+        setMembersRvAdapter()
     }
 
     private fun setOpenDialogEventObserver() {
@@ -64,7 +69,17 @@ class MembersFragment : BaseFragment<FragmentMembersBinding>(R.layout.fragment_m
             putExtra(Intent.EXTRA_TEXT, text)
         }
         startActivity(shareIntent)
+    }
 
+    private fun setMembersRvAdapter() {
+        binding.rvMembers.adapter = membersAdapter
+        membersAdapter.submitList(
+            listOf(
+                User("aaa", UserInfo("aaa", "", emptyList(), "")),
+                User("bbb", UserInfo("bbb", "", emptyList(), "")),
+                User("ccc", UserInfo("ccc", "", emptyList(), ""))
+            )
+        )
     }
 
 }

@@ -11,8 +11,8 @@ import com.ariari.mowoori.ui.register.entity.User
 class MembersAdapter : ListAdapter<User, MembersAdapter.MembersViewHolder>(membersDiffUtil) {
     class MembersViewHolder(private val binding: ItemMembersBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(memberInfo: User) {
-
+        fun bind(user: User) {
+            binding.userInfo = user.userInfo
         }
     }
 

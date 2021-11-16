@@ -26,6 +26,7 @@
             app:titleViewMode="@{TitleViewMode.TITLE_VIEW_INVITE_BUTTON}" />
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_members"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginHorizontal="10dp"
