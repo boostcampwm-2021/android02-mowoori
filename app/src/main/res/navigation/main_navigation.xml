@@ -22,12 +22,20 @@
         android:id="@+id/membersFragment"
         android:name="com.ariari.mowoori.ui.members.MembersFragment"
         android:label="MembersFragment"
-        tools:layout="@layout/fragment_members" />
+        tools:layout="@layout/fragment_members">
+        <action
+            android:id="@+id/action_membersFragment_to_missionsFragment"
+            app:destination="@id/missionsFragment" />
+    </fragment>
     <fragment
         android:id="@+id/missionsFragment"
         android:name="com.ariari.mowoori.ui.missions.MissionsFragment"
         android:label="MissionsFragment"
         tools:layout="@layout/fragment_missions">
+        <argument
+            android:name="userId"
+            app:argType="com.ariari.mowoori.ui.register.entity.User"
+            app:nullable="true" />
         <action
             android:id="@+id/action_missionsFragment_to_missionsAddFragment"
             app:destination="@id/missionsAddFragment" />
