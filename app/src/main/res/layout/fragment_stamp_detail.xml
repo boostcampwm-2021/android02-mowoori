@@ -9,6 +9,7 @@
         <variable
             name="viewModel"
             type="com.ariari.mowoori.ui.stamp_detail.StampDetailViewModel" />
+
     </data>
 
     <androidx.core.widget.NestedScrollView
@@ -36,7 +37,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
-                android:text="@{@string/stamp_detail_user(viewModel.userName.peekContent())}"
+                android:text="@{@string/stamp_detail_user(viewModel.userName)}"
                 android:textColor="@color/black"
                 android:textSize="20sp"
                 android:textStyle="bold"
@@ -47,7 +48,7 @@
                 android:id="@+id/tv_stamp_detail_mission"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{viewModel.missionName.peekContent()}"
+                android:text="@{viewModel.missionName}"
                 android:textColor="@color/black"
                 android:textSize="28sp"
                 android:textStyle="bold"

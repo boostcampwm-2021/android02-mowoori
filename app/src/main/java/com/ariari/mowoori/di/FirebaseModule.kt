@@ -1,6 +1,7 @@
 package com.ariari.mowoori.di
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -26,5 +27,5 @@ object FirebaseModule {
 
     @Provides
     @Singleton
-    fun providesFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
+    fun providesFirebaseAuth(): FirebaseAuth = Firebase.auth
 }

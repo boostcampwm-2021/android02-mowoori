@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.ariari.mowoori.R
 import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentStampsBinding
-import com.ariari.mowoori.ui.missions.entity.MissionInfo
+import com.ariari.mowoori.ui.missions.entity.Mission
 import com.ariari.mowoori.ui.stamp.adapter.StampsAdapter
 import com.ariari.mowoori.ui.stamp.entity.DetailInfo
 import com.ariari.mowoori.ui.stamp.entity.DetailMode
@@ -28,7 +28,7 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
     private val safeArgs: StampsFragmentArgs by navArgs()
     private lateinit var adapter: StampsAdapter
     private val viewModel: StampsViewModel by viewModels()
-    private lateinit var missionInfo: MissionInfo
+    private lateinit var mission: Mission
     private lateinit var userName: String
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -57,7 +57,7 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
     }
 
     private fun setMissionInfo() {
-        missionInfo = safeArgs.missionInfo
+        mission = safeArgs.mission
     }
 
     private fun setUserName() {
@@ -65,12 +65,12 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
     }
 
     private fun setMissionName() {
-        viewModel.setMissionName(missionInfo.missionName)
+        viewModel.setMissionName(mission.missionInfo.missionName)
     }
 
     private fun setStampList() {
         viewModel.setLoadingEvent(true)
-        viewModel.setStampList(missionInfo.stampList)
+        viewModel.setStampList(mission.missionInfo.stampList)
     }
 
     private fun setAdapter() {
@@ -81,11 +81,17 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
                     imageView to stampInfo.pictureUrl
                 )
                 this@StampsFragment.findNavController()
-                    .navigate(StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
-                        DetailInfo(userName,
-                            missionInfo.missionName,
-                            DetailMode.INQUIRY,
-                            stampInfo)), extras)
+                    .navigate(
+                        StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
+                            DetailInfo(
+                                userName,
+                                mission.missionId,
+                                mission.missionInfo.missionName,
+                                DetailMode.INQUIRY,
+                                stampInfo
+                            )
+                        ), extras
+                    )
 //                viewModel.setSelectedStampInfo(position, missionInfo.curStamp)
             }
         })
@@ -93,17 +99,23 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
     }
 
     private fun setCompleteBtnVisible() {
-        viewModel.setIsMyMission(missionInfo.userId)
+        viewModel.setIsMyMission(mission.missionInfo.userId)
     }
 
     private fun setCompleteClick() {
         binding.btnStampsComplete.setOnClickListener {
             it.findNavController()
-                .navigate(StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
-                    DetailInfo(userName,
-                        missionInfo.missionName,
-                        DetailMode.CERTIFY,
-                        StampInfo())))
+                .navigate(
+                    StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
+                        DetailInfo(
+                            userName,
+                            mission.missionId,
+                            mission.missionInfo.missionName,
+                            DetailMode.CERTIFY,
+                            StampInfo()
+                        )
+                    )
+                )
         }
     }
 
@@ -154,7 +166,7 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
     private fun setStampListObserver() {
         viewModel.stampList.observe(viewLifecycleOwner, { stampList ->
             adapter.submitList(stampList)
-            viewModel.fillEmptyStamps(missionInfo.totalStamp - stampList.size)
+            viewModel.fillEmptyStamps(mission.missionInfo.totalStamp - stampList.size)
             viewModel.setLoadingEvent(false)
         })
     }
@@ -162,11 +174,17 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
     private fun setSelectedStampInfoObserver() {
         viewModel.selectedStampInfo.observe(viewLifecycleOwner, EventObserver { stampInfo ->
             this.findNavController()
-                .navigate(StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
-                    DetailInfo(userName,
-                        missionInfo.missionName,
-                        DetailMode.INQUIRY,
-                        stampInfo)))
+                .navigate(
+                    StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
+                        DetailInfo(
+                            userName,
+                            mission.missionId,
+                            mission.missionInfo.missionName,
+                            DetailMode.INQUIRY,
+                            stampInfo
+                        )
+                    )
+                )
         })
     }
 }

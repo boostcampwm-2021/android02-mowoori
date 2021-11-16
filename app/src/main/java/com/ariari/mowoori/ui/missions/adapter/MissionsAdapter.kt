@@ -14,7 +14,7 @@ class MissionsAdapter(private val viewModel: MissionsViewModel) :
     class MissionsViewHolder(private val binding: ItemMissionsBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(mission: Mission, viewModel: MissionsViewModel) {
-            binding.missionInfo = mission.missionInfo
+            binding.mission = mission
             binding.viewModel = viewModel
         }
     }

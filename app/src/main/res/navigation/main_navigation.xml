@@ -74,14 +74,14 @@
         android:label="StampsFragment"
         tools:layout="@layout/fragment_stamps">
         <argument
-            android:name="missionInfo"
-            app:argType="com.ariari.mowoori.ui.missions.entity.MissionInfo" />
-        <action
-            android:id="@+id/action_stampsFragment_to_stampDetailFragment"
-            app:destination="@id/stampDetailFragment" />
+            android:name="mission"
+            app:argType="com.ariari.mowoori.ui.missions.entity.Mission" />
         <argument
             android:name="userName"
             app:argType="string" />
+        <action
+            android:id="@+id/action_stampsFragment_to_stampDetailFragment"
+            app:destination="@id/stampDetailFragment" />
     </fragment>
     <fragment
         android:id="@+id/stampDetailFragment"
