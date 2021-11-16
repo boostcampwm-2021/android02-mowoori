@@ -114,5 +114,6 @@
     <!-- PictureDialogFragment -->
     <string name="dialog_picture_gallery">GALLERY</string>
     <string name="dialog_picture_camera">CAMERA</string>
-
+    <string name="desc_dialog_picture_camera_icon">카메라 아이콘</string>
+    <string name="desc_dialog_picture_gallery_icon">갤러리 아이콘</string>
 </resources>

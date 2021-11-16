@@ -11,6 +11,7 @@ import com.ariari.mowoori.util.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -72,7 +73,7 @@ class StampsViewModel @Inject constructor(private val stampsRepository: StampsRe
                         tempStampList.add(Stamp(stampId, stampInfo))
                     }
                     .onFailure {
-                        println("${it.message}")
+                        Timber.e("stampInfo Error: $it")
                     }
             }
             _stampList.postValue(tempStampList)

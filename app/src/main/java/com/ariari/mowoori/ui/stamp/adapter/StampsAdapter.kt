@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.ViewCompat
 import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -12,31 +13,20 @@ import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.ItemStampsBinding
 import com.ariari.mowoori.ui.stamp.entity.Stamp
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
+import com.ariari.mowoori.util.LogUtil
 import com.bumptech.glide.Glide
 
 class StampsAdapter(private val listener: OnItemClickListener) :
     ListAdapter<Stamp, StampsAdapter.StampViewHolder>(stampsDiffUtil) {
 
-    companion object {
-        val stampsDiffUtil = object : DiffUtil.ItemCallback<Stamp>() {
-            override fun areItemsTheSame(oldItem: Stamp, newItem: Stamp): Boolean {
-                return oldItem.stampId == newItem.stampId
-            }
-
-            override fun areContentsTheSame(oldItem: Stamp, newItem: Stamp): Boolean {
-                return oldItem == newItem
-            }
-        }
-    }
-
-    interface OnItemClickListener {
-        fun itemClick(position: Int, imageView: ImageView)
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StampViewHolder {
-        return StampViewHolder(ItemStampsBinding.inflate(LayoutInflater.from(parent.context),
-            parent,
-            false))
+        return StampViewHolder(
+            ItemStampsBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
+        )
     }
 
     override fun onBindViewHolder(holder: StampViewHolder, position: Int) {
@@ -67,13 +57,38 @@ class StampsAdapter(private val listener: OnItemClickListener) :
 //                    binding.ivItemStamps.setImageResource(R.drawable.ic_launcher_background)
 //                    binding.ivItemStamps.clipToOutline = true
                     binding.tvItemStampsIndex.isInvisible = true
+                    binding.containerItemStamps.isClickable = true
                 }
                 stampInfo.pictureUrl != "" -> {
-                    // TODO: 글라이드
+                    LogUtil.log("adapter url", stampInfo.pictureUrl)
+
+                    Glide.with(binding.ivItemStamps)
+                        .load(stampInfo.pictureUrl)
+                        .circleCrop()
+                        .into(binding.ivItemStamps)
+                    binding.tvItemStampsIndex.isInvisible = true
+                    binding.containerItemStamps.isClickable = true
                 }
                 else -> {
-                    // TODO: 번호만 표시
+                    binding.tvItemStampsIndex.isVisible = true
+                    binding.containerItemStamps.isClickable = false
                 }
+            }
+        }
+    }
+
+    interface OnItemClickListener {
+        fun itemClick(position: Int, imageView: ImageView)
+    }
+
+    companion object {
+        val stampsDiffUtil = object : DiffUtil.ItemCallback<Stamp>() {
+            override fun areItemsTheSame(oldItem: Stamp, newItem: Stamp): Boolean {
+                return oldItem.stampId == newItem.stampId
+            }
+
+            override fun areContentsTheSame(oldItem: Stamp, newItem: Stamp): Boolean {
+                return oldItem == newItem
             }
         }
     }

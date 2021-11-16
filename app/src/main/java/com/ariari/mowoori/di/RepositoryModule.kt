@@ -46,27 +46,28 @@ object RepositoryModule {
     fun providesMainRepository(
         databaseReference: DatabaseReference,
         firebaseAuth: FirebaseAuth
-    ): HomeRepository = HomeRepositoryImpl(databaseReference,firebaseAuth)
+    ): HomeRepository = HomeRepositoryImpl(databaseReference, firebaseAuth)
 
     @Provides
     @Singleton
     fun providesGroupRepository(
         databaseReference: DatabaseReference,
         firebaseAuth: FirebaseAuth
-    ): GroupRepository = GroupRepositoryImpl(databaseReference,firebaseAuth)
+    ): GroupRepository = GroupRepositoryImpl(databaseReference, firebaseAuth)
 
     @Provides
     @Singleton
     fun providesStampsRepository(
         databaseReference: DatabaseReference,
+        storageReference: StorageReference,
         firebaseAuth: FirebaseAuth
     ): StampsRepository =
-        StampsRepositoryImpl(databaseReference, firebaseAuth)
+        StampsRepositoryImpl(databaseReference, storageReference, firebaseAuth)
 
     @Provides
     @Singleton
     fun providesMembersRepository(
         databaseReference: DatabaseReference,
         firebaseAuth: FirebaseAuth
-    ): MembersRepository = MembersRepositoryImpl(databaseReference,firebaseAuth)
+    ): MembersRepository = MembersRepositoryImpl(databaseReference, firebaseAuth)
 }

@@ -8,6 +8,7 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/container_item_stamps"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 

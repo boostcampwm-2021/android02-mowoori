@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -15,17 +16,30 @@ import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentStampDetailBinding
 import com.ariari.mowoori.ui.stamp.entity.DetailInfo
 import com.ariari.mowoori.util.EventObserver
-import com.ariari.mowoori.util.LogUtil
 import com.ariari.mowoori.widget.PictureDialogFragment
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 @AndroidEntryPoint
 class StampDetailFragment :
     BaseFragment<FragmentStampDetailBinding>(R.layout.fragment_stamp_detail) {
-
     private val safeArgs: StampDetailFragmentArgs by navArgs()
     private val viewModel: StampDetailViewModel by viewModels()
     private lateinit var detailInfo: DetailInfo
+
+    private val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) {
+        it?.run {
+            viewModel.setPictureUri(it)
+            Glide.with(requireContext())
+                .load(it)
+                .placeholder(R.drawable.border_sky_blue_f2f6ff_fill_16)
+                .into(binding.ivStampDetail)
+            binding.tvStampDetailIcon.isVisible = false
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +58,6 @@ class StampDetailFragment :
         setMissionId()
         setMissionName()
         setPicture()
-        setPictureListener()
         setRootClick()
         setIsMissionPostedObserver()
         setCloseBtnClickObserver()
@@ -78,20 +91,25 @@ class StampDetailFragment :
     }
 
     private fun setPicture() {
-        if (detailInfo.stampInfo.pictureUrl != "") {
-            binding.ivStampDetail.setImageResource(R.drawable.ic_launcher_background)
-            binding.tvStampDetailIcon.isInvisible = true
-        }
-    }
-
-    private fun setPictureListener() {
-        binding.tvStampDetailIcon.setOnClickListener {
-            // TODO: 리스너 등록
-            PictureDialogFragment().show(
+        binding.ivStampDetail.setOnClickListener {
+            PictureDialogFragment(onClick).show(
                 requireActivity().supportFragmentManager,
                 "PictureDialogFragment"
             )
         }
+        if (detailInfo.stampInfo.pictureUrl != "") {
+            Glide.with(requireContext())
+                .load(detailInfo.stampInfo.pictureUrl)
+                .override(300, 300)
+                .transform(CenterCrop(), RoundedCorners(16))
+                .into(binding.ivStampDetail)
+            binding.tvStampDetailIcon.isInvisible = true
+        }
+    }
+
+    private val onClick: () -> Unit = {
+        Timber.d("getContent")
+        getContent.launch("image/*")
     }
 
     private fun setRootClick() {
@@ -128,8 +146,7 @@ class StampDetailFragment :
     }
 
     private fun setPictureUrlObserver() {
-        viewModel.pictureUrl.observe(viewLifecycleOwner) {
-            LogUtil.log("setPictureUrl", it.toString())
+        viewModel.comment.observe(viewLifecycleOwner) {
             viewModel.postStamp()
         }
     }
@@ -137,7 +154,6 @@ class StampDetailFragment :
     private fun setBtnCertifyListener() {
         binding.btnStampDetailCertify.setOnClickListener {
             viewModel.setComment(binding.etStampDetailComment.text.toString())
-            viewModel.setPictureUrl("default")
         }
     }
 

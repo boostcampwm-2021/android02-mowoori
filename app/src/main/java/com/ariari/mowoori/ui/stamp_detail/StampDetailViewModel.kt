@@ -1,5 +1,6 @@
 package com.ariari.mowoori.ui.stamp_detail
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,10 +13,8 @@ import com.ariari.mowoori.util.Event
 import com.ariari.mowoori.util.LogUtil
 import com.ariari.mowoori.util.getCurrentDate
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -41,8 +40,8 @@ class StampDetailViewModel @Inject constructor(
     private val _comment = MutableLiveData<String>()
     val comment: LiveData<String> get() = _comment
 
-    private val _pictureUrl = MutableLiveData<String>()
-    val pictureUrl: LiveData<String> get() = _pictureUrl
+    private val _pictureUri = MutableLiveData<Uri>()
+    val pictureUri: LiveData<Uri> get() = _pictureUri
 
     private val _isStampPosted = MutableLiveData<Event<Unit>>()
     val isStampPosted: LiveData<Event<Unit>> get() = _isStampPosted
@@ -68,10 +67,6 @@ class StampDetailViewModel @Inject constructor(
         _comment.value = comment
     }
 
-    fun setPictureUrl(url: String) {
-        _pictureUrl.value = url
-    }
-
     fun setIsCertify(detailMode: DetailMode) {
         println("StampDetail - $detailMode")
         when (detailMode) {
@@ -80,25 +75,33 @@ class StampDetailViewModel @Inject constructor(
         }
     }
 
+    fun setPictureUri(uri: Uri) {
+        _pictureUri.postValue(uri)
+    }
+
     fun postStamp() {
-        // TODO: 1. stamps에 추가 - 이때 push.key로 id들고옴
-        // TODO: 2. missions에 stampList에 id추가
-        LogUtil.log("logmissionId", missionId.value.toString())
         viewModelScope.launch(IO) {
-            val stampInfo = StampInfo(pictureUrl.value!!, comment.value!!, getCurrentDate())
-            Timber.d(stampInfo.toString())
+            stampsRepository.putCertificationImage(pictureUri.value!!, missionId.value!!)
+                .onSuccess { uri ->
+                    Timber.d(uri)
+                    stampsRepository.getMissionInfo(missionId.value!!.toString())
+                        .onSuccess {
+                            LogUtil.log("getMissionInfo", it.toString())
+                            val stampInfo = StampInfo(
+                                uri, comment.value!!, getCurrentDate()
+                            )
 
-            stampsRepository.getMissionInfo(missionId.value!!.toString()).onSuccess {
-                LogUtil.log("getMissionInfo", it.toString())
-
-                stampsRepository.postStamp(stampInfo, Mission(missionId.value!!, it)).onSuccess {
-                    _isStampPosted.postValue(Event(Unit))
-                }.onFailure {
-                    // onFailure
+                            stampsRepository.postStamp(stampInfo, Mission(missionId.value!!, it))
+                                .onSuccess {
+                                    _isStampPosted.postValue(Event(Unit))
+                                }.onFailure {
+                                    throw Exception("stampInfo is not Posted.")
+                                }
+                        }
                 }
-            }.onFailure {
-                throw Exception("stampInfo is not Posted.")
-            }
+                .onFailure {
+                    throw Exception("put image is failed.")
+                }
         }
     }
 }

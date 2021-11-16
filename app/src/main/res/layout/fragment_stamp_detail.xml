@@ -9,6 +9,7 @@
         <variable
             name="viewModel"
             type="com.ariari.mowoori.ui.stamp_detail.StampDetailViewModel" />
+
     </data>
 
     <androidx.core.widget.NestedScrollView
