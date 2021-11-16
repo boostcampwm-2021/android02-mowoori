@@ -15,13 +15,13 @@ import com.ariari.mowoori.R
 import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentStampDetailBinding
 import com.ariari.mowoori.ui.stamp.entity.DetailInfo
+import com.ariari.mowoori.ui.stamp.entity.DetailMode
 import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.widget.PictureDialogFragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 
 @AndroidEntryPoint
 class StampDetailFragment :
@@ -52,18 +52,20 @@ class StampDetailFragment :
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
         setDetailInfo()
+        setEditMode()
         setBtnVisible()
         setDetailTransitionName()
         setUserName()
         setMissionId()
         setMissionName()
         setPicture()
+        setComment()
         setRootClick()
         setIsMissionPostedObserver()
         setCloseBtnClickObserver()
         setIsCertifyObserver()
         setBtnCertifyListener()
-        setPictureUrlObserver()
+        setCommentObserver()
     }
 
     private fun setDetailInfo() {
@@ -90,6 +92,16 @@ class StampDetailFragment :
         viewModel.setMissionName(detailInfo.missionName)
     }
 
+    private fun setEditMode() {
+        if (detailInfo.detailMode == DetailMode.INQUIRY) {
+            binding.etStampDetailComment.keyListener = null
+        }
+    }
+
+    private fun setComment() {
+        viewModel.setComment(detailInfo.stampInfo.comment)
+    }
+
     private fun setPicture() {
         binding.ivStampDetail.setOnClickListener {
             PictureDialogFragment(onClick).show(
@@ -108,7 +120,6 @@ class StampDetailFragment :
     }
 
     private val onClick: () -> Unit = {
-        Timber.d("getContent")
         getContent.launch("image/*")
     }
 
@@ -120,8 +131,6 @@ class StampDetailFragment :
     }
 
     private fun hideKeyboard(v: View) {
-        // InputMethodManager 를 통해 가상 키보드를 숨길 수 있다.
-        // 현재 focus 되어있는 뷰의 windowToken 을 hideSoftInputFromWindow 메서드의 매개변수로 넘겨준다.
         val inputMethodManager =
             requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(v.windowToken, 0)
@@ -145,15 +154,16 @@ class StampDetailFragment :
         })
     }
 
-    private fun setPictureUrlObserver() {
+    private fun setCommentObserver() {
         viewModel.comment.observe(viewLifecycleOwner) {
-            viewModel.postStamp()
+            binding.etStampDetailComment.setText(it)
         }
     }
 
     private fun setBtnCertifyListener() {
         binding.btnStampDetailCertify.setOnClickListener {
             viewModel.setComment(binding.etStampDetailComment.text.toString())
+            viewModel.postStamp()
         }
     }
 

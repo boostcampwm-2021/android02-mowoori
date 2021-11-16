@@ -10,12 +10,10 @@ import com.ariari.mowoori.ui.missions.entity.Mission
 import com.ariari.mowoori.ui.stamp.entity.DetailMode
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
 import com.ariari.mowoori.util.Event
-import com.ariari.mowoori.util.LogUtil
 import com.ariari.mowoori.util.getCurrentDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -56,7 +54,6 @@ class StampDetailViewModel @Inject constructor(
 
     fun setMissionId(missionId: String) {
         _missionId.value = missionId
-        LogUtil.log("viewModelsetMissionId", _missionName.value.toString())
     }
 
     fun setMissionName(missionName: String) {
@@ -67,6 +64,10 @@ class StampDetailViewModel @Inject constructor(
         _comment.value = comment
     }
 
+    fun setPictureUri(uri: Uri) {
+        _pictureUri.value = uri
+    }
+
     fun setIsCertify(detailMode: DetailMode) {
         println("StampDetail - $detailMode")
         when (detailMode) {
@@ -75,18 +76,12 @@ class StampDetailViewModel @Inject constructor(
         }
     }
 
-    fun setPictureUri(uri: Uri) {
-        _pictureUri.postValue(uri)
-    }
-
     fun postStamp() {
         viewModelScope.launch(IO) {
             stampsRepository.putCertificationImage(pictureUri.value!!, missionId.value!!)
                 .onSuccess { uri ->
-                    Timber.d(uri)
                     stampsRepository.getMissionInfo(missionId.value!!.toString())
                         .onSuccess {
-                            LogUtil.log("getMissionInfo", it.toString())
                             val stampInfo = StampInfo(
                                 uri, comment.value!!, getCurrentDate()
                             )
