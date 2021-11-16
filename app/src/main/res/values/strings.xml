@@ -10,7 +10,7 @@
     <string name="bottom_nav_members">Members</string>
     <string name="drawer_header_group_list">그룹 리스트</string>
 
-    <!-- Register -->
+    <!-- RegisterFragment -->
     <string name="register_please_enter_nickname">닉네임을\n입력해주세요</string>
     <string name="register_nickname_hint">(1자 이상 11자 이하)</string>
     <string name="register_nickname_error_msg">닉네임을 확인해주세요</string>
@@ -24,14 +24,15 @@
     <string name="desc_title_view_back">뒤로가기 버튼</string>
     <string name="desc_title_view_close">창 끄기 버튼</string>
     <string name="desc_title_view_plus">정보 추가 버튼</string>
+    <string name="desc_title_view_plus_members">구성원 추가 버튼</string>
     <string name="title_view_text">View Title</string>
 
-    <!--invite_check-->
+    <!-- InviteCheckFragment -->
     <string name="invite_check_title">`우리`의\n초대를 받으셨나요?</string>
     <string name="invite_check_yes">네, 초대받았어요!</string>
     <string name="invite_check_no">초대가 뭐죠?\n저는 몰라요 ㅠㅠ</string>
 
-    <!--group-->
+    <!-- GroupFragment -->
     <string name="group_name_title">`우리`의\n이름을 정해주세요</string>
     <string name="group_name_complete">완료</string>
     <string name="group_name">정직한 코박쥐들</string>
@@ -39,10 +40,21 @@
     <string name="group_invite_title">초대코드를\n입력해주세요</string>
     <string name="group_invalid">올바르지 않은 형식입니다.</string>
 
-    <!--home-->
+    <!-- HomeFragment -->
     <string name="desc_home_snowman_face">눈사람 얼굴</string>
     <string name="desc_home_snowman_body">눈사람 몸통</string>
+    <string name="desc_home_snowman_button">눈사람 단추</string>
     <string name="all_complete">완료</string>
+    <string name="desc_home_snowman_o_mouth">눈사람 오 모양 입술</string>
+    <string name="desc_home_snowman_left_eye">눈사람 왼쪽 눈</string>
+    <string name="desc_home_snowman_right_eye">눈사람 오른쪽 눈</string>
+    <string name="desc_home_snowman_left_pupil">눈사람 왼쪽 동공</string>
+    <string name="desc_home_snowman_right_pupil">눈사람 오른쪽 동공</string>
+    <string name="desc_home_snowman_left_hand">눈사람 왼손</string>
+    <string name="desc_home_exclamation">느낌표</string>
+    <string name="desc_home_heart">하트</string>
+    <string name="desc_home_snowman_right_hand">눈사람 오른손</string>
+    <string name="desc_home_big_heart">왕 하트</string>
 
     <!-- MissionsFragment -->
     <string name="item_missions_stamp_count">%d/%d</string>
@@ -65,13 +77,10 @@
     <string name="dialog_cancel">취소</string>
     <string name="dialog_save">저장</string>
 
-    <!--notification-->
+    <!-- NotificationFragment-->
     <string name="item_notification_title"><font color="#000000">모우리</font>님이 <b>매일 잔디채우기</b> 미션에 <b>2</b>번째 스탬프를 찍었어요!!!!!!!!!!!!!!!!!!!!!</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="desc_home_snowman_button">눈사람 단추</string>
 
-    <!--missionsAdd-->
+    <!-- MissionsAddFragment -->
     <string name="missions_add_what_mission_title">어떤 미션인가요?</string>
     <string name="missions_add_what_mission">미션명을 입력하세요.</string>
     <string name="missions_add_how_mission_title">얼마나 오래 하시나요?</string>
@@ -86,7 +95,9 @@
     <string name="missions_add_when_invalid">종료일이 시작일보다 빨라요.</string>
     <string name="missions_add_count_hint">10</string>
 
-    <!--members-->
+    <!-- MembersFragment -->
+    <string name="desc_members_profile">구성원 프로필 이미지</string>
+    <string name="tv_title_view_invite">초대하기</string>
     <string name="members_title">\'우리\'들</string>
     <string name="members_share">공유하기</string>
     <string name="members_invite_code_title">초대코드</string>
@@ -103,14 +114,5 @@
     <!-- PictureDialogFragment -->
     <string name="dialog_picture_gallery">GALLERY</string>
     <string name="dialog_picture_camera">CAMERA</string>
-    <string name="desc_home_snowman_o_mouth">눈사람 오 모양 입술</string>
-    <string name="desc_home_snowman_left_eye">눈사람 왼쪽 눈</string>
-    <string name="desc_home_snowman_right_eye">눈사람 오른쪽 눈</string>
-    <string name="desc_home_snowman_left_pupil">눈사람 왼쪽 동공</string>
-    <string name="desc_home_snowman_right_pupil">눈사람 오른쪽 동공</string>
-    <string name="desc_home_snowman_left_hand">눈사람 왼손</string>
-    <string name="desc_home_exclamation">느낌표</string>
-    <string name="desc_home_heart">하트</string>
-    <string name="desc_home_snowman_right_hand">눈사람 오른손</string>
-    <string name="desc_home_big_heart">왕 하트</string>
+
 </resources>
