@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
             when (destination.id) {
                 R.id.homeFragment, R.id.membersFragment -> showBottomNav()
                 R.id.missionsFragment -> {
-                    if (arguments != null) {
+                    if (arguments?.get("userId") != null) {
                         // 구성원의 미션
                         hideBottomNav()
                     } else {
