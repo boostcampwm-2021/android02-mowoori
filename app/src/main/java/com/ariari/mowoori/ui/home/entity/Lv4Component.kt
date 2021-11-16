@@ -1,17 +1,12 @@
 package com.ariari.mowoori.ui.home.entity
 
 import android.widget.ImageView
+import com.ariari.mowoori.databinding.LayoutSnowmanFaceLv4Binding
 
 data class Lv4Component(
-    val leftBlackEye: ImageView,
-    val leftWhiteEye: ImageView,
-    val rightBlackEye: ImageView,
-    val rightWhiteEye: ImageView,
-    val leftHand: ImageView,
-    val rightHand: ImageView,
+    val face: LayoutSnowmanFaceLv4Binding,
+    val hands: List<ImageView>,
     val body: ImageView,
-    val firstExclamation: ImageView,
-    val secondExclamation: ImageView,
-    val leftHeart: ImageView,
-    val rightHeart: ImageView,
+    val exclamations: List<ImageView>,
+    val hearts: List<ImageView>,
 )

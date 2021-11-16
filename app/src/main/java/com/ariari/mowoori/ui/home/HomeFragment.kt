@@ -69,6 +69,18 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         )
     }
 
+    // 4단계 눈사람 팔 애니메이션
+    private val snowmanLv4Animator by lazy {
+        SnowmanLv4Animator(Lv4Component(binding.layoutHomeSnowmanFaceLv4,
+            listOf(binding.ivHomeSnowmanLeftHand, binding.ivHomeSnowmanRightHand),
+            binding.ivHomeSnowmanBody,
+            listOf(binding.ivHomeFirstExclamation, binding.ivHomeSecondExclamation),
+            listOf(binding.ivHomeLeftHeart, binding.ivHomeRightHeart)),
+            homeViewModel,
+            viewLifecycleOwner,
+            requireContext())
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setUserInfo()
@@ -78,18 +90,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = homeViewModel
-        val ani = SnowmanLv4Animator(Lv4Component(binding.ivHomeSnowmanLeftEyeBlackLv4,
-            binding.ivHomeSnowmanLeftEyeWhiteLv4,
-            binding.ivHomeSnowmanRightEyeBlackLv4,
-            binding.ivHomeSnowmanRightEyeWhiteLv4,
-            binding.ivHomeSnowmanLeftHand,
-            binding.ivHomeSnowmanRightHand,
-            binding.ivHomeSnowmanBody,
-            binding.ivHomeFirstExclamation,
-            binding.ivHomeSecondExclamation,
-            binding.ivHomeLeftHeart,
-            binding.ivHomeLeftHeart), homeViewModel, viewLifecycleOwner, requireContext())
-        ani.start()
         setUserInfoObserver()
         setCurrentGroupInfoObserver()
         setGroupInfoListObserver()
@@ -229,7 +229,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
                     snowmanLv3Animator.start()
                 }
                 SnowmanLevel.LV4 -> {
-                    // TODO: 4단계(최종) 눈사람 - 팔 등 추가 장식
+                    snowmanLv4Animator.start()
                 }
             }
         }

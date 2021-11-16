@@ -36,124 +36,74 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
-            <ImageView
-                android:id="@+id/iv_home_snowman_face_lv4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="-10dp"
-                android:contentDescription="@string/desc_home_snowman_face"
-                android:src="@drawable/ic_snowman_face_4"
-                app:layout_constraintBottom_toTopOf="@id/iv_home_snowman_body"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
 
             <ImageView
-                android:visibility="invisible"
                 android:id="@+id/iv_home_first_exclamation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:alpha="0"
                 android:contentDescription="@string/desc_home_exclamation"
                 android:src="@drawable/ic_exclamation"
-                app:layout_constraintBottom_toTopOf="@+id/iv_home_snowman_face_lv4"
-                app:layout_constraintStart_toEndOf="@id/iv_home_snowman_face_lv4" />
+                app:layout_constraintBottom_toTopOf="@+id/iv_home_right_heart"
+                app:layout_constraintStart_toStartOf="@id/iv_home_right_heart" />
 
             <ImageView
-                android:visibility="invisible"
-
                 android:id="@+id/iv_home_second_exclamation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:alpha="0"
                 android:contentDescription="@string/desc_home_exclamation"
                 android:src="@drawable/ic_exclamation"
-                app:layout_constraintBottom_toTopOf="@+id/iv_home_snowman_face_lv4"
+                app:layout_constraintBottom_toBottomOf="@+id/iv_home_first_exclamation"
                 app:layout_constraintStart_toEndOf="@id/iv_home_first_exclamation" />
-
-            <ImageView
-                android:id="@+id/iv_home_snowman_left_eye_black_lv4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/desc_home_snowman_left_eye"
-                android:src="@drawable/ic_snowman_eye_black_4"
-                app:layout_constraintBottom_toBottomOf="@id/iv_home_snowman_mouth_oh_lv4"
-                app:layout_constraintEnd_toStartOf="@id/iv_home_snowman_right_eye_black_lv4"
-                app:layout_constraintStart_toStartOf="@id/iv_home_snowman_face_lv4"
-                app:layout_constraintTop_toTopOf="@id/iv_home_snowman_face_lv4" />
-
-            <ImageView
-                android:id="@+id/iv_home_snowman_right_eye_black_lv4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/desc_home_snowman_right_eye"
-                android:src="@drawable/ic_snowman_eye_black_4"
-                app:layout_constraintBottom_toBottomOf="@id/iv_home_snowman_mouth_oh_lv4"
-                app:layout_constraintEnd_toEndOf="@id/iv_home_snowman_face_lv4"
-                app:layout_constraintStart_toEndOf="@id/iv_home_snowman_left_eye_black_lv4"
-                app:layout_constraintTop_toTopOf="@id/iv_home_snowman_face_lv4" />
-
-            <ImageView
-                android:id="@+id/iv_home_snowman_left_eye_white_lv4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/desc_home_snowman_left_pupil"
-                android:src="@drawable/ic_snowman_eye_white_4"
-                app:layout_constraintBottom_toBottomOf="@id/iv_home_snowman_left_eye_black_lv4"
-                app:layout_constraintEnd_toEndOf="@id/iv_home_snowman_left_eye_black_lv4"
-                app:layout_constraintTop_toTopOf="@id/iv_home_snowman_left_eye_black_lv4" />
-
-            <ImageView
-                android:id="@+id/iv_home_snowman_right_eye_white_lv4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/desc_home_snowman_right_pupil"
-                android:src="@drawable/ic_snowman_eye_white_4"
-                app:layout_constraintBottom_toBottomOf="@id/iv_home_snowman_right_eye_black_lv4"
-                app:layout_constraintEnd_toEndOf="@id/iv_home_snowman_right_eye_black_lv4"
-                app:layout_constraintTop_toTopOf="@id/iv_home_snowman_right_eye_black_lv4" />
-
-            <ImageView
-                android:id="@+id/iv_home_snowman_mouth_oh_lv4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/desc_home_snowman_o_mouth"
-                android:src="@drawable/ic_snowman_mouth_oh_4"
-                app:layout_constraintBottom_toBottomOf="@id/iv_home_snowman_face_lv4"
-                app:layout_constraintEnd_toEndOf="@id/iv_home_snowman_face_lv4"
-                app:layout_constraintStart_toStartOf="@id/iv_home_snowman_face_lv4"
-                app:layout_constraintTop_toBottomOf="@id/iv_home_snowman_left_eye_black_lv4" />
-
-            <ImageView
-                android:visibility="invisible"
-                android:id="@+id/iv_home_left_heart"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_heart"
-                app:layout_constraintBottom_toTopOf="@id/iv_home_snowman_left_hand"
-                app:layout_constraintStart_toStartOf="@id/iv_home_snowman_left_hand" />
 
             <ImageView
                 android:id="@+id/iv_home_snowman_left_hand"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:alpha="0.0"
+                android:alpha="0"
                 android:contentDescription="@string/desc_home_snowman_left_hand"
                 android:src="@drawable/ic_snowman_left_hand_4"
                 app:layout_constraintBottom_toBottomOf="@id/iv_home_snowman_button_top"
                 app:layout_constraintEnd_toStartOf="@id/iv_home_snowman_button_top" />
 
             <ImageView
+                android:id="@+id/iv_home_left_heart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="-5dp"
+                android:alpha="0"
+                android:contentDescription="@string/desc_home_heart"
+                android:src="@drawable/ic_heart"
+                app:layout_constraintBottom_toTopOf="@id/iv_home_snowman_left_hand"
+                app:layout_constraintStart_toStartOf="@id/iv_home_snowman_left_hand" />
+
+            <ImageView
                 android:id="@+id/iv_home_snowman_right_hand"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:alpha="0.0"
-                android:contentDescription="@string/desc_home_snowman_left_hand"
+                android:contentDescription="@string/desc_home_snowman_right_hand"
                 android:src="@drawable/ic_snowman_right_hand_4"
                 app:layout_constraintBottom_toBottomOf="@id/iv_home_snowman_button_top"
                 app:layout_constraintStart_toEndOf="@id/iv_home_snowman_button_top" />
 
             <ImageView
-                android:id="@+id/iv_home_snowman_body"
+                android:id="@+id/iv_home_right_heart"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="-5dp"
+                android:alpha="0"
+                android:contentDescription="@string/desc_home_heart"
+                android:src="@drawable/ic_heart"
+                app:layout_constraintBottom_toTopOf="@id/iv_home_snowman_left_hand"
+                app:layout_constraintEnd_toEndOf="@id/iv_home_snowman_right_hand" />
+
+            <ImageView
+                android:id="@+id/iv_home_snowman_body"
+                android:layout_width="139dp"
+                android:layout_height="121dp"
                 android:contentDescription="@string/desc_home_snowman_body"
                 android:src="@drawable/ic_snowman_body"
                 android:visibility="@{viewModel.snowmanLevel == SnowmanLevel.LV3 || viewModel.snowmanLevel == SnowmanLevel.LV4 ? View.VISIBLE : View.GONE}"
@@ -177,7 +127,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:alpha="0"
+                android:alpha="@{viewModel.snowmanLevel == SnowmanLevel.LV4 ? 1 : 0}"
                 android:contentDescription="@string/desc_home_snowman_button"
                 android:src="@drawable/ic_snowman_button"
                 android:visibility="@{viewModel.snowmanLevel == SnowmanLevel.LV3 || viewModel.snowmanLevel == SnowmanLevel.LV4 ? View.VISIBLE : View.GONE}"
@@ -191,7 +141,7 @@
                 android:id="@+id/iv_home_snowman_button_middle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:alpha="0"
+                android:alpha="@{viewModel.snowmanLevel == SnowmanLevel.LV4 ? 1 : 0}"
                 android:contentDescription="@string/desc_home_snowman_button"
                 android:src="@drawable/ic_snowman_button"
                 android:visibility="@{viewModel.snowmanLevel == SnowmanLevel.LV3 || viewModel.snowmanLevel == SnowmanLevel.LV4 ? View.VISIBLE : View.GONE}"
@@ -206,7 +156,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
-                android:alpha="0"
+                android:alpha="@{viewModel.snowmanLevel == SnowmanLevel.LV4 ? 1 : 0}"
                 android:contentDescription="@string/desc_home_snowman_button"
                 android:src="@drawable/ic_snowman_button"
                 android:visibility="@{viewModel.snowmanLevel == SnowmanLevel.LV3 || viewModel.snowmanLevel == SnowmanLevel.LV4 ? View.VISIBLE : View.GONE}"
@@ -223,6 +173,13 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/container_home_appbar"
                 app:lottie_fileName="lottie-sun.json" />
+
+            <include
+                android:id="@+id/layout_home_snowman_face_lv4"
+                layout="@layout/layout_snowman_face_lv4"
+                app:layout_constraintBottom_toTopOf="@id/iv_home_snowman_body"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
 
             <com.google.android.material.appbar.AppBarLayout
                 android:id="@+id/container_home_appbar"

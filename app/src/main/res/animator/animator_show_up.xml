@@ -4,26 +4,46 @@
 
     <objectAnimator android:duration="200">
         <propertyValuesHolder
+            android:propertyName="alpha"
+            android:valueFrom="0.0"
+            android:valueTo="1.0"
+            android:valueType="floatType" />
+        <propertyValuesHolder
             android:propertyName="scaleX"
             android:valueFrom="0"
-            android:valueTo="1.2"
+            android:valueTo="1.3"
             android:valueType="floatType" />
         <propertyValuesHolder
             android:propertyName="scaleY"
             android:valueFrom="0"
-            android:valueTo="1.2"
+            android:valueTo="1.3"
             android:valueType="floatType" />
     </objectAnimator>
 
     <objectAnimator android:duration="100">
         <propertyValuesHolder
             android:propertyName="scaleX"
-            android:valueFrom="1.2"
+            android:valueFrom="1.3"
             android:valueTo="1.0"
             android:valueType="floatType" />
         <propertyValuesHolder
             android:propertyName="scaleY"
-            android:valueFrom="1.2"
+            android:valueFrom="1.3"
+            android:valueTo="1.0"
+            android:valueType="floatType" />
+    </objectAnimator>
+
+    <objectAnimator
+        android:duration="2000"
+        android:repeatCount="10">
+        <propertyValuesHolder
+            android:propertyName="scaleX"
+            android:valueFrom="1.3"
+            android:valueTo="1.0"
+            android:valueType="floatType" />
+        <propertyValuesHolder
+            android:propertyName="scaleY"
+            android:valueFrom="1.3"
             android:valueTo="1.0"
             android:valueType="floatType" />
     </objectAnimator>
