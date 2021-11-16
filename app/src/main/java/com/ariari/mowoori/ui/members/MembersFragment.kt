@@ -20,24 +20,42 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MembersFragment : BaseFragment<FragmentMembersBinding>(R.layout.fragment_members) {
-    private val viewModel: MembersViewModel by viewModels()
+    private val membersViewModel: MembersViewModel by viewModels()
     private val membersAdapter = MembersAdapter()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = viewModel
-        viewModel.fetchGroupInfo()
+        binding.viewModel = membersViewModel
+        membersViewModel.fetchGroupInfo()
         setOpenDialogEventObserver()
+        setCurrentGroupObserver()
+        setMembersListObserver()
         setMembersRvAdapter()
     }
 
     private fun setOpenDialogEventObserver() {
-        viewModel.openInviteDialogEvent.observe(viewLifecycleOwner, {
+        membersViewModel.openInviteDialogEvent.observe(viewLifecycleOwner, {
             it.peekContent()?.let { groupId ->
                 showInviteDialog(groupId)
             }
         })
+    }
+
+    private fun setCurrentGroupObserver(){
+        membersViewModel.currentGroup.observe(viewLifecycleOwner){
+            membersViewModel.fetchMemberList()
+        }
+    }
+
+    private fun setMembersListObserver(){
+        membersViewModel.membersList.observe(viewLifecycleOwner){
+            membersAdapter.submitList(it)
+        }
+    }
+
+    private fun setMembersRvAdapter() {
+        binding.rvMembers.adapter = membersAdapter
     }
 
     private fun showInviteDialog(groupId: String) {
@@ -69,17 +87,6 @@ class MembersFragment : BaseFragment<FragmentMembersBinding>(R.layout.fragment_m
             putExtra(Intent.EXTRA_TEXT, text)
         }
         startActivity(shareIntent)
-    }
-
-    private fun setMembersRvAdapter() {
-        binding.rvMembers.adapter = membersAdapter
-        membersAdapter.submitList(
-            listOf(
-                User("aaa", UserInfo("aaa", "", emptyList(), "")),
-                User("bbb", UserInfo("bbb", "", emptyList(), "")),
-                User("ccc", UserInfo("ccc", "", emptyList(), ""))
-            )
-        )
     }
 
 }

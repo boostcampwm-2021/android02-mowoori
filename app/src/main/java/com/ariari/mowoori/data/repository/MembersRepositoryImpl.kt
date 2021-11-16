@@ -2,6 +2,8 @@ package com.ariari.mowoori.data.repository
 
 import com.ariari.mowoori.ui.home.entity.Group
 import com.ariari.mowoori.ui.home.entity.GroupInfo
+import com.ariari.mowoori.ui.register.entity.User
+import com.ariari.mowoori.ui.register.entity.UserInfo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import kotlinx.coroutines.tasks.await
@@ -25,4 +27,13 @@ class MembersRepositoryImpl @Inject constructor(
     }
 
     override fun getUserUid(): String? = firebaseAuth.currentUser?.uid
+
+    override suspend fun getUserInfo(userId: String): User? =
+        kotlin.runCatching {
+            val userSnapshot = databaseReference.child("users/$userId").get().await()
+            User(
+                userId,
+                userSnapshot.getValue(UserInfo::class.java) ?: UserInfo()
+            )
+        }.getOrNull()
 }

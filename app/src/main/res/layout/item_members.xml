@@ -21,8 +21,9 @@
         <ImageView
             android:id="@+id/iv_members_profile"
             setSrcFromUrl="@{userInfo.profileImage}"
-            android:layout_width="94dp"
-            android:layout_height="94dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
             android:layout_marginTop="18dp"
             android:contentDescription="@string/desc_members_profile"
             app:layout_constraintEnd_toEndOf="parent"
