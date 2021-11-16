@@ -19,6 +19,10 @@ import javax.inject.Inject
 class MembersViewModel @Inject constructor(
     private val membersRepository: MembersRepository,
 ) : ViewModel() {
+
+    private val _loadingEvent = MutableLiveData<Event<Boolean>>()
+    val loadingEvent: LiveData<Event<Boolean>> get() = _loadingEvent
+
     private val _openInviteDialogEvent = MutableLiveData<Event<String?>>()
     val openInviteDialogEvent: LiveData<Event<String?>> = _openInviteDialogEvent
 
@@ -27,6 +31,10 @@ class MembersViewModel @Inject constructor(
 
     private val _membersList = MutableLiveData<List<User>>()
     val membersList: LiveData<List<User>> = _membersList
+
+    fun setLoadingEvent(isLoading: Boolean) {
+        _loadingEvent.value = Event(isLoading)
+    }
 
     fun fetchGroupInfo() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -46,7 +54,8 @@ class MembersViewModel @Inject constructor(
                 requireNotNull(currentGroup.value).groupInfo.userList.map { userId ->
                     async { membersRepository.getUserInfo(userId) }
                 }
-            _membersList.postValue(deferredMemberList.awaitAll().map { result -> result ?: return@launch})
+            _membersList.postValue(
+                deferredMemberList.awaitAll().map { result -> result ?: return@launch })
         }
     }
 }

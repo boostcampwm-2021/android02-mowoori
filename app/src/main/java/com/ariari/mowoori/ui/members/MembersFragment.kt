@@ -14,8 +14,10 @@ import com.ariari.mowoori.databinding.FragmentMembersBinding
 import com.ariari.mowoori.ui.members.adapter.MembersAdapter
 import com.ariari.mowoori.ui.register.entity.User
 import com.ariari.mowoori.ui.register.entity.UserInfo
+import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.util.toastMessage
 import com.ariari.mowoori.widget.InviteDialogFragment
+import com.ariari.mowoori.widget.ProgressDialogManager
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -27,11 +29,20 @@ class MembersFragment : BaseFragment<FragmentMembersBinding>(R.layout.fragment_m
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = membersViewModel
+        membersViewModel.setLoadingEvent(true)
         membersViewModel.fetchGroupInfo()
+        setLoadingObserver()
         setOpenDialogEventObserver()
         setCurrentGroupObserver()
         setMembersListObserver()
         setMembersRvAdapter()
+    }
+
+    private fun setLoadingObserver() {
+        membersViewModel.loadingEvent.observe(viewLifecycleOwner, EventObserver {
+            if (it) ProgressDialogManager.instance.show(requireContext())
+            else ProgressDialogManager.instance.clear()
+        })
     }
 
     private fun setOpenDialogEventObserver() {
@@ -51,6 +62,7 @@ class MembersFragment : BaseFragment<FragmentMembersBinding>(R.layout.fragment_m
     private fun setMembersListObserver(){
         membersViewModel.membersList.observe(viewLifecycleOwner){
             membersAdapter.submitList(it)
+            membersViewModel.setLoadingEvent(false)
         }
     }
 
