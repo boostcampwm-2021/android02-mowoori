@@ -1,10 +1,15 @@
 package com.ariari.mowoori.ui.stamp_detail
 
 import android.app.Activity
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -19,32 +24,47 @@ import com.ariari.mowoori.ui.stamp.entity.DetailMode
 import com.ariari.mowoori.ui.stamp_detail.entity.PictureType
 import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.util.LogUtil
+import com.ariari.mowoori.util.getCurrentDateTime
+import com.ariari.mowoori.util.toastMessage
 import com.ariari.mowoori.widget.PictureDialogFragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
+import java.io.File
 
 @AndroidEntryPoint
 class StampDetailFragment :
     BaseFragment<FragmentStampDetailBinding>(R.layout.fragment_stamp_detail) {
-    private val safeArgs: StampDetailFragmentArgs by navArgs()
     private val viewModel: StampDetailViewModel by viewModels()
+    private val safeArgs: StampDetailFragmentArgs by navArgs()
     private lateinit var detailInfo: DetailInfo
 
-    private val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) {
-        it?.run {
-            LogUtil.log("getContent", it.toString())
-            viewModel.setPictureUri(it)
-            Glide.with(requireContext())
-                .load(it)
-                .override(300, 300)
-                .transform(CenterCrop(), RoundedCorners(16))
-                .into(binding.ivStampDetail)
-            binding.tvStampDetailIcon.isVisible = false
+    private var currentPhotoPath: String? = null
+    private var providerUri: Uri? = null
+
+    private val activityGalleryLauncher =
+        registerForActivityResult(ActivityResultContracts.GetContent()) {
+            saveCurrentPicture(it)
         }
-    }
+
+    private val activityPictureLauncher =
+        registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            if (success) {
+                LogUtil.log("takePictureContent", success.toString())
+                saveCurrentPicture(providerUri)
+            } else {
+                LogUtil.log("takePictureContent", success.toString())
+            }
+        }
+
+    private val activityPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                savePhoto()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,25 +76,43 @@ class StampDetailFragment :
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
+        init()
+        setListener()
+        setObserver()
+        setDetailTransitionName()
+    }
+
+    private fun init() {
         setDetailInfo()
         setEditMode()
         setBtnVisible()
-        setDetailTransitionName()
         setUserName()
         setMissionId()
         setMissionName()
-        setPicture()
         setComment()
+    }
+
+    private fun setListener() {
+        setBtnCertifyListener()
+        setPictureClickListener()
         setRootClick()
+    }
+
+    private fun setObserver() {
         setIsMissionPostedObserver()
         setCloseBtnClickObserver()
         setIsCertifyObserver()
-        setBtnCertifyListener()
         setCommentObserver()
     }
 
     private fun setDetailInfo() {
         detailInfo = safeArgs.detailInfo
+    }
+
+    private fun setEditMode() {
+        if (detailInfo.detailMode == DetailMode.INQUIRY) {
+            binding.etStampDetailComment.keyListener = null
+        }
     }
 
     private fun setBtnVisible() {
@@ -97,23 +135,11 @@ class StampDetailFragment :
         viewModel.setMissionName(detailInfo.missionName)
     }
 
-    private fun setEditMode() {
-        if (detailInfo.detailMode == DetailMode.INQUIRY) {
-            binding.etStampDetailComment.keyListener = null
-        }
-    }
-
     private fun setComment() {
         viewModel.setComment(detailInfo.stampInfo.comment)
     }
 
-    private fun setPicture() {
-        binding.ivStampDetail.setOnClickListener {
-            PictureDialogFragment(onClick).show(
-                requireActivity().supportFragmentManager,
-                "PictureDialogFragment"
-            )
-        }
+    private fun setPictureClickListener() {
         if (detailInfo.stampInfo.pictureUrl != "") {
             Glide.with(requireContext())
                 .load(detailInfo.stampInfo.pictureUrl)
@@ -121,18 +147,105 @@ class StampDetailFragment :
                 .transform(CenterCrop(), RoundedCorners(16))
                 .into(binding.ivStampDetail)
             binding.tvStampDetailIcon.isInvisible = true
+        } else {
+            binding.ivStampDetail.setOnClickListener {
+                PictureDialogFragment(onClick).show(
+                    requireActivity().supportFragmentManager,
+                    "PictureDialogFragment"
+                )
+            }
+        }
+    }
+
+    private fun setBtnCertifyListener() {
+        binding.btnStampDetailCertify.setOnClickListener {
+            viewModel.setComment(binding.etStampDetailComment.text.toString())
+            viewModel.postStamp()
         }
     }
 
     private val onClick: (pictureType: PictureType) -> Unit = {
         when (it) {
             PictureType.CAMERA -> {
-                Timber.d(it.toString())
+                takePicture(android.Manifest.permission.CAMERA)
             }
             else -> {
-                getContent.launch("image/*")
+                activityGalleryLauncher.launch("image/*")
             }
         }
+    }
+
+    private fun takePicture(permission: String) {
+        if (!hasPermission(permission)) {
+            activityPermissionLauncher.launch(permission)
+        } else {
+            savePhoto()
+        }
+    }
+
+    private fun savePhoto() {
+        Timber.d("모든 권한이 승인되어 있어서 사진찍기 가능")
+        val photoFile: File?
+        try {
+            photoFile = createImageFile()
+            if (photoFile != null) {
+                providerUri = FileProvider.getUriForFile(
+                    requireContext(),
+                    "com.ariari.mowoori.fileProvider",
+                    photoFile
+                )
+                LogUtil.log("providerUri", providerUri.toString())
+                activityPictureLauncher.launch(providerUri)
+            }
+        } catch (exception: Exception) {
+            Timber.e("create Image File Error~~")
+        }
+    }
+
+    private fun createImageFile(): File {
+        Timber.d("createImageFile Start")
+        val timeStamp = getCurrentDateTime()
+        Timber.d(timeStamp)
+        val imageFileName = "${detailInfo.missionId}_$timeStamp.jpg"
+        Timber.d(imageFileName)
+        val storageDir = File(
+            requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+                .toString(),
+            "Mowoori"
+        )
+        // LogUtil.log("storageDir", storageDir.toString())
+
+        if (!storageDir.exists()) {
+            // Timber.d("make new dir")
+            storageDir.mkdirs()
+        }
+        val imageFile = File(storageDir, imageFileName)
+        // LogUtil.log("imageFile", imageFile.toString())
+        currentPhotoPath = imageFile.absolutePath
+        // LogUtil.log("currentPhotoPath", currentPhotoPath.toString())
+        return imageFile
+    }
+
+    private fun saveCurrentPicture(uri: Uri?) {
+        viewModel.setPictureUri(uri)
+        Glide.with(requireContext())
+            .load(uri)
+            .override(300, 300)
+            .transform(CenterCrop(), RoundedCorners(16))
+            .into(binding.ivStampDetail)
+        binding.tvStampDetailIcon.isVisible = false
+    }
+
+    private fun hasPermission(permission: String): Boolean {
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                permission
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            toastMessage("사진 촬영을 위해서는 카메라 권한이 필요합니다.")
+            return false
+        }
+        return true
     }
 
     private fun setRootClick() {
@@ -169,13 +282,6 @@ class StampDetailFragment :
     private fun setCommentObserver() {
         viewModel.comment.observe(viewLifecycleOwner) {
             binding.etStampDetailComment.setText(it)
-        }
-    }
-
-    private fun setBtnCertifyListener() {
-        binding.btnStampDetailCertify.setOnClickListener {
-            viewModel.setComment(binding.etStampDetailComment.text.toString())
-            viewModel.postStamp()
         }
     }
 

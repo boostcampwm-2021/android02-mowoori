@@ -104,7 +104,7 @@
     <string name="members_invite_code_copy_complete">초대코드가 클립보드에 복사되었습니다.</string>
 
     <!-- StampDetailFragment -->
-    <string name="stamp_detail_user">`%s` 님의</string>
+    <string name="stamp_detail_user">%s님의</string>
     <string name="stamp_detail_picture">인증 사진</string>
     <string name="stamp_detail_comment">한줄평</string>
     <string name="stamp_detail_hint">한줄평을 작성해주세요</string>

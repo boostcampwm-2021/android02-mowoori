@@ -1,11 +1,14 @@
 package com.ariari.mowoori.ui.intro
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.animation.AlphaAnimation
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.ariari.mowoori.BuildConfig
 import com.ariari.mowoori.R
@@ -14,9 +17,12 @@ import com.ariari.mowoori.databinding.ActivityIntroBinding
 import com.ariari.mowoori.ui.main.MainActivity
 import com.ariari.mowoori.ui.register.RegisterActivity
 import com.ariari.mowoori.util.EventObserver
+import com.ariari.mowoori.util.LogUtil
+import com.ariari.mowoori.util.toastMessage
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -34,18 +40,25 @@ class IntroActivity : AppCompatActivity() {
             }
         }
 
+    private val permissionList = listOf(
+        android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        android.Manifest.permission.READ_EXTERNAL_STORAGE
+    )
+
     @Inject
     lateinit var preference: MoWooriPreference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
         auth = FirebaseAuth.getInstance()
 //        autoLogin()
         binding.viewModel = viewModel
 
         setListeners()
         setObservers()
+        requestPermissions(permissionList)
 
         //For Test
         if (BuildConfig.DEBUG) {
@@ -136,4 +149,46 @@ class IntroActivity : AppCompatActivity() {
             moveToMain()
         }
     }
+
+    private fun requestPermissions(permissions: List<String>) {
+        if (!hasPermissions(permissions)) {
+            Timber.d("hasPermission false")
+            toastMessage("앱 사용 중에 이미지 저장을 위해 반드시 외부저장소 권한이 필요합니다!!!!!!!")
+            activityPermissionLauncher.launch(permissions.toTypedArray())
+        }
+    }
+
+    private fun hasPermissions(permissions: List<String>): Boolean {
+        permissions.forEach {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    it
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                return@hasPermissions false
+            }
+        }
+        return true
+    }
+
+    private val activityPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions: Map<String, Boolean>? ->
+            Timber.d("register까지 잘 들어왔음")
+            permissions?.let {
+                it.entries.forEach { it ->
+                    val permissionName = it.key
+                    val isGranted = it.value
+                    if (isGranted) {
+                        LogUtil.log("permissionName", permissionName)
+//                    when (permissionName) {
+//                        else -> toastMessage("외부 저장소 쓰기/읽기 권한이 추가되었습니다.")
+//                    }
+                    } else {
+                        Timber.d("register 문제발생")
+                        // toastMessage("앱 사용 중에 이미지 저장을 위해 반드시 외부저장소 권한이 필요합니다.")
+                        //finish()
+                    }
+                }
+            }
+        }
 }
