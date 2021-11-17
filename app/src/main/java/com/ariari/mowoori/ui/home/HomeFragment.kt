@@ -90,6 +90,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = homeViewModel
+        binding.layoutHomeSnowmanFaceLv4.viewModel = homeViewModel
         setUserInfoObserver()
         setCurrentGroupInfoObserver()
         setGroupInfoListObserver()
@@ -97,8 +98,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         setDrawerAdapter()
         setRecyclerViewDecoration()
         setObserver()
-        // 임시로 3단계로 설정 추후에 단계별 애니메이션 나오도록 설정 필요
-        setSnowmanLevel(SnowmanLevel.LV4)
         setClickListener()
         setMenuListener()
     }
@@ -192,10 +191,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         }
     }
 
-    private fun setSnowmanLevel(level: SnowmanLevel) {
-        homeViewModel.updateSnowmanLevel(level)
-    }
-
     private fun updateSnowAnimation(isSnowing: Boolean) {
         viewLifecycleOwner.lifecycleScope.launch {
             if (isSnowing) {
@@ -216,7 +211,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         viewLifecycleOwner.lifecycleScope.launch {
             when (snowmanLevel) {
                 SnowmanLevel.LV1 -> {
-                    // TODO: 눈사람이 녹아버리는 애니메이션 추가
+                    // 1단계 - 눈만 내리는 애니메이션
                 }
                 SnowmanLevel.LV2 -> {
                     // 2단계 눈사람 - 얼굴 통통 애니메이션

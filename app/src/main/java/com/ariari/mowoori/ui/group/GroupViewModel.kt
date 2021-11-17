@@ -16,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class GroupViewModel @Inject constructor(
     private val groupRepository: GroupRepository,
-    private val introRepository: IntroRepository
+    private val introRepository: IntroRepository,
 ) : ViewModel() {
 
     val groupName = MutableLiveData<String>("")
@@ -59,7 +59,7 @@ class GroupViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             groupRepository.getUser().onSuccess {
                 val name = groupName.value ?: return@launch
-                val groupInfo = GroupInfo(name, listOf(it.userId))
+                val groupInfo = GroupInfo(0, name, listOf(it.userId))
                 groupRepository.putGroupInfo(groupInfo, it).onSuccess { newGroupId ->
                     _addGroupCompleteEvent.postValue(Event(newGroupId))
                 }.onFailure {
