@@ -208,19 +208,25 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <com.google.android.material.navigation.NavigationView
-            android:id="@+id/nav_view_drawer"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="start">
+            android:layout_gravity="start"
+            android:background="@color/white">
+
+            <include
+                android:id="@+id/layout_drawer_header"
+                layout="@layout/item_drawer_header" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_drawer"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="0dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layout_drawer_header"
                 tools:listitem="@layout/item_drawer_group" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </com.google.android.material.navigation.NavigationView>
     </androidx.drawerlayout.widget.DrawerLayout>
 </layout>

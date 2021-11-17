@@ -12,7 +12,6 @@ import com.ariari.mowoori.R
 import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentHomeBinding
 import com.ariari.mowoori.ui.home.adapter.DrawerAdapter
-import com.ariari.mowoori.ui.home.adapter.DrawerAdapterDecoration
 import com.ariari.mowoori.ui.home.animator.SnowAnimator
 import com.ariari.mowoori.ui.home.animator.SnowmanLv2Animator
 import com.ariari.mowoori.ui.home.animator.SnowmanLv3Animator
@@ -91,10 +90,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         setGroupInfoListObserver()
         setDrawerOpenListener()
         setDrawerAdapter()
-        setRecyclerViewDecoration()
         setObservers()
         setClickListener()
         setMenuListener()
+        setPlusClickListener()
     }
 
     override fun onDestroyView() {
@@ -114,15 +113,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     }
 
     private fun setCurrentGroupInfoObserver() {
-        homeViewModel.currentGroupInfo.observe(viewLifecycleOwner, { group ->
-            adapter.notifyDataSetChanged()
+        homeViewModel.currentGroupInfo.observe(viewLifecycleOwner, {
+            adapter.submitList(adapter.currentList)
         })
     }
 
     private fun setGroupInfoListObserver() {
         homeViewModel.groupList.observe(viewLifecycleOwner, { groupList ->
-            adapter.groups = groupList
-            adapter.notifyDataSetChanged()
+            adapter.submitList(groupList)
         })
     }
 
@@ -164,11 +162,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
             }
         })
         binding.rvDrawer.adapter = adapter
-    }
-
-    private fun setRecyclerViewDecoration() {
-        val itemDecoration = DrawerAdapterDecoration()
-        binding.rvDrawer.addItemDecoration(itemDecoration)
     }
 
     private fun setObservers() {
@@ -232,6 +225,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
                     snowmanLv4Animator.start()
                 }
             }
+        }
+    }
+
+    private fun setPlusClickListener() {
+        binding.layoutDrawerHeader.tvDrawerHeaderAdd.setOnClickListener {
+            findNavController().navigate(R.id.action_homeFragment_to_inviteCheckFragment)
         }
     }
 }

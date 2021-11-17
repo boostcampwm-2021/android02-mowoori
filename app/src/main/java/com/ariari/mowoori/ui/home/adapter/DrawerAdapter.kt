@@ -1,72 +1,45 @@
 package com.ariari.mowoori.ui.home.adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.findNavController
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.ItemDrawerGroupBinding
-import com.ariari.mowoori.databinding.ItemDrawerHeaderBinding
 import com.ariari.mowoori.ui.home.entity.Group
-import com.ariari.mowoori.ui.home.entity.GroupInfo
 
 class DrawerAdapter(private val listener: OnItemClickListener) :
-    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    ListAdapter<Group, DrawerAdapter.GroupViewHolder>(diffUtil) {
+
+    companion object {
+        val diffUtil = object : DiffUtil.ItemCallback<Group>() {
+            override fun areItemsTheSame(oldItem: Group, newItem: Group): Boolean {
+                return oldItem.groupId == newItem.groupId
+            }
+
+            override fun areContentsTheSame(oldItem: Group, newItem: Group): Boolean {
+                return oldItem == newItem
+            }
+        }
+    }
 
     interface OnItemClickListener {
         fun itemClick(groupId: String)
     }
 
-    companion object {
-        private const val HEADER = 0
-        private const val GROUP = 1
-    }
-
-    var groups = listOf<Group>()
-
-    override fun getItemViewType(position: Int): Int {
-        return when (position) {
-            0 -> HEADER
-            else -> GROUP
-        }
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return when (viewType) {
-            HEADER -> HeaderViewHolder(
-                ItemDrawerHeaderBinding.inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false
-                )
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroupViewHolder {
+        return GroupViewHolder(
+            ItemDrawerGroupBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
             )
-            else -> GroupViewHolder(
-                ItemDrawerGroupBinding.inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false
-                )
-            )
-        }
+        )
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (holder) {
-            is HeaderViewHolder -> Unit // nothing to bind
-            else -> (holder as GroupViewHolder).bind(groups[position - 1])
-        }
-    }
-
-    override fun getItemCount(): Int = groups.size + 1
-
-    inner class HeaderViewHolder(binding: ItemDrawerHeaderBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        init {
-            binding.tvDrawerHeaderAdd.setOnClickListener {
-                it.findNavController().navigate(R.id.action_homeFragment_to_inviteCheckFragment)
-            }
-        }
+    override fun onBindViewHolder(holder: GroupViewHolder, position: Int) {
+        holder.bind(getItem(position))
     }
 
     inner class GroupViewHolder(private val binding: ItemDrawerGroupBinding) :
