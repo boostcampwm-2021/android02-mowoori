@@ -9,6 +9,7 @@ import android.animation.PropertyValuesHolder
 import android.content.Context
 import android.util.Property
 import android.view.View
+import android.view.ViewTreeObserver
 import androidx.core.view.isInvisible
 import com.ariari.mowoori.R
 import com.ariari.mowoori.ui.home.HomeViewModel
@@ -42,8 +43,11 @@ class SnowmanLv4Animator(
     private lateinit var disappearFirstExclamationAnimator: Animator
     private lateinit var disappearSecondExclamationAnimator: Animator
 
-    fun start() {
+    init {
         homeViewModel.addSources()
+    }
+
+    fun start() {
         setXMLAnimators()
         initViewInfo()
     }
@@ -187,40 +191,76 @@ class SnowmanLv4Animator(
         }
 
     private fun initViewInfo() {
-        with(component.body) {
-            post { homeViewModel.bodyMeasured() }
-        }
+        component.body.viewTreeObserver.addOnPreDrawListener(object :
+            ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                component.body.viewTreeObserver.removeOnPreDrawListener(this)
+                homeViewModel.bodyMeasured()
+                return true
+            }
+        })
     }
 
     fun setViewInfo() {
-        with(component.face.ivHomeSnowmanLeftEyeBlackLv4) {
-            post {
+        component.face.ivHomeSnowmanLeftEyeBlackLv4.viewTreeObserver.addOnPreDrawListener(object :
+            ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                component.face.ivHomeSnowmanLeftEyeBlackLv4.viewTreeObserver.removeOnPreDrawListener(
+                    this)
                 leftBlackEyeInfo =
-                    ViewInfo(this.x, this.y, this.width.toFloat(), this.height.toFloat())
+                    ViewInfo(component.face.ivHomeSnowmanLeftEyeBlackLv4.x,
+                        component.face.ivHomeSnowmanLeftEyeBlackLv4.y,
+                        component.face.ivHomeSnowmanLeftEyeBlackLv4.width.toFloat(),
+                        component.face.ivHomeSnowmanLeftEyeBlackLv4.height.toFloat())
                 homeViewModel.leftBlackViewInfoDone()
+                return true
             }
-        }
-        with(component.face.ivHomeSnowmanLeftEyeWhiteLv4) {
-            post {
+        })
+
+        component.face.ivHomeSnowmanLeftEyeWhiteLv4.viewTreeObserver.addOnPreDrawListener(object :
+            ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                component.face.ivHomeSnowmanLeftEyeWhiteLv4.viewTreeObserver.removeOnPreDrawListener(
+                    this)
                 leftWhiteEyeInfo =
-                    ViewInfo(this.x, this.y, this.width.toFloat(), this.height.toFloat())
+                    ViewInfo(component.face.ivHomeSnowmanLeftEyeWhiteLv4.x,
+                        component.face.ivHomeSnowmanLeftEyeWhiteLv4.y,
+                        component.face.ivHomeSnowmanLeftEyeWhiteLv4.width.toFloat(),
+                        component.face.ivHomeSnowmanLeftEyeWhiteLv4.height.toFloat())
                 homeViewModel.leftWhiteViewInfoDone()
+                return true
             }
-        }
-        with(component.face.ivHomeSnowmanRightEyeBlackLv4) {
-            post {
+        })
+
+        component.face.ivHomeSnowmanRightEyeBlackLv4.viewTreeObserver.addOnPreDrawListener(object :
+            ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                component.face.ivHomeSnowmanRightEyeBlackLv4.viewTreeObserver.removeOnPreDrawListener(
+                    this)
                 rightBlackEyeInfo =
-                    ViewInfo(this.x, this.y, this.width.toFloat(), this.height.toFloat())
+                    ViewInfo(component.face.ivHomeSnowmanRightEyeBlackLv4.x,
+                        component.face.ivHomeSnowmanRightEyeBlackLv4.y,
+                        component.face.ivHomeSnowmanRightEyeBlackLv4.width.toFloat(),
+                        component.face.ivHomeSnowmanRightEyeBlackLv4.height.toFloat())
                 homeViewModel.rightBlackViewInfoDone()
+                return true
             }
-        }
-        with(component.face.ivHomeSnowmanRightEyeWhiteLv4) {
-            post {
+        })
+
+        component.face.ivHomeSnowmanRightEyeWhiteLv4.viewTreeObserver.addOnPreDrawListener(object :
+            ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                component.face.ivHomeSnowmanRightEyeWhiteLv4.viewTreeObserver.removeOnPreDrawListener(
+                    this)
                 rightWhiteEyeInfo =
-                    ViewInfo(this.x, this.y, this.width.toFloat(), this.height.toFloat())
+                    ViewInfo(component.face.ivHomeSnowmanRightEyeWhiteLv4.x,
+                        component.face.ivHomeSnowmanRightEyeWhiteLv4.y,
+                        component.face.ivHomeSnowmanRightEyeWhiteLv4.width.toFloat(),
+                        component.face.ivHomeSnowmanRightEyeWhiteLv4.height.toFloat())
                 homeViewModel.rightWhiteViewInfoDone()
+                return true
             }
-        }
+        })
     }
 
     fun setObjectAnimators() {
