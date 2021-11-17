@@ -1,10 +1,13 @@
 package com.ariari.mowoori.ui.stamp_detail
 
 import android.app.Activity
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -19,6 +22,7 @@ import com.ariari.mowoori.ui.stamp.entity.DetailMode
 import com.ariari.mowoori.ui.stamp_detail.entity.PictureType
 import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.util.LogUtil
+import com.ariari.mowoori.util.toastMessage
 import com.ariari.mowoori.widget.PictureDialogFragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
@@ -33,9 +37,8 @@ class StampDetailFragment :
     private val viewModel: StampDetailViewModel by viewModels()
     private lateinit var detailInfo: DetailInfo
 
-    private val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) {
-        it?.run {
-            LogUtil.log("getContent", it.toString())
+    private val activityGalleryLauncher =
+        registerForActivityResult(ActivityResultContracts.GetContent()) {
             viewModel.setPictureUri(it)
             Glide.with(requireContext())
                 .load(it)
@@ -44,7 +47,24 @@ class StampDetailFragment :
                 .into(binding.ivStampDetail)
             binding.tvStampDetailIcon.isVisible = false
         }
-    }
+
+    private val activityPictureLauncher =
+        registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            if (success) {
+                LogUtil.log("takePictureContent", success.toString())
+            } else {
+                LogUtil.log("takePictureContent", success.toString())
+            }
+        }
+
+    private val activityPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                activityPictureLauncher.launch("image/temp".toUri())
+            } else {
+                toastMessage("사진 촬영을 위해서는 카메라 권한이 필요합니다.")
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -127,12 +147,33 @@ class StampDetailFragment :
     private val onClick: (pictureType: PictureType) -> Unit = {
         when (it) {
             PictureType.CAMERA -> {
-                Timber.d(it.toString())
+                takePicture(android.Manifest.permission.CAMERA)
             }
             else -> {
-                getContent.launch("image/*")
+                activityGalleryLauncher.launch("image/*")
             }
         }
+    }
+
+    private fun takePicture(permission: String) {
+        if (!hasPermission(permission)) {
+            activityPermissionLauncher.launch(permission)
+        } else {
+            Timber.d("모든 권한이 승인되어 있어서 사진찍기 가능")
+            activityPictureLauncher.launch("image/temp".toUri())
+        }
+    }
+
+    private fun hasPermission(permission: String): Boolean {
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                permission
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            toastMessage("사진 촬영을 위해서는 카메라 권한이 필요합니다.")
+            return false
+        }
+        return true
     }
 
     private fun setRootClick() {

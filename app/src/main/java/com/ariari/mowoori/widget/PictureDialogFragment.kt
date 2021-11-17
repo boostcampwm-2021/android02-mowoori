@@ -21,7 +21,6 @@ class PictureDialogFragment(private val onClick: (pictureType: PictureType) -> U
         binding.containerDialogPictureCamera.setOnClickListener {
             onClick(PictureType.CAMERA)
             dismiss()
-            // TODO: 사진촬영
         }
     }
 }
