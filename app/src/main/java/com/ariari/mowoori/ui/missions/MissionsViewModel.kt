@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.MissionsRepository
 import com.ariari.mowoori.ui.missions.entity.Mission
 import com.ariari.mowoori.ui.missions.entity.MissionInfo
+import com.ariari.mowoori.ui.register.entity.User
 import com.ariari.mowoori.util.Event
 import com.ariari.mowoori.util.getCurrentDate
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -63,39 +64,47 @@ class MissionsViewModel @Inject constructor(
         setLoadingEvent(true)
     }
 
-    fun loadMissionsList() {
+    fun sendUserToLoadMissions(user: User?) {
         viewModelScope.launch(Dispatchers.IO) {
-            missionsRepository.getUser().onSuccess { user ->
-                val missionIdList =
-                    missionsRepository.getMissionIdList(user.userInfo.currentGroupId)
-                val missions = missionsRepository.getMissions(user.userId)
-                _missionsList.postValue(
-                    when (requireNotNull(missionsType.value).peekContent()) {
-                        NOT_DONE_TYPE -> {
-                            missions.filter {
-                                (missionIdList.contains(it.missionId)) &&
-                                        (getCurrentDate() <= it.missionInfo.dueDate) &&
-                                        (it.missionInfo.curStamp < it.missionInfo.totalStamp)
-                            }
-                        }
-                        DONE_TYPE -> {
-                            missions.filter {
-                                (missionIdList.contains(it.missionId)) &&
-                                        (it.missionInfo.curStamp == it.missionInfo.totalStamp)
-                            }
-                        }
-                        FAIL_TYPE -> {
-                            missions.filter {
-                                (missionIdList.contains(it.missionId)) &&
-                                        (getCurrentDate() > it.missionInfo.dueDate) &&
-                                        (it.missionInfo.curStamp < it.missionInfo.totalStamp)
-                            }
-                        }
-                        else -> throw IllegalStateException()
-                    })
-            }.onFailure {
-                throw Exception("get User Exception!!")
+            if (user != null) {
+                loadMissionsList(user)
+            } else {
+                missionsRepository.getUser().onSuccess { user ->
+                    loadMissionsList(user)
+                }.onFailure { throw Exception("get User Exception!!") }
             }
+        }
+    }
+
+    private fun loadMissionsList(user: User) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val missionIdList =
+                missionsRepository.getMissionIdList(user.userInfo.currentGroupId)
+            val missions = missionsRepository.getMissions(user.userId)
+            _missionsList.postValue(
+                when (requireNotNull(missionsType.value).peekContent()) {
+                    NOT_DONE_TYPE -> {
+                        missions.filter {
+                            (missionIdList.contains(it.missionId)) &&
+                                    (getCurrentDate() <= it.missionInfo.dueDate) &&
+                                    (it.missionInfo.curStamp < it.missionInfo.totalStamp)
+                        }
+                    }
+                    DONE_TYPE -> {
+                        missions.filter {
+                            (missionIdList.contains(it.missionId)) &&
+                                    (it.missionInfo.curStamp == it.missionInfo.totalStamp)
+                        }
+                    }
+                    FAIL_TYPE -> {
+                        missions.filter {
+                            (missionIdList.contains(it.missionId)) &&
+                                    (getCurrentDate() > it.missionInfo.dueDate) &&
+                                    (it.missionInfo.curStamp < it.missionInfo.totalStamp)
+                        }
+                    }
+                    else -> throw IllegalStateException()
+                })
         }
     }
 

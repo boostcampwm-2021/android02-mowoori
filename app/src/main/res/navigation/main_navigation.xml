@@ -34,6 +34,7 @@
         tools:layout="@layout/fragment_missions">
         <argument
             android:name="userId"
+            android:defaultValue="@null"
             app:argType="com.ariari.mowoori.ui.register.entity.User"
             app:nullable="true" />
         <action

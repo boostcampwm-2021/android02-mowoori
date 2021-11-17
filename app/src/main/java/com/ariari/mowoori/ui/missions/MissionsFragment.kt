@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.ariari.mowoori.R
 import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentMissionsBinding
 import com.ariari.mowoori.ui.missions.adapter.MissionsAdapter
+import com.ariari.mowoori.ui.register.entity.User
 import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.widget.ProgressDialogManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -18,6 +20,7 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
     private val missionsAdapter: MissionsAdapter by lazy {
         MissionsAdapter(missionsViewModel)
     }
+    private val args by navArgs<MissionsFragmentArgs>()
     private lateinit var userName: String
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -48,7 +51,7 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
 
     private fun setMissionsRvAdapter() {
         binding.rvMissions.adapter = missionsAdapter
-        missionsViewModel.loadMissionsList()
+        missionsViewModel.sendUserToLoadMissions(args.userId)
     }
 
     private fun setPlusBtnClickObserver() {
@@ -59,7 +62,7 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
 
     private fun setMissionsTypeObserver() {
         missionsViewModel.missionsType.observe(viewLifecycleOwner, EventObserver {
-            missionsViewModel.loadMissionsList()
+            missionsViewModel.sendUserToLoadMissions(args.userId)
         })
     }
 
