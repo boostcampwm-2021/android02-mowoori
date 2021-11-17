@@ -30,7 +30,6 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
         missionsViewModel.setLoadingEvent(true)
         setMissionsRvAdapter()
         setObserver()
-        getUserName()
     }
 
     private fun setObserver() {
@@ -81,10 +80,6 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
                 )
             )
         })
-    }
-
-    private fun getUserName() {
-        missionsViewModel.loadUserName()
     }
 
     private fun setUserNameObserver() {

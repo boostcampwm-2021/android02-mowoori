@@ -29,7 +29,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:onPlusClick="@{viewModel::setPlusBtnClick}"
-            app:text="@string/missions_my_mission"
+            app:titleViewText="@{@string/missions_my_mission(viewModel.userName.peekContent())}"
             app:titleViewMode="@{TitleViewMode.TITLE_VIEW_PLUS_BUTTON}" />
 
         <TextView

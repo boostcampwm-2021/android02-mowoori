@@ -65,11 +65,13 @@ class MissionsViewModel @Inject constructor(
     }
 
     fun sendUserToLoadMissions(user: User?) {
-        viewModelScope.launch(Dispatchers.IO) {
-            if (user != null) {
-                loadMissionsList(user)
-            } else {
+        if (user != null) {
+            loadUserName(user.userInfo.nickname)
+            loadMissionsList(user)
+        } else {
+            viewModelScope.launch(Dispatchers.IO) {
                 missionsRepository.getUser().onSuccess { user ->
+                    loadUserName(user.userInfo.nickname)
                     loadMissionsList(user)
                 }.onFailure { throw Exception("get User Exception!!") }
             }
@@ -108,16 +110,8 @@ class MissionsViewModel @Inject constructor(
         }
     }
 
-    fun loadUserName() {
-        viewModelScope.launch(Dispatchers.IO) {
-            missionsRepository.getUser()
-                .onSuccess {
-                    _userName.postValue(Event(it.userInfo.nickname))
-                }
-                .onFailure {
-                    println("${it.message}")
-                }
-        }
+    private fun loadUserName(userName:String) {
+        _userName.postValue(Event(userName))
     }
 
     companion object {
