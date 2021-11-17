@@ -86,7 +86,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         binding.viewModel = homeViewModel
         binding.layoutHomeSnowmanFaceLv4.viewModel = homeViewModel
         setUserInfoObserver()
-        setCurrentGroupInfoObserver()
         setGroupInfoListObserver()
         setDrawerOpenListener()
         setDrawerAdapter()
@@ -109,12 +108,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     private fun setUserInfoObserver() {
         homeViewModel.userInfo.observe(viewLifecycleOwner, EventObserver { userInfo ->
             homeViewModel.setGroupInfoList(userInfo)
-        })
-    }
-
-    private fun setCurrentGroupInfoObserver() {
-        homeViewModel.currentGroupInfo.observe(viewLifecycleOwner, {
-            adapter.submitList(adapter.currentList)
         })
     }
 
@@ -206,24 +199,22 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     }
 
     private fun updateWinterAnimation(snowmanLevel: SnowmanLevel) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            when (snowmanLevel) {
-                SnowmanLevel.LV1 -> {
-                    // 1단계 - 눈만 내리는 애니메이션
-                }
-                SnowmanLevel.LV2 -> {
-                    // 2단계 눈사람 - 얼굴 통통 애니메이션
-                    binding.ivHomeSnowmanFaceLv2.isVisible = true
-                    snowmanLv2Animator.start()
-                }
-                SnowmanLevel.LV3 -> {
-                    // 3단계 눈사람 - 얼굴 몸통 합체 애니메이션
-                    binding.ivHomeSnowmanFaceLv3.setImageResource(R.drawable.ic_snowman_face_3_rotate)
-                    snowmanLv3Animator.start()
-                }
-                SnowmanLevel.LV4 -> {
-                    snowmanLv4Animator.start()
-                }
+        when (snowmanLevel) {
+            SnowmanLevel.LV1 -> {
+                // 1단계 - 눈만 내리는 애니메이션
+            }
+            SnowmanLevel.LV2 -> {
+                // 2단계 눈사람 - 얼굴 통통 애니메이션
+                binding.ivHomeSnowmanFaceLv2.isVisible = true
+                snowmanLv2Animator.start()
+            }
+            SnowmanLevel.LV3 -> {
+                // 3단계 눈사람 - 얼굴 몸통 합체 애니메이션
+                binding.ivHomeSnowmanFaceLv3.setImageResource(R.drawable.ic_snowman_face_3_rotate)
+                snowmanLv3Animator.start()
+            }
+            SnowmanLevel.LV4 -> {
+                snowmanLv4Animator.start()
             }
         }
     }

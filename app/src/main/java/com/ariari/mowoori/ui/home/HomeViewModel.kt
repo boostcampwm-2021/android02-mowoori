@@ -74,12 +74,16 @@ class HomeViewModel @Inject constructor(
     }
 
     fun setCurrentGroupInfo(groupId: String) {
-        _groupList.value?.let { groupList ->
-            groupList.forEach {
-                it.selected = it.groupId == groupId
-                if (it.selected) _currentGroupInfo.postValue(it)
-            }
+        val currentGroupList = groupList.value ?: return
+        val tempGroupList = mutableListOf<Group>()
+        currentGroupList.forEach {
+            tempGroupList.add(it.copy())
         }
+        tempGroupList.forEach {
+            it.selected = it.groupId == groupId
+            if (it.selected) _currentGroupInfo.value = it
+        }
+        _groupList.value = tempGroupList
         homeRepository.setCurrentGroupId(groupId)
     }
 
