@@ -8,6 +8,8 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavDirections
+import androidx.navigation.fragment.findNavController
 import com.ariari.mowoori.R
 import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentMembersBinding
@@ -23,7 +25,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MembersFragment : BaseFragment<FragmentMembersBinding>(R.layout.fragment_members) {
     private val membersViewModel: MembersViewModel by viewModels()
-    private val membersAdapter = MembersAdapter()
+    private val membersAdapter by lazy { MembersAdapter { user -> moveToMissionsFragment(user) } }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -39,8 +41,8 @@ class MembersFragment : BaseFragment<FragmentMembersBinding>(R.layout.fragment_m
     }
 
     private fun setLoadingObserver() {
-        membersViewModel.loadingEvent.observe(viewLifecycleOwner, EventObserver {
-            if (it) ProgressDialogManager.instance.show(requireContext())
+        membersViewModel.loadingEvent.observe(viewLifecycleOwner, EventObserver { isLoading ->
+            if (isLoading) ProgressDialogManager.instance.show(requireContext())
             else ProgressDialogManager.instance.clear()
         })
     }
@@ -53,14 +55,14 @@ class MembersFragment : BaseFragment<FragmentMembersBinding>(R.layout.fragment_m
         })
     }
 
-    private fun setCurrentGroupObserver(){
-        membersViewModel.currentGroup.observe(viewLifecycleOwner){
+    private fun setCurrentGroupObserver() {
+        membersViewModel.currentGroup.observe(viewLifecycleOwner) {
             membersViewModel.fetchMemberList()
         }
     }
 
-    private fun setMembersListObserver(){
-        membersViewModel.membersList.observe(viewLifecycleOwner){
+    private fun setMembersListObserver() {
+        membersViewModel.membersList.observe(viewLifecycleOwner) {
             membersAdapter.submitList(it)
             membersViewModel.setLoadingEvent(false)
         }
@@ -99,6 +101,12 @@ class MembersFragment : BaseFragment<FragmentMembersBinding>(R.layout.fragment_m
             putExtra(Intent.EXTRA_TEXT, text)
         }
         startActivity(shareIntent)
+    }
+
+    private fun moveToMissionsFragment(user: User) {
+        findNavController().navigate(
+            MembersFragmentDirections.actionMembersFragmentToMissionsFragment(user)
+        )
     }
 
 }

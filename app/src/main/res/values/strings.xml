@@ -58,7 +58,7 @@
 
     <!-- MissionsFragment -->
     <string name="item_missions_stamp_count">%d/%d</string>
-    <string name="missions_my_mission">나의 미션</string>
+    <string name="missions_my_mission">%s님의 미션</string>
     <string name="missions_not_done">미완료</string>
     <string name="missions_done">완료</string>
     <string name="missions_fail">실패</string>

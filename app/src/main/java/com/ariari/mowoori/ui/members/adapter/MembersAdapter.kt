@@ -8,11 +8,22 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ariari.mowoori.databinding.ItemMembersBinding
 import com.ariari.mowoori.ui.register.entity.User
 
-class MembersAdapter : ListAdapter<User, MembersAdapter.MembersViewHolder>(membersDiffUtil) {
-    class MembersViewHolder(private val binding: ItemMembersBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+class MembersAdapter(
+    private val clickEvent: (User) -> Unit
+) : ListAdapter<User, MembersAdapter.MembersViewHolder>(membersDiffUtil) {
+    class MembersViewHolder(
+        private val binding: ItemMembersBinding,
+        private val clickEvent: (User) -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
+
+        init {
+            itemView.setOnClickListener {
+                clickEvent(requireNotNull(binding.user))
+            }
+        }
+
         fun bind(user: User) {
-            binding.userInfo = user.userInfo
+            binding.user = user
         }
     }
 
@@ -22,7 +33,7 @@ class MembersAdapter : ListAdapter<User, MembersAdapter.MembersViewHolder>(membe
                 LayoutInflater.from(parent.context),
                 parent,
                 false
-            )
+            ), clickEvent
         )
 
     override fun onBindViewHolder(holder: MembersViewHolder, position: Int) {

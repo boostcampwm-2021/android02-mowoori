@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.MissionsRepository
 import com.ariari.mowoori.ui.missions.entity.Mission
 import com.ariari.mowoori.ui.missions.entity.MissionInfo
+import com.ariari.mowoori.ui.register.entity.User
 import com.ariari.mowoori.util.Event
 import com.ariari.mowoori.util.getCurrentDate
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,6 +19,9 @@ import javax.inject.Inject
 class MissionsViewModel @Inject constructor(
     private val missionsRepository: MissionsRepository
 ) : ViewModel() {
+    private val _loadingEvent = MutableLiveData<Event<Boolean>>()
+    val loadingEvent: LiveData<Event<Boolean>> get() = _loadingEvent
+
     private val _plusBtnClick = MutableLiveData<Event<Boolean>>()
     val plusBtnClick: LiveData<Event<Boolean>> = _plusBtnClick
 
@@ -33,6 +37,10 @@ class MissionsViewModel @Inject constructor(
     private val _userName = MutableLiveData<Event<String>>()
     val userName: LiveData<Event<String>> get() = _userName
 
+    fun setLoadingEvent(isLoading: Boolean) {
+        _loadingEvent.value = Event(isLoading)
+    }
+
     fun setPlusBtnClick() {
         _plusBtnClick.value = Event(true)
     }
@@ -43,62 +51,67 @@ class MissionsViewModel @Inject constructor(
 
     fun setNotDoneType() {
         _missionsType.value = Event(NOT_DONE_TYPE)
+        setLoadingEvent(true)
     }
 
     fun setDoneType() {
         _missionsType.value = Event(DONE_TYPE)
+        setLoadingEvent(true)
     }
 
     fun setFailType() {
         _missionsType.value = Event(FAIL_TYPE)
+        setLoadingEvent(true)
     }
 
-    fun loadMissionsList() {
-        viewModelScope.launch(Dispatchers.IO) {
-            missionsRepository.getUser().onSuccess { user ->
-                val missionIdList =
-                    missionsRepository.getMissionIdList(user.userInfo.currentGroupId)
-                val missions = missionsRepository.getMissions(user.userId)
-                _missionsList.postValue(
-                    when (requireNotNull(missionsType.value).peekContent()) {
-                        NOT_DONE_TYPE -> {
-                            missions.filter {
-                                (missionIdList.contains(it.missionId)) &&
-                                        (getCurrentDate() <= it.missionInfo.dueDate) &&
-                                        (it.missionInfo.curStamp < it.missionInfo.totalStamp)
-                            }
-                        }
-                        DONE_TYPE -> {
-                            missions.filter {
-                                (missionIdList.contains(it.missionId)) &&
-                                        (it.missionInfo.curStamp == it.missionInfo.totalStamp)
-                            }
-                        }
-                        FAIL_TYPE -> {
-                            missions.filter {
-                                (missionIdList.contains(it.missionId)) &&
-                                        (getCurrentDate() > it.missionInfo.dueDate) &&
-                                        (it.missionInfo.curStamp < it.missionInfo.totalStamp)
-                            }
-                        }
-                        else -> throw IllegalStateException()
-                    })
-            }.onFailure {
-                throw Exception("get User Exception!!")
+    fun sendUserToLoadMissions(user: User?) {
+        if (user != null) {
+            loadUserName(user.userInfo.nickname)
+            loadMissionsList(user)
+        } else {
+            viewModelScope.launch(Dispatchers.IO) {
+                missionsRepository.getUser().onSuccess { user ->
+                    loadUserName(user.userInfo.nickname)
+                    loadMissionsList(user)
+                }.onFailure { throw Exception("get User Exception!!") }
             }
         }
     }
 
-    fun loadUserName() {
+    private fun loadMissionsList(user: User) {
         viewModelScope.launch(Dispatchers.IO) {
-            missionsRepository.getUser()
-                .onSuccess {
-                    _userName.postValue(Event(it.userInfo.nickname))
-                }
-                .onFailure {
-                    println("${it.message}")
-                }
+            val missionIdList =
+                missionsRepository.getMissionIdList(user.userInfo.currentGroupId)
+            val missions = missionsRepository.getMissions(user.userId)
+            _missionsList.postValue(
+                when (requireNotNull(missionsType.value).peekContent()) {
+                    NOT_DONE_TYPE -> {
+                        missions.filter {
+                            (missionIdList.contains(it.missionId)) &&
+                                    (getCurrentDate() <= it.missionInfo.dueDate) &&
+                                    (it.missionInfo.curStamp < it.missionInfo.totalStamp)
+                        }
+                    }
+                    DONE_TYPE -> {
+                        missions.filter {
+                            (missionIdList.contains(it.missionId)) &&
+                                    (it.missionInfo.curStamp == it.missionInfo.totalStamp)
+                        }
+                    }
+                    FAIL_TYPE -> {
+                        missions.filter {
+                            (missionIdList.contains(it.missionId)) &&
+                                    (getCurrentDate() > it.missionInfo.dueDate) &&
+                                    (it.missionInfo.curStamp < it.missionInfo.totalStamp)
+                        }
+                    }
+                    else -> throw IllegalStateException()
+                })
         }
+    }
+
+    private fun loadUserName(userName:String) {
+        _userName.postValue(Event(userName))
     }
 
     companion object {

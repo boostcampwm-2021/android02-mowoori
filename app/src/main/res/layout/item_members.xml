@@ -6,8 +6,8 @@
     <data>
 
         <variable
-            name="userInfo"
-            type="com.ariari.mowoori.ui.register.entity.UserInfo" />
+            name="user"
+            type="com.ariari.mowoori.ui.register.entity.User" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -20,7 +20,7 @@
 
         <ImageView
             android:id="@+id/iv_members_profile"
-            imageUrl="@{userInfo.profileImage}"
+            imageUrl="@{user.userInfo.profileImage}"
             isCircle="@{true}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
             android:layout_marginTop="20dp"
             android:layout_marginBottom="22dp"
             android:gravity="center"
-            android:text="@{userInfo.nickname}"
+            android:text="@{user.userInfo.nickname}"
             android:textColor="@color/black"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"

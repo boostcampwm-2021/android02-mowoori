@@ -19,7 +19,6 @@ import javax.inject.Inject
 class MembersViewModel @Inject constructor(
     private val membersRepository: MembersRepository,
 ) : ViewModel() {
-
     private val _loadingEvent = MutableLiveData<Event<Boolean>>()
     val loadingEvent: LiveData<Event<Boolean>> get() = _loadingEvent
 
