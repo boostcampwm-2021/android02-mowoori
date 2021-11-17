@@ -7,6 +7,7 @@ data class Group(
 )
 
 data class GroupInfo(
+    val doneMission: Int = 0,
     val groupName: String = "",
     val userList: List<String> = emptyList(),
     val missionList: List<String> = emptyList(),

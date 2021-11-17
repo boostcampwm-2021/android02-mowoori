@@ -28,6 +28,9 @@ class HomeViewModel @Inject constructor(
 
     private val _currentGroupInfo = MutableLiveData<Group>()
     val currentGroupInfo: LiveData<Group> = _currentGroupInfo
+    val snowmanLevel: LiveData<SnowmanLevel> =
+        Transformations.map(currentGroupInfo) { group -> setSnowmanLevel(group.groupInfo.doneMission) }
+
     val currentGroupName: LiveData<String> =
         Transformations.map(currentGroupInfo) { group -> group.groupInfo.groupName }
 
@@ -36,9 +39,6 @@ class HomeViewModel @Inject constructor(
 
     private var _isSnowing = MutableLiveData(true)
     val isSnowing: LiveData<Boolean> = _isSnowing
-
-    private var _snowmanLevel = MutableLiveData<SnowmanLevel>()
-    val snowmanLevel: LiveData<SnowmanLevel> = _snowmanLevel
 
     private val animatorList: MutableList<Animator> = mutableListOf()
 
@@ -91,8 +91,13 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun updateSnowmanLevel(snowmanLevel: SnowmanLevel) {
-        _snowmanLevel.postValue(snowmanLevel)
+    private fun setSnowmanLevel(doneMission: Int): SnowmanLevel {
+        return when {
+            doneMission <= 1 -> SnowmanLevel.LV1
+            doneMission == 2 -> SnowmanLevel.LV2
+            doneMission == 3 -> SnowmanLevel.LV3
+            else -> SnowmanLevel.LV4
+        }
     }
 
     fun addAnimator(anim: Animator) {
