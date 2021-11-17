@@ -12,7 +12,6 @@ import com.ariari.mowoori.R
 import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentHomeBinding
 import com.ariari.mowoori.ui.home.adapter.DrawerAdapter
-import com.ariari.mowoori.ui.home.adapter.DrawerAdapterDecoration
 import com.ariari.mowoori.ui.home.animator.SnowAnimator
 import com.ariari.mowoori.ui.home.animator.SnowmanLv2Animator
 import com.ariari.mowoori.ui.home.animator.SnowmanLv3Animator
@@ -87,14 +86,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         binding.viewModel = homeViewModel
         binding.layoutHomeSnowmanFaceLv4.viewModel = homeViewModel
         setUserInfoObserver()
-        setCurrentGroupInfoObserver()
         setGroupInfoListObserver()
         setDrawerOpenListener()
         setDrawerAdapter()
-        setRecyclerViewDecoration()
         setObservers()
         setClickListener()
         setMenuListener()
+        setPlusClickListener()
     }
 
     override fun onDestroyView() {
@@ -113,16 +111,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         })
     }
 
-    private fun setCurrentGroupInfoObserver() {
-        homeViewModel.currentGroupInfo.observe(viewLifecycleOwner, { group ->
-            adapter.notifyDataSetChanged()
-        })
-    }
-
     private fun setGroupInfoListObserver() {
         homeViewModel.groupList.observe(viewLifecycleOwner, { groupList ->
-            adapter.groups = groupList
-            adapter.notifyDataSetChanged()
+            adapter.submitList(groupList)
         })
     }
 
@@ -164,11 +155,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
             }
         })
         binding.rvDrawer.adapter = adapter
-    }
-
-    private fun setRecyclerViewDecoration() {
-        val itemDecoration = DrawerAdapterDecoration()
-        binding.rvDrawer.addItemDecoration(itemDecoration)
     }
 
     private fun setObservers() {
@@ -213,25 +199,29 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     }
 
     private fun updateWinterAnimation(snowmanLevel: SnowmanLevel) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            when (snowmanLevel) {
-                SnowmanLevel.LV1 -> {
-                    // 1단계 - 눈만 내리는 애니메이션
-                }
-                SnowmanLevel.LV2 -> {
-                    // 2단계 눈사람 - 얼굴 통통 애니메이션
-                    binding.ivHomeSnowmanFaceLv2.isVisible = true
-                    snowmanLv2Animator.start()
-                }
-                SnowmanLevel.LV3 -> {
-                    // 3단계 눈사람 - 얼굴 몸통 합체 애니메이션
-                    binding.ivHomeSnowmanFaceLv3.setImageResource(R.drawable.ic_snowman_face_3_rotate)
-                    snowmanLv3Animator.start()
-                }
-                SnowmanLevel.LV4 -> {
-                    snowmanLv4Animator.start()
-                }
+        when (snowmanLevel) {
+            SnowmanLevel.LV1 -> {
+                // 1단계 - 눈만 내리는 애니메이션
             }
+            SnowmanLevel.LV2 -> {
+                // 2단계 눈사람 - 얼굴 통통 애니메이션
+                binding.ivHomeSnowmanFaceLv2.isVisible = true
+                snowmanLv2Animator.start()
+            }
+            SnowmanLevel.LV3 -> {
+                // 3단계 눈사람 - 얼굴 몸통 합체 애니메이션
+                binding.ivHomeSnowmanFaceLv3.setImageResource(R.drawable.ic_snowman_face_3_rotate)
+                snowmanLv3Animator.start()
+            }
+            SnowmanLevel.LV4 -> {
+                snowmanLv4Animator.start()
+            }
+        }
+    }
+
+    private fun setPlusClickListener() {
+        binding.layoutDrawerHeader.tvDrawerHeaderAdd.setOnClickListener {
+            findNavController().navigate(R.id.action_homeFragment_to_inviteCheckFragment)
         }
     }
 }
