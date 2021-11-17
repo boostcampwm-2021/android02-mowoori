@@ -305,6 +305,7 @@ class SnowmanLv4Animator(
 
     private fun setAnimationSet() {
         moveEyeToLeftAnimatorSet = AnimatorSet().apply {
+            startDelay = 800
             playTogether(moveLeftEyeToLeftAnimator, moveRightEyeToLeftAnimator)
             addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator?) {
