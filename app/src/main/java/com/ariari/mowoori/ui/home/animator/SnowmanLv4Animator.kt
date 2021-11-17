@@ -10,7 +10,6 @@ import android.content.Context
 import android.util.Property
 import android.view.View
 import androidx.core.view.isInvisible
-import androidx.lifecycle.LifecycleOwner
 import com.ariari.mowoori.R
 import com.ariari.mowoori.ui.home.HomeViewModel
 import com.ariari.mowoori.ui.home.entity.Lv4Component
@@ -19,7 +18,6 @@ import com.ariari.mowoori.ui.home.entity.ViewInfo
 class SnowmanLv4Animator(
     private val component: Lv4Component,
     private val homeViewModel: HomeViewModel,
-    private val lifecycleOwner: LifecycleOwner,
     private val context: Context,
 ) {
     private lateinit var leftBlackEyeInfo: ViewInfo
@@ -48,7 +46,6 @@ class SnowmanLv4Animator(
         homeViewModel.addSources()
         setXMLAnimators()
         initViewInfo()
-        setObservers()
     }
 
     private fun setXMLAnimators() {
@@ -195,53 +192,38 @@ class SnowmanLv4Animator(
         }
     }
 
-    private fun setObservers() {
-        setIsBodyMeasuredObserver()
-        setViewInfoMediatorObserver()
+    fun setViewInfo() {
+        with(component.face.ivHomeSnowmanLeftEyeBlackLv4) {
+            post {
+                leftBlackEyeInfo =
+                    ViewInfo(this.x, this.y, this.width.toFloat(), this.height.toFloat())
+                homeViewModel.leftBlackViewInfoDone()
+            }
+        }
+        with(component.face.ivHomeSnowmanLeftEyeWhiteLv4) {
+            post {
+                leftWhiteEyeInfo =
+                    ViewInfo(this.x, this.y, this.width.toFloat(), this.height.toFloat())
+                homeViewModel.leftWhiteViewInfoDone()
+            }
+        }
+        with(component.face.ivHomeSnowmanRightEyeBlackLv4) {
+            post {
+                rightBlackEyeInfo =
+                    ViewInfo(this.x, this.y, this.width.toFloat(), this.height.toFloat())
+                homeViewModel.rightBlackViewInfoDone()
+            }
+        }
+        with(component.face.ivHomeSnowmanRightEyeWhiteLv4) {
+            post {
+                rightWhiteEyeInfo =
+                    ViewInfo(this.x, this.y, this.width.toFloat(), this.height.toFloat())
+                homeViewModel.rightWhiteViewInfoDone()
+            }
+        }
     }
 
-    private fun setIsBodyMeasuredObserver() {
-        homeViewModel.isBodyMeasured.observe(lifecycleOwner, {
-            with(component.face.ivHomeSnowmanLeftEyeBlackLv4) {
-                post {
-                    leftBlackEyeInfo =
-                        ViewInfo(this.x, this.y, this.width.toFloat(), this.height.toFloat())
-                    homeViewModel.leftBlackViewInfoDone()
-                }
-            }
-            with(component.face.ivHomeSnowmanLeftEyeWhiteLv4) {
-                post {
-                    leftWhiteEyeInfo =
-                        ViewInfo(this.x, this.y, this.width.toFloat(), this.height.toFloat())
-                    homeViewModel.leftWhiteViewInfoDone()
-                }
-            }
-            with(component.face.ivHomeSnowmanRightEyeBlackLv4) {
-                post {
-                    rightBlackEyeInfo =
-                        ViewInfo(this.x, this.y, this.width.toFloat(), this.height.toFloat())
-                    homeViewModel.rightBlackViewInfoDone()
-                }
-            }
-            with(component.face.ivHomeSnowmanRightEyeWhiteLv4) {
-                post {
-                    rightWhiteEyeInfo =
-                        ViewInfo(this.x, this.y, this.width.toFloat(), this.height.toFloat())
-                    homeViewModel.rightWhiteViewInfoDone()
-                }
-            }
-        })
-    }
-
-    private fun setViewInfoMediatorObserver() {
-        homeViewModel.viewInfoMediator.observe(lifecycleOwner, {
-            if (it) {
-                setObjectAnimators()
-            }
-        })
-    }
-
-    private fun setObjectAnimators() {
+    fun setObjectAnimators() {
         setMoveLeftEyeToLeftAnimator()
         setMoveRightEyeToLeftAnimator()
         moveLeftEyeToRightAnimator = getAnimatorOfFloat(component.face.ivHomeSnowmanLeftEyeWhiteLv4,

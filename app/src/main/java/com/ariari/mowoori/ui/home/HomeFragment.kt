@@ -2,8 +2,6 @@ package com.ariari.mowoori.ui.home
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-import android.animation.ObjectAnimator
-import android.animation.PropertyValuesHolder
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
@@ -20,7 +18,6 @@ import com.ariari.mowoori.ui.home.animator.SnowmanLv2Animator
 import com.ariari.mowoori.ui.home.animator.SnowmanLv3Animator
 import com.ariari.mowoori.ui.home.animator.SnowmanLv4Animator
 import com.ariari.mowoori.ui.home.entity.Lv4Component
-import com.ariari.mowoori.ui.home.entity.ViewInfo
 import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.util.LogUtil
 import dagger.hilt.android.AndroidEntryPoint
@@ -76,9 +73,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
             binding.ivHomeSnowmanBody,
             listOf(binding.ivHomeFirstExclamation, binding.ivHomeSecondExclamation),
             listOf(binding.ivHomeLeftHeart, binding.ivHomeRightHeart)),
-            homeViewModel,
-            viewLifecycleOwner,
-            requireContext())
+            homeViewModel, requireContext())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -97,7 +92,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         setDrawerOpenListener()
         setDrawerAdapter()
         setRecyclerViewDecoration()
-        setObserver()
+        setObservers()
         setClickListener()
         setMenuListener()
     }
@@ -176,13 +171,23 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         binding.rvDrawer.addItemDecoration(itemDecoration)
     }
 
-    private fun setObserver() {
+    private fun setObservers() {
         homeViewModel.isSnowing.observe(viewLifecycleOwner) {
             updateSnowAnimation(it)
         }
         homeViewModel.snowmanLevel.observe(viewLifecycleOwner) {
             updateWinterAnimation(it)
         }
+        homeViewModel.viewInfoMediator.observe(viewLifecycleOwner, {
+            if (it) {
+                snowmanLv4Animator.setObjectAnimators()
+            }
+        })
+        homeViewModel.isBodyMeasured.observe(viewLifecycleOwner, {
+            if (it) {
+                snowmanLv4Animator.setViewInfo()
+            }
+        })
     }
 
     private fun setClickListener() {
