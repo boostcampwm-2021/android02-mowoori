@@ -74,7 +74,7 @@
         tools:layout="@layout/fragment_notification" />
     <fragment
         android:id="@+id/missionsAddFragment"
-        android:name="com.ariari.mowoori.ui.missions_add.MissionsAddFragment"
+        android:name="com.ariari.mowoori.ui.missionsadd.MissionsAddFragment"
         android:label="MissionsAddFragment"
         tools:layout="@layout/fragment_missions_add" />
     <fragment
