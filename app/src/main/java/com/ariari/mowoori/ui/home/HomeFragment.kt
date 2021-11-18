@@ -142,8 +142,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     private fun setDrawerAdapter() {
         adapter = DrawerAdapter(object : DrawerAdapter.OnItemClickListener {
             override fun itemClick(groupId: String) {
-                homeViewModel.setCurrentGroupInfo(groupId)
                 homeViewModel.cancelAnimator()
+                homeViewModel.setCurrentGroupInfo(groupId)
                 binding.drawerHome.close()
             }
         })
