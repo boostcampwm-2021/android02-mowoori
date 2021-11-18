@@ -27,7 +27,7 @@ class HomeViewModel @Inject constructor(
     val userInfo: LiveData<Event<UserInfo>> = _userInfo
 
     private val _currentGroupInfo = MutableLiveData<Group>()
-    val currentGroupInfo: LiveData<Group> = _currentGroupInfo
+    private val currentGroupInfo: LiveData<Group> = _currentGroupInfo
     val snowmanLevel: LiveData<SnowmanLevel> =
         Transformations.map(currentGroupInfo) { group -> setSnowmanLevel(group.groupInfo.doneMission) }
 
@@ -167,4 +167,17 @@ class HomeViewModel @Inject constructor(
         _isRightWhiteViewInfoDone.value = true
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        println("HomeFragment onCleared")
+    }
+
+    fun removeSources() {
+        with(_viewInfoMediator) {
+            removeSource(_isLeftBlackViewInfoDone)
+            removeSource(_isLeftWhiteViewInfoDone)
+            removeSource(_isRightBlackViewInfoDone)
+            removeSource(_isRightWhiteViewInfoDone)
+        }
+    }
 }

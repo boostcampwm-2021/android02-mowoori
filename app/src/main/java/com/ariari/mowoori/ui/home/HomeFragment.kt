@@ -88,6 +88,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     override fun onDestroyView() {
         Timber.d("destroy")
         homeViewModel.cancelAnimator()
+        homeViewModel.removeSources()
         super.onDestroyView()
     }
 
