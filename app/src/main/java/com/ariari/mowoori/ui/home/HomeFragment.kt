@@ -204,7 +204,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
                 LogUtil.log("start", snowJob.toString())
                 snowJob = launch {
                     while (isActive) {
-                        snowAnimator.dropSnow(100L)
+                        snowAnimator.dropSnow(200L)
                     }
                 }
             } else {
