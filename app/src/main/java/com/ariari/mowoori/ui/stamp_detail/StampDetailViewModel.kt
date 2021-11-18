@@ -1,6 +1,7 @@
 package com.ariari.mowoori.ui.stamp_detail
 
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -35,10 +36,10 @@ class StampDetailViewModel @Inject constructor(
     private val _missionName = MutableLiveData<String>()
     val missionName: LiveData<String> get() = _missionName
 
-    private val _comment = MutableLiveData<String>()
+    private val _comment = MutableLiveData("미션 완료.")
     val comment: LiveData<String> get() = _comment
 
-    private val _pictureUri = MutableLiveData<Uri>()
+    private val _pictureUri = MutableLiveData("default".toUri())
     val pictureUri: LiveData<Uri> get() = _pictureUri
 
     private val _isStampPosted = MutableLiveData<Event<Unit>>()

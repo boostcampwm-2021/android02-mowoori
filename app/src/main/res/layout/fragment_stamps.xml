@@ -26,7 +26,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:onBackClick="@{viewModel::setBackBtnClick}"
             app:titleViewMode="@{TitleViewMode.TITLE_VIEW_BACK_BUTTON}"
-            app:titleViewText="@{viewModel.missionName.peekContent()}" />
+            app:titleViewText="@{viewModel.mission.missionInfo.missionName}" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_stamps"

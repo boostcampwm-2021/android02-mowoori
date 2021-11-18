@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.MissionsRepository
 import com.ariari.mowoori.ui.missions.entity.Mission
-import com.ariari.mowoori.ui.missions.entity.MissionInfo
 import com.ariari.mowoori.ui.register.entity.User
 import com.ariari.mowoori.util.Event
 import com.ariari.mowoori.util.getCurrentDate
@@ -34,8 +33,8 @@ class MissionsViewModel @Inject constructor(
     private val _missionsList = MutableLiveData<List<Mission>>()
     val missionsList: LiveData<List<Mission>> = _missionsList
 
-    private val _userName = MutableLiveData<Event<String>>()
-    val userName: LiveData<Event<String>> get() = _userName
+    private val _user = MutableLiveData<Event<User>>()
+    val user: LiveData<Event<User>> get() = _user
 
     fun setLoadingEvent(isLoading: Boolean) {
         _loadingEvent.value = Event(isLoading)
@@ -66,12 +65,12 @@ class MissionsViewModel @Inject constructor(
 
     fun sendUserToLoadMissions(user: User?) {
         if (user != null) {
-            loadUserName(user.userInfo.nickname)
+            loadUser(user)
             loadMissionsList(user)
         } else {
             viewModelScope.launch(Dispatchers.IO) {
                 missionsRepository.getUser().onSuccess { user ->
-                    loadUserName(user.userInfo.nickname)
+                    loadUser(user)
                     loadMissionsList(user)
                 }.onFailure { throw Exception("get User Exception!!") }
             }
@@ -110,8 +109,8 @@ class MissionsViewModel @Inject constructor(
         }
     }
 
-    private fun loadUserName(userName:String) {
-        _userName.postValue(Event(userName))
+    private fun loadUser(user: User) {
+        _user.postValue(Event(user))
     }
 
     companion object {
