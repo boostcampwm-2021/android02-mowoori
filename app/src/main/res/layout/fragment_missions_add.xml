@@ -9,7 +9,7 @@
 
         <variable
             name="viewModel"
-            type="com.ariari.mowoori.ui.missions_add.MissionsAddViewModel" />
+            type="com.ariari.mowoori.ui.missionsadd.MissionsAddViewModel" />
     </data>
 
     <androidx.constraintlayout.motion.widget.MotionLayout

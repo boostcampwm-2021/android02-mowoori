@@ -19,9 +19,10 @@
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
-    <style name="Theme.NumberPicker" parent="android:Widget.Material.NumberPicker">
-        <item name="android:textSize">40sp</item>
+    <style name="NumberPicker">
+        <item name="android:textSize">30sp</item>
         <item name="android:textStyle">bold</item>
+        <item name="android:colorControlNormal">@android:color/transparent</item>
         <item name="android:textColorPrimary">@color/sky_blue_2094FF</item>
     </style>
 </resources>
