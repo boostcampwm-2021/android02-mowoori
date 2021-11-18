@@ -33,47 +33,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
     // 1단계 눈내리는 애니메이션
     private var snowJob: Job? = null
-    private val snowAnimator by lazy {
-        SnowAnimator(
-            binding.containerHome,
-            homeViewModel,
-            requireContext()
-        )
-    }
+    private lateinit var snowAnimator: SnowAnimator
 
     // 2단계 눈사람 얼굴 애니메이션
-    private val snowmanLv2Animator by lazy {
-        SnowmanLv2Animator(
-            binding.ivHomeSnowmanFaceLv2,
-            homeViewModel,
-            requireContext()
-        )
-    }
+    private lateinit var snowmanLv2Animator: SnowmanLv2Animator
 
     // 3단계 눈사람 얼굴, 몸통 애니메이션
-    private val snowmanLv3Animator by lazy {
-        SnowmanLv3Animator(
-            binding.ivHomeSnowmanFaceLv3,
-            binding.ivHomeSnowmanBody,
-            arrayOf(
-                binding.ivHomeSnowmanButtonTop,
-                binding.ivHomeSnowmanButtonMiddle,
-                binding.ivHomeSnowmanButtonBottom
-            ),
-            homeViewModel,
-            requireContext()
-        )
-    }
+    private lateinit var snowmanLv3Animator: SnowmanLv3Animator
 
     // 4단계 눈사람 팔 애니메이션
-    private val snowmanLv4Animator by lazy {
-        SnowmanLv4Animator(Lv4Component(binding.layoutHomeSnowmanFaceLv4,
-            listOf(binding.ivHomeSnowmanLeftHand, binding.ivHomeSnowmanRightHand),
-            binding.ivHomeSnowmanBody,
-            listOf(binding.ivHomeFirstExclamation, binding.ivHomeSecondExclamation),
-            listOf(binding.ivHomeLeftHeart, binding.ivHomeRightHeart)),
-            homeViewModel, requireContext())
-    }
+    private lateinit var snowmanLv4Animator: SnowmanLv4Animator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,6 +54,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = homeViewModel
         binding.layoutHomeSnowmanFaceLv4.viewModel = homeViewModel
+        setAnimators()
         setUserInfoObserver()
         setGroupInfoListObserver()
         setDrawerOpenListener()
@@ -95,10 +65,31 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         setPlusClickListener()
     }
 
+    private fun setAnimators() {
+        snowAnimator = SnowAnimator(binding.containerHome, homeViewModel, requireContext())
+        snowmanLv2Animator =
+            SnowmanLv2Animator(binding.ivHomeSnowmanFaceLv2, homeViewModel, requireContext())
+        snowmanLv3Animator =
+            SnowmanLv3Animator(binding.ivHomeSnowmanFaceLv3, binding.ivHomeSnowmanBody,
+                arrayOf(
+                    binding.ivHomeSnowmanButtonTop,
+                    binding.ivHomeSnowmanButtonMiddle,
+                    binding.ivHomeSnowmanButtonBottom
+                ),
+                homeViewModel, requireContext())
+        snowmanLv4Animator = SnowmanLv4Animator(Lv4Component(binding.layoutHomeSnowmanFaceLv4,
+            listOf(binding.ivHomeSnowmanLeftHand, binding.ivHomeSnowmanRightHand),
+            binding.ivHomeSnowmanBody,
+            listOf(binding.ivHomeFirstExclamation, binding.ivHomeSecondExclamation),
+            listOf(binding.ivHomeLeftHeart, binding.ivHomeRightHeart)),
+            homeViewModel, requireContext())
+    }
+
     override fun onDestroyView() {
         Timber.d("destroy")
         homeViewModel.cancelSnowAnimator()
         homeViewModel.cancelAnimator()
+        homeViewModel.removeSources()
         super.onDestroyView()
     }
 
@@ -166,14 +157,21 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         homeViewModel.snowmanLevel.observe(viewLifecycleOwner) {
             updateWinterAnimation(it)
         }
-        homeViewModel.viewInfoMediator.observe(viewLifecycleOwner, {
-            if (it) {
-                snowmanLv4Animator.setObjectAnimators()
-            }
-        })
         homeViewModel.isBodyMeasured.observe(viewLifecycleOwner, {
             if (it) {
-                snowmanLv4Animator.setViewInfo()
+                snowmanLv4Animator.setBlackViewInfo()
+            }
+        })
+        homeViewModel.blackEyeViewInfoMediator.observe(viewLifecycleOwner, {
+            if (it) {
+                snowmanLv4Animator.setWhiteViewInfo()
+                homeViewModel.doneBlackViewInfo()
+            }
+        })
+        homeViewModel.whiteEyeViewInfoMediator.observe(viewLifecycleOwner, {
+            if (it) {
+                snowmanLv4Animator.setObjectAnimators()
+                homeViewModel.doneWhiteViewInfo()
             }
         })
     }
