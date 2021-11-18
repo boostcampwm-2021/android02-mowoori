@@ -74,14 +74,12 @@ class HomeViewModel @Inject constructor(
     }
 
     fun setCurrentGroupInfo(groupId: String) {
-        val currentGroupList = groupList.value ?: return
-        val tempGroupList = mutableListOf<Group>()
-        currentGroupList.forEach {
-            tempGroupList.add(it.copy())
-        }
-        tempGroupList.forEach {
-            it.selected = it.groupId == groupId
-            if (it.selected) _currentGroupInfo.value = it
+        val currGroupList = groupList.value ?: return
+        val tempGroupList = currGroupList.toMutableList().map {
+            val copyGroup = it.copy()
+            copyGroup.selected = copyGroup.groupId == groupId
+            if (copyGroup.selected) _currentGroupInfo.value = it
+            copyGroup
         }
         _groupList.value = tempGroupList
         homeRepository.setCurrentGroupId(groupId)
@@ -170,6 +168,13 @@ class HomeViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         println("HomeFragment onCleared")
+    }
+
+    fun doneViewInfo() {
+        _isLeftBlackViewInfoDone.value = false
+        _isLeftWhiteViewInfoDone.value = false
+        _isRightBlackViewInfoDone.value = false
+        _isRightWhiteViewInfoDone.value = false
     }
 
     fun removeSources() {

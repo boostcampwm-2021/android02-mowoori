@@ -158,6 +158,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         homeViewModel.viewInfoMediator.observe(viewLifecycleOwner, {
             if (it) {
                 snowmanLv4Animator.setObjectAnimators()
+                homeViewModel.doneViewInfo()
             }
         })
         homeViewModel.isBodyMeasured.observe(viewLifecycleOwner, {
