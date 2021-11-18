@@ -44,6 +44,7 @@ class SnowmanLv4Animator(
 
     fun start() {
         homeViewModel.addSources()
+        homeViewModel.resetAlphaForLv4()
         setXMLAnimators()
         initViewInfo()
     }
