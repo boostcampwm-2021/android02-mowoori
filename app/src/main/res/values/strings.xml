@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MoWoori</string>
+    <string name="app_name">모우리</string>
     <string name="binding_error">Binding not initialized to reference the view.</string>
     <string name="nothing">아무것도 없어요</string>
     <string name="desc_app_logo">앱 로고</string>
