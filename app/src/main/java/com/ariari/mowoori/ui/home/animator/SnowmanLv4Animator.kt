@@ -48,6 +48,7 @@ class SnowmanLv4Animator(
     }
 
     fun start() {
+        homeViewModel.resetAlphaForLv4()
         setXMLAnimators()
         initViewInfo()
     }

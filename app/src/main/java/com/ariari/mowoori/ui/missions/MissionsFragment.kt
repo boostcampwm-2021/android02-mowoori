@@ -50,7 +50,7 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
 
     private fun setMissionsRvAdapter() {
         binding.rvMissions.adapter = missionsAdapter
-        missionsViewModel.sendUserToLoadMissions(args.userId)
+        missionsViewModel.sendUserToLoadMissions(args.user)
     }
 
     private fun setPlusBtnClickObserver() {
@@ -61,7 +61,7 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
 
     private fun setMissionsTypeObserver() {
         missionsViewModel.missionsType.observe(viewLifecycleOwner, EventObserver {
-            missionsViewModel.sendUserToLoadMissions(args.userId)
+            missionsViewModel.sendUserToLoadMissions(args.user)
         })
     }
 

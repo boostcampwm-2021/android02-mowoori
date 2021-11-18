@@ -64,8 +64,10 @@ class StampDetailViewModel @Inject constructor(
         _comment.value = comment
     }
 
-    fun setPictureUri(uri: Uri) {
-        _pictureUri.value = uri
+    fun setPictureUri(uri: Uri?) {
+        uri?.let {
+            _pictureUri.value = it
+        }
     }
 
     fun setIsCertify(detailMode: DetailMode) {

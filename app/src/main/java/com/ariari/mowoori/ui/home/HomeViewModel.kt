@@ -40,7 +40,16 @@ class HomeViewModel @Inject constructor(
     private var _isSnowing = MutableLiveData(true)
     val isSnowing: LiveData<Boolean> = _isSnowing
 
+    private var _alphaForLv4 = MutableLiveData(0f)
+    val alphaForLv4: LiveData<Float> = _alphaForLv4
+
+    private val snowAnimatorList: MutableList<Animator> = mutableListOf()
+
     private val animatorList: MutableList<Animator> = mutableListOf()
+
+    fun resetAlphaForLv4() {
+        _alphaForLv4.value = 0f
+    }
 
     fun setUserInfo() {
         val uid = homeRepository.getUserUid()
@@ -102,9 +111,23 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun addSnowAnimator(anim: Animator) {
+        if (!snowAnimatorList.contains(anim)) {
+            snowAnimatorList.add(anim)
+        }
+    }
+
+
     fun addAnimator(anim: Animator) {
         if (!animatorList.contains(anim)) {
             animatorList.add(anim)
+        }
+    }
+
+    fun cancelSnowAnimator() {
+        snowAnimatorList.forEach {
+            it.removeAllListeners()
+            it.cancel()
         }
     }
 

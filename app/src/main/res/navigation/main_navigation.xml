@@ -33,7 +33,7 @@
         android:label="MissionsFragment"
         tools:layout="@layout/fragment_missions">
         <argument
-            android:name="userId"
+            android:name="user"
             android:defaultValue="@null"
             app:argType="com.ariari.mowoori.ui.register.entity.User"
             app:nullable="true" />
@@ -74,7 +74,7 @@
         tools:layout="@layout/fragment_notification" />
     <fragment
         android:id="@+id/missionsAddFragment"
-        android:name="com.ariari.mowoori.ui.missions_add.MissionsAddFragment"
+        android:name="com.ariari.mowoori.ui.missionsadd.MissionsAddFragment"
         android:label="MissionsAddFragment"
         tools:layout="@layout/fragment_missions_add" />
     <fragment

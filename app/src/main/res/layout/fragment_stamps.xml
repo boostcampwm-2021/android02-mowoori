@@ -6,6 +6,8 @@
 
         <import type="com.ariari.mowoori.ui.custom.TitleViewMode" />
 
+        <import type="android.view.View" />
+
         <variable
             name="viewModel"
             type="com.ariari.mowoori.ui.stamp.StampsViewModel" />
@@ -49,7 +51,7 @@
             android:textColor="@color/sky_blue_2094FF"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:visibility="@{viewModel.isMyMission().peekContent() ? 0 : 1}"
+            android:visibility="@{viewModel.isMyMission().peekContent() ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

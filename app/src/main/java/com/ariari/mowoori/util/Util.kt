@@ -12,6 +12,10 @@ fun getCurrentDate(): Int {
     return dateFormat.format(today).toInt()
 }
 
+fun getCurrentDateTime(): String {
+    return SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+}
+
 fun getCurrentDatePlusMonths(month: Int): Int {
     val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.KOREA)
     val calendar = Calendar.getInstance().apply {

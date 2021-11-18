@@ -117,10 +117,12 @@ class SnowmanLv3Animator(
         }
 
     private fun initSnowInfo() {
-        face.post {
-            faceInfo = ViewInfo(face.x, face.y, face.width.toFloat(), face.height.toFloat())
-            body.post {
+        body.post {
+            face.post {
                 bodyInfo = ViewInfo(body.x, body.y, body.width.toFloat(), body.height.toFloat())
+                face.x = (body.x - face.width) / 2
+                face.y = body.y + (body.height - face.height)
+                faceInfo = ViewInfo(face.x, face.y, face.width.toFloat(), face.height.toFloat())
                 initHorizontalAnimator()
                 startFirstAnimation()
             }
