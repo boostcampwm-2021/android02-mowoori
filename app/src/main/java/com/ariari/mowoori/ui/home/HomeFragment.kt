@@ -155,15 +155,21 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         homeViewModel.snowmanLevel.observe(viewLifecycleOwner) {
             updateWinterAnimation(it)
         }
-        homeViewModel.viewInfoMediator.observe(viewLifecycleOwner, {
-            if (it) {
-                snowmanLv4Animator.setObjectAnimators()
-                homeViewModel.doneViewInfo()
-            }
-        })
         homeViewModel.isBodyMeasured.observe(viewLifecycleOwner, {
             if (it) {
-                snowmanLv4Animator.setViewInfo()
+                snowmanLv4Animator.setBlackViewInfo()
+            }
+        })
+        homeViewModel.blackEyeViewInfoMediator.observe(viewLifecycleOwner, {
+            if (it) {
+                snowmanLv4Animator.setWhiteViewInfo()
+                homeViewModel.doneBlackViewInfo()
+            }
+        })
+        homeViewModel.whiteEyeViewInfoMediator.observe(viewLifecycleOwner, {
+            if (it) {
+                snowmanLv4Animator.setObjectAnimators()
+                homeViewModel.doneWhiteViewInfo()
             }
         })
     }

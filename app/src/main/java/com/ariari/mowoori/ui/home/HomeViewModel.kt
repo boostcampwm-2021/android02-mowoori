@@ -121,22 +121,26 @@ class HomeViewModel @Inject constructor(
     private val _isLeftWhiteViewInfoDone = MutableLiveData<Boolean>()
     private val _isRightBlackViewInfoDone = MutableLiveData<Boolean>()
     private val _isRightWhiteViewInfoDone = MutableLiveData<Boolean>()
-    private val _viewInfoMediator = MediatorLiveData<Boolean>()
-    val viewInfoMediator: LiveData<Boolean> = _viewInfoMediator
+    private val _blackEyeViewInfoMediator = MediatorLiveData<Boolean>()
+    val blackEyeViewInfoMediator: LiveData<Boolean> = _blackEyeViewInfoMediator
+    private val _whiteEyeViewInfoMediator = MediatorLiveData<Boolean>()
+    val whiteEyeViewInfoMediator: LiveData<Boolean> = _whiteEyeViewInfoMediator
 
     fun addSources() {
-        with(_viewInfoMediator) {
+        with(_blackEyeViewInfoMediator) {
             addSource(_isLeftBlackViewInfoDone) {
-                this.value = isViewInfoDone()
-            }
-            addSource(_isLeftWhiteViewInfoDone) {
-                this.value = isViewInfoDone()
+                this.value = isBlackEyeViewInfoDone()
             }
             addSource(_isRightBlackViewInfoDone) {
-                this.value = isViewInfoDone()
+                this.value = isBlackEyeViewInfoDone()
+            }
+        }
+        with(_whiteEyeViewInfoMediator) {
+            addSource(_isLeftWhiteViewInfoDone) {
+                this.value = isWhiteEyeViewInfoDone()
             }
             addSource(_isRightWhiteViewInfoDone) {
-                this.value = isViewInfoDone()
+                this.value = isWhiteEyeViewInfoDone()
             }
         }
     }
@@ -145,8 +149,12 @@ class HomeViewModel @Inject constructor(
         _isBodyMeasured.value = true
     }
 
-    private fun isViewInfoDone(): Boolean {
-        return _isLeftBlackViewInfoDone.value == true && _isLeftWhiteViewInfoDone.value == true && _isRightBlackViewInfoDone.value == true && _isRightWhiteViewInfoDone.value == true
+    private fun isBlackEyeViewInfoDone(): Boolean {
+        return _isLeftBlackViewInfoDone.value == true && _isRightBlackViewInfoDone.value == true
+    }
+
+    private fun isWhiteEyeViewInfoDone(): Boolean {
+        return _isLeftWhiteViewInfoDone.value == true && _isRightWhiteViewInfoDone.value == true
     }
 
     fun leftBlackViewInfoDone() {
@@ -165,23 +173,23 @@ class HomeViewModel @Inject constructor(
         _isRightWhiteViewInfoDone.value = true
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        println("HomeFragment onCleared")
+    fun doneBlackViewInfo() {
+        _isLeftBlackViewInfoDone.value = false
+        _isRightBlackViewInfoDone.value = false
     }
 
-    fun doneViewInfo() {
-        _isLeftBlackViewInfoDone.value = false
+    fun doneWhiteViewInfo() {
         _isLeftWhiteViewInfoDone.value = false
-        _isRightBlackViewInfoDone.value = false
         _isRightWhiteViewInfoDone.value = false
     }
 
     fun removeSources() {
-        with(_viewInfoMediator) {
+        with(_blackEyeViewInfoMediator) {
             removeSource(_isLeftBlackViewInfoDone)
-            removeSource(_isLeftWhiteViewInfoDone)
             removeSource(_isRightBlackViewInfoDone)
+        }
+        with(_whiteEyeViewInfoMediator) {
+            removeSource(_isLeftWhiteViewInfoDone)
             removeSource(_isRightWhiteViewInfoDone)
         }
     }
