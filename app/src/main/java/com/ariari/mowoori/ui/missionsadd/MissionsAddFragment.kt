@@ -158,7 +158,7 @@ class MissionsAddFragment :
 
     private fun isMissionNameValid(): Boolean {
         with(binding.tvMissionsAddWhatInvalid) {
-            return@isMissionNameValid if (binding.etMissionsAddWhat.text.length !in 1..10) {
+            return@isMissionNameValid if (binding.etMissionsAddWhat.text.length !in 1..15) {
                 isVisible = true
                 getVibrateAnimInstance().run {
                     setTarget(binding.tvMissionsAddWhatInvalid)

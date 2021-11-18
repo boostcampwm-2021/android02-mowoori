@@ -87,7 +87,7 @@
     <string name="missions_add_count_front">미션을</string>
     <string name="missions_add_count_back">번 수행할거예요.</string>
     <string name="missions_add_when_start">부터</string>
-    <string name="missions_add_what_invalid">1~10자 사이로 입력해주세요.</string>
+    <string name="missions_add_what_invalid">1~15자 사이로 입력해주세요.</string>
     <string name="missions_add_when_start_title">시작일</string>
     <string name="missions_add_when_start_hint">2021년 10월 11일</string>
     <string name="missions_add_when_end_title">종료일</string>
