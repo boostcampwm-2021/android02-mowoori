@@ -9,7 +9,6 @@ import com.ariari.mowoori.R
 import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentMissionsBinding
 import com.ariari.mowoori.ui.missions.adapter.MissionsAdapter
-import com.ariari.mowoori.ui.register.entity.User
 import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.widget.ProgressDialogManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -76,15 +75,15 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
         missionsViewModel.itemClick.observe(viewLifecycleOwner, EventObserver {
             findNavController().navigate(
                 MissionsFragmentDirections.actionMissionsFragmentToStampsFragment(
-                    it, userName
+                    missionsViewModel.user.value!!.peekContent(), it.missionId
                 )
             )
         })
     }
 
     private fun setUserNameObserver() {
-        missionsViewModel.userName.observe(viewLifecycleOwner, EventObserver {
-            userName = it
+        missionsViewModel.user.observe(viewLifecycleOwner, EventObserver {
+            userName = it.userInfo.nickname
         })
     }
 }

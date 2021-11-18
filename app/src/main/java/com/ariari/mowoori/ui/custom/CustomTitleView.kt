@@ -62,8 +62,10 @@ class CustomTitleView : ConstraintLayout {
     }
 
 
-    fun setTitleViewText(title: String) {
-        binding.tvCustomTitleViewTitle.text = title
+    fun setTitleViewText(title: String?) {
+        title?.let {
+            binding.tvCustomTitleViewTitle.text = title
+        }
     }
 
     fun setTitleViewMode(mode: Int) {

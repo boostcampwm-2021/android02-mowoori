@@ -4,6 +4,7 @@ import com.ariari.mowoori.ui.missions.entity.Mission
 import com.ariari.mowoori.ui.missions.entity.MissionInfo
 import com.ariari.mowoori.ui.register.entity.User
 import com.ariari.mowoori.ui.register.entity.UserInfo
+import com.ariari.mowoori.util.LogUtil
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.GenericTypeIndicator
@@ -53,27 +54,36 @@ class MissionsRepositoryImpl @Inject constructor(
         User(uid, userInfo)
     }
 
+    override suspend fun getMissionInfo(missionId: String): Result<MissionInfo> =
+        kotlin.runCatching {
+            val snapshot = firebaseReference.child("missions/$missionId").get().await()
+            LogUtil.log("getMission Impl", snapshot.getValue(MissionInfo::class.java).toString())
+            val missionInfo = snapshot.getValue(MissionInfo::class.java)
+                ?: throw NullPointerException("mission is null")
+            missionInfo
+        }
+
     override suspend fun isExistGroupId(groupId: String): Boolean {
         val snapshot = firebaseReference.child("groups/$groupId").get().await()
         return snapshot.exists()
     }
 
-    override suspend fun postMission(missionInfo: MissionInfo, groupId:String, missionIdList: List<String>) {
+    override suspend fun postMission(
+        missionInfo: MissionInfo,
+        groupId: String,
+        missionIdList: List<String>
+    ) {
         val missionId = firebaseReference.child("missions").push().key
         missionId?.let {
             val updatedMissionList = missionIdList.toMutableList().apply {
-                    add(missionId)
-                }
+                add(missionId)
+            }
 
             val childUpdates = hashMapOf(
                 "missions/$missionId" to missionInfo,
                 "groups/$groupId/missionList" to updatedMissionList
             )
             firebaseReference.updateChildren(childUpdates)
-
-//            firebaseReference.child("missions").child(mission.missionId)
-//                .setValue(mission.missionInfo).await()
-
             missionId
         }
     }

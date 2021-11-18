@@ -83,10 +83,10 @@
         android:label="StampsFragment"
         tools:layout="@layout/fragment_stamps">
         <argument
-            android:name="mission"
-            app:argType="com.ariari.mowoori.ui.missions.entity.Mission" />
+            android:name="user"
+            app:argType="com.ariari.mowoori.ui.register.entity.User" />
         <argument
-            android:name="userName"
+            android:name="missionId"
             app:argType="string" />
         <action
             android:id="@+id/action_stampsFragment_to_stampDetailFragment"

@@ -15,6 +15,7 @@ import com.ariari.mowoori.ui.stamp.entity.Stamp
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
 import com.ariari.mowoori.util.LogUtil
 import com.bumptech.glide.Glide
+import timber.log.Timber
 
 class StampsAdapter(private val listener: OnItemClickListener) :
     ListAdapter<Stamp, StampsAdapter.StampViewHolder>(stampsDiffUtil) {
@@ -44,6 +45,7 @@ class StampsAdapter(private val listener: OnItemClickListener) :
 
         fun bind(stampInfo: StampInfo) {
             ViewCompat.setTransitionName(binding.ivItemStamps, stampInfo.pictureUrl)
+            Timber.d(adapterPosition.toString())
             binding.tvItemStampsIndex.text = (adapterPosition + 1).toString()
             // TODO: 이런 로직은 뷰모델에서 해야하는데, 어댑터에 대한 뷰모델을 만들어아 할까?
             when {
