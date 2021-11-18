@@ -1,4 +1,4 @@
-package com.ariari.mowoori.ui.missions_add
+package com.ariari.mowoori.ui.missionsadd
 
 import android.animation.Animator
 import android.animation.AnimatorInflater
@@ -81,7 +81,14 @@ class MissionsAddFragment :
                     override fun onDialogPositiveClick(dialog: DialogFragment) {
                         val np =
                             (dialog as NumberPickerDialogFragment).binding.numberPickerMissionCount
-                        missionsAddViewModel.updateMissionCount(np.value)
+                        missionsAddViewModel.updateMissionCount(
+                            when (np.value) {
+                                0 -> 10
+                                1 -> 20
+                                2 -> 30
+                                else -> throw IllegalAccessException()
+                            }
+                        )
                         dialog.dismiss()
                     }
 

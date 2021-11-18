@@ -1,4 +1,4 @@
-package com.ariari.mowoori.ui.missions_add
+package com.ariari.mowoori.ui.missionsadd
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
