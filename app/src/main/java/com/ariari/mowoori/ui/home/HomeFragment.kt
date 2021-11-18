@@ -97,6 +97,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
     override fun onDestroyView() {
         Timber.d("destroy")
+        homeViewModel.cancelSnowAnimator()
         homeViewModel.cancelAnimator()
         super.onDestroyView()
     }
@@ -151,6 +152,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         adapter = DrawerAdapter(object : DrawerAdapter.OnItemClickListener {
             override fun itemClick(groupId: String) {
                 homeViewModel.setCurrentGroupInfo(groupId)
+                homeViewModel.cancelAnimator()
                 binding.drawerHome.close()
             }
         })
@@ -188,7 +190,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
                 LogUtil.log("start", snowJob.toString())
                 snowJob = launch {
                     while (isActive) {
-                        snowAnimator.dropSnow(100L)
+                        snowAnimator.dropSnow(200L)
                     }
                 }
             } else {

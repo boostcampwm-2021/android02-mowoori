@@ -25,6 +25,7 @@ class SnowAnimator(
         // snow 크기 설정
         scaleX = Random.nextFloat() * .3f + .2f
         scaleY = scaleX
+        alpha = 0.7f
     }
 
     suspend fun dropSnow(delayTime: Long) {
@@ -48,7 +49,7 @@ class SnowAnimator(
 
         val snowAnimSet = AnimatorSet().apply {
             playTogether(moverX, moverY)
-            duration = (Math.random() * 3000 + 3000).toLong()
+            duration = (Math.random() * 3000 + 9000).toLong()
             addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationCancel(animation: Animator?) {
                     super.onAnimationCancel(animation)
@@ -61,7 +62,7 @@ class SnowAnimator(
                 }
             })
         }
-        homeViewModel.addAnimator(snowAnimSet)
+        homeViewModel.addSnowAnimator(snowAnimSet)
         snowAnimSet.start()
         delay(delayTime)
     }
