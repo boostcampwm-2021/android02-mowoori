@@ -8,31 +8,68 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavDirections
+import androidx.navigation.fragment.findNavController
 import com.ariari.mowoori.R
 import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentMembersBinding
+import com.ariari.mowoori.ui.members.adapter.MembersAdapter
+import com.ariari.mowoori.ui.register.entity.User
+import com.ariari.mowoori.ui.register.entity.UserInfo
+import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.util.toastMessage
 import com.ariari.mowoori.widget.InviteDialogFragment
+import com.ariari.mowoori.widget.ProgressDialogManager
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MembersFragment : BaseFragment<FragmentMembersBinding>(R.layout.fragment_members) {
-    private val viewModel: MembersViewModel by viewModels()
+    private val membersViewModel: MembersViewModel by viewModels()
+    private val membersAdapter by lazy { MembersAdapter { user -> moveToMissionsFragment(user) } }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = viewModel
-        viewModel.fetchGroupInfo()
+        binding.viewModel = membersViewModel
+        membersViewModel.setLoadingEvent(true)
+        membersViewModel.fetchGroupInfo()
+        setLoadingObserver()
         setOpenDialogEventObserver()
+        setCurrentGroupObserver()
+        setMembersListObserver()
+        setMembersRvAdapter()
+    }
+
+    private fun setLoadingObserver() {
+        membersViewModel.loadingEvent.observe(viewLifecycleOwner, EventObserver { isLoading ->
+            if (isLoading) ProgressDialogManager.instance.show(requireContext())
+            else ProgressDialogManager.instance.clear()
+        })
     }
 
     private fun setOpenDialogEventObserver() {
-        viewModel.openInviteDialogEvent.observe(viewLifecycleOwner, {
+        membersViewModel.openInviteDialogEvent.observe(viewLifecycleOwner, {
             it.peekContent()?.let { groupId ->
                 showInviteDialog(groupId)
             }
         })
+    }
+
+    private fun setCurrentGroupObserver() {
+        membersViewModel.currentGroup.observe(viewLifecycleOwner) {
+            membersViewModel.fetchMemberList()
+        }
+    }
+
+    private fun setMembersListObserver() {
+        membersViewModel.membersList.observe(viewLifecycleOwner) {
+            membersAdapter.submitList(it)
+            membersViewModel.setLoadingEvent(false)
+        }
+    }
+
+    private fun setMembersRvAdapter() {
+        binding.rvMembers.adapter = membersAdapter
     }
 
     private fun showInviteDialog(groupId: String) {
@@ -64,7 +101,12 @@ class MembersFragment : BaseFragment<FragmentMembersBinding>(R.layout.fragment_m
             putExtra(Intent.EXTRA_TEXT, text)
         }
         startActivity(shareIntent)
+    }
 
+    private fun moveToMissionsFragment(user: User) {
+        findNavController().navigate(
+            MembersFragmentDirections.actionMembersFragmentToMissionsFragment(user)
+        )
     }
 
 }

@@ -4,7 +4,7 @@ import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import com.ariari.mowoori.R
-import com.ariari.mowoori.util.TimberUtil
+import com.ariari.mowoori.util.LogUtil
 
 class ProgressDialogManager {
     private var progressDialog: ProgressDialog? = null
@@ -18,7 +18,7 @@ class ProgressDialogManager {
             progressDialog = ProgressDialog(context)
             progressDialog?.show()
         } catch (e: Exception) {
-            TimberUtil.timber("ProgressDialogManager", "clear: $e")
+            LogUtil.log("ProgressDialogManager", "clear: $e")
         }
     }
 
@@ -30,7 +30,7 @@ class ProgressDialogManager {
                 progressDialog = null
             }
         } catch (e: Exception) {
-            TimberUtil.timber("ProgressDialogManager", "clear: $e")
+            LogUtil.log("ProgressDialogManager", "clear: $e")
         }
     }
 

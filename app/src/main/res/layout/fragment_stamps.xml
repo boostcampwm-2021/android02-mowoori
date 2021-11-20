@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
         <import type="com.ariari.mowoori.ui.custom.TitleViewMode" />
+
+        <import type="android.view.View" />
 
         <variable
             name="viewModel"
@@ -25,7 +26,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:onBackClick="@{viewModel::setBackBtnClick}"
             app:titleViewMode="@{TitleViewMode.TITLE_VIEW_BACK_BUTTON}"
-            app:titleViewText="@{viewModel.missionName.peekContent()}" />
+            app:titleViewText="@{viewModel.mission.missionInfo.missionName}" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_stamps"
@@ -33,11 +34,11 @@
             android:layout_height="0dp"
             android:layout_margin="32dp"
             android:padding="10dp"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:layout_constraintBottom_toTopOf="@id/btn_stamps_complete"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/title_view_stamps"
-            tools:listitem="@layout/item_stamps" />
+            app:layout_constraintTop_toBottomOf="@id/title_view_stamps" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_stamps_complete"
@@ -50,7 +51,7 @@
             android:textColor="@color/sky_blue_2094FF"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:visibility="@{viewModel.isMyMission().peekContent() ? 0 : 1}"
+            android:visibility="@{viewModel.isMyMission().peekContent() ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

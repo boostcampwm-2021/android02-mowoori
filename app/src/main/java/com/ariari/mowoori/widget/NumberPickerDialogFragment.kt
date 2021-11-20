@@ -18,11 +18,11 @@ class NumberPickerDialogFragment(private val now: Int, private val listener: Not
 
     private fun setNumberPicker() {
         binding.numberPickerMissionCount.apply {
-            value = now
-            maxValue = 30
-            minValue = 10
             wrapSelectorWheel = false
-            descendantFocusability = NumberPicker.FOCUS_BLOCK_DESCENDANTS
+            minValue = 0
+            maxValue = 2
+            displayedValues = arrayOf("10", "20", "30")
+            //descendantFocusability = NumberPicker.FOCUS_BLOCK_DESCENDANTS
         }
     }
 

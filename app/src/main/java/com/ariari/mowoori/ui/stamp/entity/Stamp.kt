@@ -12,5 +12,5 @@ data class Stamp(
 data class StampInfo(
     val pictureUrl: String = "",
     val comment: String = "",
-    val timeStamp: Long = 0,
+    val timeStamp: Int = 0,
 ) : Parcelable

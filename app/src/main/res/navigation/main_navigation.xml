@@ -22,12 +22,21 @@
         android:id="@+id/membersFragment"
         android:name="com.ariari.mowoori.ui.members.MembersFragment"
         android:label="MembersFragment"
-        tools:layout="@layout/fragment_members" />
+        tools:layout="@layout/fragment_members">
+        <action
+            android:id="@+id/action_membersFragment_to_missionsFragment"
+            app:destination="@id/missionsFragment" />
+    </fragment>
     <fragment
         android:id="@+id/missionsFragment"
         android:name="com.ariari.mowoori.ui.missions.MissionsFragment"
         android:label="MissionsFragment"
         tools:layout="@layout/fragment_missions">
+        <argument
+            android:name="user"
+            android:defaultValue="@null"
+            app:argType="com.ariari.mowoori.ui.register.entity.User"
+            app:nullable="true" />
         <action
             android:id="@+id/action_missionsFragment_to_missionsAddFragment"
             app:destination="@id/missionsAddFragment" />
@@ -65,7 +74,7 @@
         tools:layout="@layout/fragment_notification" />
     <fragment
         android:id="@+id/missionsAddFragment"
-        android:name="com.ariari.mowoori.ui.missions_add.MissionsAddFragment"
+        android:name="com.ariari.mowoori.ui.missionsadd.MissionsAddFragment"
         android:label="MissionsAddFragment"
         tools:layout="@layout/fragment_missions_add" />
     <fragment
@@ -74,14 +83,14 @@
         android:label="StampsFragment"
         tools:layout="@layout/fragment_stamps">
         <argument
-            android:name="missionInfo"
-            app:argType="com.ariari.mowoori.ui.missions.entity.MissionInfo" />
+            android:name="user"
+            app:argType="com.ariari.mowoori.ui.register.entity.User" />
+        <argument
+            android:name="missionId"
+            app:argType="string" />
         <action
             android:id="@+id/action_stampsFragment_to_stampDetailFragment"
             app:destination="@id/stampDetailFragment" />
-        <argument
-            android:name="userName"
-            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/stampDetailFragment"

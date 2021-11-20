@@ -1,14 +1,13 @@
-package com.ariari.mowoori.ui.missions_add
+package com.ariari.mowoori.ui.missionsadd
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.MissionsRepository
-import com.ariari.mowoori.ui.missions.entity.Mission
 import com.ariari.mowoori.ui.missions.entity.MissionInfo
 import com.ariari.mowoori.util.Event
-import com.ariari.mowoori.util.TimberUtil
+import com.ariari.mowoori.util.LogUtil
 import com.ariari.mowoori.util.getCurrentDate
 import com.ariari.mowoori.util.getCurrentDatePlusMonths
 import com.ariari.mowoori.util.getMissionIntFormatDate
@@ -55,17 +54,16 @@ class MissionsAddViewModel @Inject constructor(
     fun postMission(missionName: String) {
         viewModelScope.launch(Dispatchers.IO) {
             missionsRepository.getUser().onSuccess { user ->
-                // missionIdList에 항목 추가
+                val missionInfo = getMissionInfo(user.userId, missionName)
                 var missionIdList =
                     missionsRepository.getMissionIdList(user.userInfo.currentGroupId)
-                val mission = createMission(user.userId, missionName)
 
-                if (missionIdList.isEmpty()) missionIdList = mutableListOf()
-                (missionIdList as MutableList).add(mission.missionId)
-                missionsRepository.postMissionIdList(user.userInfo.currentGroupId, missionIdList)
-
-                // missions에 mission 추가
-                missionsRepository.postMission(mission)
+                // missions에 missionInfo 추가, currentGroup의 missionList에 missionInfo 추가
+                missionsRepository.postMission(
+                    missionInfo,
+                    user.userInfo.currentGroupId,
+                    missionIdList
+                )
 
                 // 화면 종료 Event 실행
                 _isMissionPosted.postValue(Event(Unit))
@@ -75,16 +73,13 @@ class MissionsAddViewModel @Inject constructor(
         }
     }
 
-    private fun createMission(userId: String, missionName: String): Mission {
-        return Mission(
-            missionName,
-            MissionInfo(
-                missionName = missionName,
-                userId = userId,
-                totalStamp = missionCount.value!!,
-                startDate = missionStartDate.value!!,
-                dueDate = missionEndDate.value!!
-            )
+    private fun getMissionInfo(userId: String, missionName: String): MissionInfo {
+        return MissionInfo(
+            missionName = missionName,
+            userId = userId,
+            totalStamp = missionCount.value!!,
+            startDate = missionStartDate.value!!,
+            dueDate = missionEndDate.value!!
         )
     }
 
@@ -98,7 +93,7 @@ class MissionsAddViewModel @Inject constructor(
 
     fun updateMissionStartDate(year: Int, month: Int, date: Int) {
         _missionStartDate.value = getMissionIntFormatDate(year, month, date)
-        TimberUtil.timber("update", _missionStartDate.value.toString())
+        LogUtil.log("update", _missionStartDate.value.toString())
     }
 
     fun updateMissionEndDate(year: Int, month: Int, date: Int) {

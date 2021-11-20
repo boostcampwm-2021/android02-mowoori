@@ -9,12 +9,14 @@
 
         <variable
             name="viewModel"
-            type="com.ariari.mowoori.ui.missions_add.MissionsAddViewModel" />
+            type="com.ariari.mowoori.ui.missionsadd.MissionsAddViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.constraintlayout.motion.widget.MotionLayout
+        android:id="@+id/constraintLayout4"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:layoutDescription="@xml/fragment_missions_add_xml_constraintlayout_scene"
         tools:context=".ui.missions_add.MissionsAddFragment">
 
         <com.ariari.mowoori.ui.custom.CustomTitleView
@@ -29,7 +31,7 @@
 
         <TextView
             android:id="@+id/tv_missions_add_what_title"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="@string/missions_add_what_mission_title"
@@ -41,11 +43,11 @@
 
         <EditText
             android:id="@+id/et_missions_add_what"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="4dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="80dp"
             android:autofillHints="no"
             android:cursorVisible="false"
             android:focusable="true"
@@ -54,6 +56,7 @@
             android:inputType="textNoSuggestions"
             android:textColor="@color/sky_blue_2094FF"
             android:textSize="22sp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_missions_add_what_title" />
 
@@ -72,7 +75,7 @@
 
         <TextView
             android:id="@+id/tv_missions_add_when_title"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="24dp"
@@ -210,5 +213,12 @@
             app:strokeColor="@color/sky_blue_2094FF"
             app:strokeWidth="2dp" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="0dp" />
+
+    </androidx.constraintlayout.motion.widget.MotionLayout>
 </layout>

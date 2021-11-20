@@ -38,12 +38,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setBottomNavVisibility() {
-        navController.addOnDestinationChangedListener { _, destination, _ ->
+        navController.addOnDestinationChangedListener { _, destination, arguments ->
             when (destination.id) {
                 R.id.homeFragment, R.id.membersFragment -> showBottomNav()
                 R.id.missionsFragment -> {
-                    // 나의 미션 or 구성원의 미션에 따라 달라짐.
-                    showBottomNav()
+                    if (arguments?.get("user") != null) {
+                        // 구성원의 미션
+                        hideBottomNav()
+                    } else {
+                        // 나의 미션
+                        showBottomNav()
+                    }
                 }
                 else -> hideBottomNav()
             }

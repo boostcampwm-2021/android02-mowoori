@@ -11,6 +11,7 @@ import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.CustomTitleViewBinding
 import com.ariari.mowoori.ui.custom.TitleViewMode.Companion.TITLE_VIEW_BACK_BUTTON
 import com.ariari.mowoori.ui.custom.TitleViewMode.Companion.TITLE_VIEW_CLOSE_BUTTON
+import com.ariari.mowoori.ui.custom.TitleViewMode.Companion.TITLE_VIEW_INVITE_BUTTON
 import com.ariari.mowoori.ui.custom.TitleViewMode.Companion.TITLE_VIEW_PLUS_BUTTON
 import java.lang.IllegalStateException
 
@@ -61,8 +62,10 @@ class CustomTitleView : ConstraintLayout {
     }
 
 
-    fun setTitleViewText(title: String) {
-        binding.tvCustomTitleViewTitle.text = title
+    fun setTitleViewText(title: String?) {
+        title?.let {
+            binding.tvCustomTitleViewTitle.text = title
+        }
     }
 
     fun setTitleViewMode(mode: Int) {
@@ -71,6 +74,7 @@ class CustomTitleView : ConstraintLayout {
             TITLE_VIEW_BACK_BUTTON -> binding.btnCustomTitleViewBack.visibility = View.VISIBLE
             TITLE_VIEW_CLOSE_BUTTON -> binding.btnCustomTitleViewClose.visibility = View.VISIBLE
             TITLE_VIEW_PLUS_BUTTON -> binding.btnCustomTitleViewPlus.visibility = View.VISIBLE
+            TITLE_VIEW_INVITE_BUTTON -> binding.btnCustomTitleViewInvite.visibility = View.VISIBLE
             else -> throw IllegalStateException()
         }
     }
@@ -85,5 +89,9 @@ class CustomTitleView : ConstraintLayout {
 
     fun setOnPlusClick(clickEvent: () -> Unit) {
         binding.btnCustomTitleViewPlus.setOnClickListener { clickEvent() }
+    }
+
+    fun setOnInviteClick(clickEvent: () -> Unit) {
+        binding.btnCustomTitleViewInvite.setOnClickListener { clickEvent() }
     }
 }
