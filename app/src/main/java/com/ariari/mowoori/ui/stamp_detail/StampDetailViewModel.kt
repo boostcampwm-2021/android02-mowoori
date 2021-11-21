@@ -22,6 +22,9 @@ import javax.inject.Inject
 class StampDetailViewModel @Inject constructor(
     private val stampsRepository: StampsRepository
 ) : ViewModel() {
+    private val _loadingEvent = MutableLiveData<Event<Boolean>>()
+    val loadingEvent: LiveData<Event<Boolean>> get() = _loadingEvent
+
     private val _closeBtnClick = MutableLiveData<Event<Boolean>>()
     val closeBtnClick: LiveData<Event<Boolean>> get() = _closeBtnClick
 
@@ -45,6 +48,10 @@ class StampDetailViewModel @Inject constructor(
 
     private val _isStampPosted = MutableLiveData<Event<Unit>>()
     val isStampPosted: LiveData<Event<Unit>> get() = _isStampPosted
+
+    fun setLoadingEvent(flag: Boolean) {
+        _loadingEvent.postValue(Event(flag))
+    }
 
     fun setCloseBtnClick() {
         _closeBtnClick.value = Event(true)
@@ -81,6 +88,7 @@ class StampDetailViewModel @Inject constructor(
     }
 
     fun postStamp() {
+        setLoadingEvent(true)
         viewModelScope.launch(IO) {
             stampsRepository.putCertificationImage(pictureUri.value!!, missionId.value!!)
                 .onSuccess { uri ->
@@ -94,6 +102,7 @@ class StampDetailViewModel @Inject constructor(
                             stampsRepository.postStamp(stampInfo, Mission(missionId.value!!, it))
                                 .onSuccess {
                                     _isStampPosted.postValue(Event(Unit))
+                                    setLoadingEvent(false)
                                 }.onFailure {
                                     throw Exception("stampInfo is not Posted.")
                                 }
