@@ -27,6 +27,7 @@ import com.ariari.mowoori.util.LogUtil
 import com.ariari.mowoori.util.getCurrentDateTime
 import com.ariari.mowoori.util.toastMessage
 import com.ariari.mowoori.widget.PictureDialogFragment
+import com.ariari.mowoori.widget.ProgressDialogManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -37,7 +38,7 @@ import java.io.File
 @AndroidEntryPoint
 class StampDetailFragment :
     BaseFragment<FragmentStampDetailBinding>(R.layout.fragment_stamp_detail) {
-    private val viewModel: StampDetailViewModel by viewModels()
+    private val stampViewModel: StampDetailViewModel by viewModels()
     private val safeArgs: StampDetailFragmentArgs by navArgs()
     private lateinit var detailInfo: DetailInfo
 
@@ -75,7 +76,7 @@ class StampDetailFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = viewModel
+        binding.viewModel = stampViewModel
         init()
         setListener()
         setObserver()
@@ -99,6 +100,7 @@ class StampDetailFragment :
     }
 
     private fun setObserver() {
+        setLoadingObserver()
         setIsMissionPostedObserver()
         setCloseBtnClickObserver()
         setIsCertifyObserver()
@@ -116,7 +118,7 @@ class StampDetailFragment :
     }
 
     private fun setBtnVisible() {
-        viewModel.setIsCertify(detailInfo.detailMode)
+        stampViewModel.setIsCertify(detailInfo.detailMode)
     }
 
     private fun setDetailTransitionName() {
@@ -124,19 +126,19 @@ class StampDetailFragment :
     }
 
     private fun setUserName() {
-        viewModel.setUserName(detailInfo.userName)
+        stampViewModel.setUserName(detailInfo.userName)
     }
 
     private fun setMissionId() {
-        viewModel.setMissionId(detailInfo.missionId)
+        stampViewModel.setMissionId(detailInfo.missionId)
     }
 
     private fun setMissionName() {
-        viewModel.setMissionName(detailInfo.missionName)
+        stampViewModel.setMissionName(detailInfo.missionName)
     }
 
     private fun setComment() {
-        viewModel.setComment(detailInfo.stampInfo.comment)
+        stampViewModel.setComment(detailInfo.stampInfo.comment)
     }
 
     private fun setPictureClickListener() {
@@ -159,8 +161,8 @@ class StampDetailFragment :
 
     private fun setBtnCertifyListener() {
         binding.btnStampDetailCertify.setOnClickListener {
-            viewModel.setComment(binding.etStampDetailComment.text.toString())
-            viewModel.postStamp()
+            stampViewModel.setComment(binding.etStampDetailComment.text.toString())
+            stampViewModel.postStamp()
         }
     }
 
@@ -227,7 +229,7 @@ class StampDetailFragment :
     }
 
     private fun saveCurrentPicture(uri: Uri?) {
-        viewModel.setPictureUri(uri)
+        stampViewModel.setPictureUri(uri)
         Glide.with(requireContext())
             .load(uri)
             .override(300, 300)
@@ -262,13 +264,13 @@ class StampDetailFragment :
     }
 
     private fun setCloseBtnClickObserver() {
-        viewModel.closeBtnClick.observe(viewLifecycleOwner, EventObserver {
+        stampViewModel.closeBtnClick.observe(viewLifecycleOwner, EventObserver {
             this.findNavController().popBackStack()
         })
     }
 
     private fun setIsCertifyObserver() {
-        viewModel.isCertify.observe(viewLifecycleOwner, EventObserver {
+        stampViewModel.isCertify.observe(viewLifecycleOwner, EventObserver {
             if (it) {
                 binding.btnStampDetailCertify.isVisible = true
                 binding.tvStampDetailComment.isFocusable = true
@@ -280,15 +282,22 @@ class StampDetailFragment :
     }
 
     private fun setCommentObserver() {
-        viewModel.comment.observe(viewLifecycleOwner) {
+        stampViewModel.comment.observe(viewLifecycleOwner) {
             binding.etStampDetailComment.setText(it)
         }
     }
 
     private fun setIsMissionPostedObserver() {
-        viewModel.isStampPosted.observe(viewLifecycleOwner, EventObserver {
+        stampViewModel.isStampPosted.observe(viewLifecycleOwner, EventObserver {
             // TODO: 알림 발생
             this.findNavController().popBackStack()
+        })
+    }
+
+    private fun setLoadingObserver() {
+        stampViewModel.loadingEvent.observe(viewLifecycleOwner, EventObserver { isLoading ->
+            if (isLoading) ProgressDialogManager.instance.show(requireContext())
+            else ProgressDialogManager.instance.clear()
         })
     }
 }

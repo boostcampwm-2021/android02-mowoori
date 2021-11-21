@@ -56,8 +56,6 @@ class StampsAdapter(private val listener: OnItemClickListener) :
                         .circleCrop()
                         .into(binding.ivItemStamps)
 
-//                    binding.ivItemStamps.setImageResource(R.drawable.ic_launcher_background)
-//                    binding.ivItemStamps.clipToOutline = true
                     binding.tvItemStampsIndex.isInvisible = true
                     binding.containerItemStamps.isClickable = true
                 }
@@ -72,6 +70,7 @@ class StampsAdapter(private val listener: OnItemClickListener) :
                     binding.containerItemStamps.isClickable = true
                 }
                 else -> {
+                    binding.ivItemStamps.setImageResource(R.drawable.border_sky_blue_line_oval)
                     binding.tvItemStampsIndex.isVisible = true
                     binding.containerItemStamps.isClickable = false
                 }

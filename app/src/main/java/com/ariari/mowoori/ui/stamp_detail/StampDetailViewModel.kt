@@ -11,6 +11,7 @@ import com.ariari.mowoori.ui.missions.entity.Mission
 import com.ariari.mowoori.ui.stamp.entity.DetailMode
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
 import com.ariari.mowoori.util.Event
+import com.ariari.mowoori.util.LogUtil
 import com.ariari.mowoori.util.getCurrentDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO
@@ -21,6 +22,9 @@ import javax.inject.Inject
 class StampDetailViewModel @Inject constructor(
     private val stampsRepository: StampsRepository
 ) : ViewModel() {
+    private val _loadingEvent = MutableLiveData<Event<Boolean>>()
+    val loadingEvent: LiveData<Event<Boolean>> get() = _loadingEvent
+
     private val _closeBtnClick = MutableLiveData<Event<Boolean>>()
     val closeBtnClick: LiveData<Event<Boolean>> get() = _closeBtnClick
 
@@ -44,6 +48,10 @@ class StampDetailViewModel @Inject constructor(
 
     private val _isStampPosted = MutableLiveData<Event<Unit>>()
     val isStampPosted: LiveData<Event<Unit>> get() = _isStampPosted
+
+    fun setLoadingEvent(flag: Boolean) {
+        _loadingEvent.postValue(Event(flag))
+    }
 
     fun setCloseBtnClick() {
         _closeBtnClick.value = Event(true)
@@ -80,9 +88,11 @@ class StampDetailViewModel @Inject constructor(
     }
 
     fun postStamp() {
+        setLoadingEvent(true)
         viewModelScope.launch(IO) {
             stampsRepository.putCertificationImage(pictureUri.value!!, missionId.value!!)
                 .onSuccess { uri ->
+                    LogUtil.log("stamp",uri)
                     stampsRepository.getMissionInfo(missionId.value!!.toString())
                         .onSuccess {
                             val stampInfo = StampInfo(
@@ -92,6 +102,7 @@ class StampDetailViewModel @Inject constructor(
                             stampsRepository.postStamp(stampInfo, Mission(missionId.value!!, it))
                                 .onSuccess {
                                     _isStampPosted.postValue(Event(Unit))
+                                    setLoadingEvent(false)
                                 }.onFailure {
                                     throw Exception("stampInfo is not Posted.")
                                 }
