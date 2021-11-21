@@ -17,13 +17,13 @@
             android:layout_width="@dimen/stamp_width"
             android:layout_height="@dimen/stamp_height"
             android:layout_margin="4dp"
-            android:background="@drawable/border_sky_blue_line_oval"
+            android:background="@android:color/transparent"
             android:contentDescription="@string/desc_item_stamps_stamp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:src="@drawable/ic_launcher_background" />
+            tools:src="@drawable/ic_empty" />
 
         <TextView
             android:id="@+id/tv_item_stamps_index"

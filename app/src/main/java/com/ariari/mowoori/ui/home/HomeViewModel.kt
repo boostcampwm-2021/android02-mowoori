@@ -84,7 +84,7 @@ class HomeViewModel @Inject constructor(
 
     fun setCurrentGroupInfo(groupId: String) {
         val currGroupList = groupList.value ?: return
-        val tempGroupList = currGroupList.toMutableList().map {
+        val tempGroupList = currGroupList.map {
             val copyGroup = it.copy()
             copyGroup.selected = copyGroup.groupId == groupId
             if (copyGroup.selected) _currentGroupInfo.value = it

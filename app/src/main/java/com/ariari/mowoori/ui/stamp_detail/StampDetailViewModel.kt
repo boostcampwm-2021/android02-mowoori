@@ -11,6 +11,7 @@ import com.ariari.mowoori.ui.missions.entity.Mission
 import com.ariari.mowoori.ui.stamp.entity.DetailMode
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
 import com.ariari.mowoori.util.Event
+import com.ariari.mowoori.util.LogUtil
 import com.ariari.mowoori.util.getCurrentDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO
@@ -83,6 +84,7 @@ class StampDetailViewModel @Inject constructor(
         viewModelScope.launch(IO) {
             stampsRepository.putCertificationImage(pictureUri.value!!, missionId.value!!)
                 .onSuccess { uri ->
+                    LogUtil.log("stamp",uri)
                     stampsRepository.getMissionInfo(missionId.value!!.toString())
                         .onSuccess {
                             val stampInfo = StampInfo(
