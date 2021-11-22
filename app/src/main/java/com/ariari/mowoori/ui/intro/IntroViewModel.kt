@@ -22,6 +22,11 @@ class IntroViewModel @Inject constructor(
 
     private var fcmToken = ""
 
+    fun setUserRegistered(isRegistered:Boolean){
+        introRepository.setUserRegistered(isRegistered)
+    }
+
+    fun getUserRegistered() = introRepository.getUserRegistered()
 
     fun checkUserRegistered(userUid: String) {
         viewModelScope.launch(Dispatchers.IO) {

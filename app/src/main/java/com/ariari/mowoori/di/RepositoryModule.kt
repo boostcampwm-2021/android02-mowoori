@@ -1,5 +1,7 @@
 package com.ariari.mowoori.di
 
+import android.content.SharedPreferences
+import com.ariari.mowoori.data.local.datasource.MoWooriPrefDataSource
 import com.ariari.mowoori.data.repository.GroupRepository
 import com.ariari.mowoori.data.repository.GroupRepositoryImpl
 import com.ariari.mowoori.data.repository.HomeRepository
@@ -29,9 +31,10 @@ object RepositoryModule {
     fun providesIntroRepository(
         databaseReference: DatabaseReference,
         storageReference: StorageReference,
-        firebaseAuth: FirebaseAuth
+        firebaseAuth: FirebaseAuth,
+        prefs: MoWooriPrefDataSource
     ): IntroRepository =
-        IntroRepositoryImpl(databaseReference, storageReference, firebaseAuth)
+        IntroRepositoryImpl(databaseReference, storageReference, firebaseAuth, prefs)
 
     @Provides
     @Singleton

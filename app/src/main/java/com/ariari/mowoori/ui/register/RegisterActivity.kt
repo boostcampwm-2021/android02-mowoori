@@ -10,7 +10,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import com.ariari.mowoori.R
-import com.ariari.mowoori.data.preference.MoWooriPreference
+import com.ariari.mowoori.data.local.datasource.MoWooriPrefDataSource
 import com.ariari.mowoori.databinding.ActivityRegisterBinding
 import com.ariari.mowoori.ui.main.MainActivity
 import com.ariari.mowoori.util.EventObserver
@@ -24,28 +24,26 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class RegisterActivity : AppCompatActivity() {
 
-    private val viewModel: RegisterViewModel by viewModels()
+    private val registerViewModel: RegisterViewModel by viewModels()
     private val binding by lazy {
         ActivityRegisterBinding.inflate(layoutInflater)
     }
     private val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) {
         it?.let {
-            viewModel.setProfileImage(it)
+            registerViewModel.setProfileImage(it)
         }
     }
-    @Inject
-    lateinit var preference: MoWooriPreference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        binding.viewModel = viewModel
+        binding.viewModel = registerViewModel
         binding.lifecycleOwner = this
         setObservers()
         setRootClick()
         setCompleteClick()
-        viewModel.createNickName()
-        viewModel.initFcmToken()
+        registerViewModel.createNickName()
+        registerViewModel.initFcmToken()
     }
 
     private fun setObservers() {
@@ -74,7 +72,7 @@ class RegisterActivity : AppCompatActivity() {
         binding.btnRegisterComplete.setOnClickListener {
             ConfirmDialogFragment(object : BaseDialogFragment.NoticeDialogListener {
                 override fun onDialogPositiveClick(dialog: DialogFragment) {
-                    viewModel.registerUserInfo()
+                    registerViewModel.registerUserInfo()
                 }
 
                 override fun onDialogNegativeClick(dialog: DialogFragment) {
@@ -85,17 +83,17 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun setInvalidNickNameObserver() {
-        viewModel.invalidNicknameEvent.observe(this, EventObserver {
+        registerViewModel.invalidNicknameEvent.observe(this, EventObserver {
             ProgressDialogManager.instance.clear()
             toastMessage(getString(R.string.register_nickname_error_msg))
         })
     }
 
     private fun setRegisterSuccessObserver() {
-        viewModel.registerSuccessEvent.observe(this, EventObserver {
+        registerViewModel.registerSuccessEvent.observe(this, EventObserver {
             ProgressDialogManager.instance.clear()
             if (it) {
-                preference.setUserRegistered(true)
+                registerViewModel.setUserRegistered(true)
                 moveToMain()
             } else {
                 toastMessage(getString(R.string.register_fail_msg))
@@ -104,13 +102,13 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun setProfileClickObserver() {
-        viewModel.profileImageClickEvent.observe(this, EventObserver {
+        registerViewModel.profileImageClickEvent.observe(this, EventObserver {
             getContent.launch("image/*")
         })
     }
 
     private fun setLoadingEventObserver() {
-        viewModel.loadingEvent.observe(this, EventObserver {
+        registerViewModel.loadingEvent.observe(this, EventObserver {
             if (it) {
                 ProgressDialogManager.instance.show(this)
             } else {

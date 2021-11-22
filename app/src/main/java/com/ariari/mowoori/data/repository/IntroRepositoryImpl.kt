@@ -1,6 +1,7 @@
 package com.ariari.mowoori.data.repository
 
 import android.net.Uri
+import com.ariari.mowoori.data.local.datasource.MoWooriPrefDataSource
 import com.ariari.mowoori.ui.register.entity.UserInfo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
@@ -12,8 +13,15 @@ import javax.inject.Inject
 class IntroRepositoryImpl @Inject constructor(
     private val firebaseReference: DatabaseReference,
     private val storageReference: StorageReference,
-    private val firebaseAuth: FirebaseAuth
+    private val firebaseAuth: FirebaseAuth,
+    private val preference: MoWooriPrefDataSource
 ) : IntroRepository {
+    override fun setUserRegistered(isRegistered: Boolean) {
+        preference.setUserRegistered(isRegistered)
+    }
+
+    override fun getUserRegistered(): Boolean = preference.getUserRegistered()
+
     override suspend fun checkUserRegistered(userUid: String): Boolean {
         val snapshot = firebaseReference.child("users").child(userUid).get().await()
         return snapshot.value != null

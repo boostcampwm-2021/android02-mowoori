@@ -52,6 +52,10 @@ class RegisterViewModel @Inject constructor(
         _profileImageUri.postValue(uri)
     }
 
+    fun setUserRegistered(isRegistered:Boolean){
+        introRepository.setUserRegistered(isRegistered)
+    }
+
     fun registerUserInfo() {
         _loadingEvent.value = Event(true)
         val nickname = profileText.value ?: ""

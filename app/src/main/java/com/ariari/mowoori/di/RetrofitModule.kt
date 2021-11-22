@@ -1,7 +1,5 @@
 package com.ariari.mowoori.di
 
-import com.google.firebase.messaging.FirebaseMessaging
-import com.google.firebase.messaging.RemoteMessage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

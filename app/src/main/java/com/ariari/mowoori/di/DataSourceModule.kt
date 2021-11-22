@@ -4,9 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import com.ariari.mowoori.data.preference.MoWooriPreference
-import com.ariari.mowoori.data.preference.MoWooriPreferenceImpl
-import dagger.Binds
+import com.ariari.mowoori.data.local.datasource.MoWooriPrefDataSource
+import com.ariari.mowoori.data.local.datasource.MoWooriPrefDataSourceImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,6 +28,6 @@ object DataSourceModule {
         )
 
     @Provides
-    fun provideMowooriPreference(preferences: SharedPreferences): MoWooriPreference =
-        MoWooriPreferenceImpl(preferences)
+    fun provideMowooriPreference(preferences: SharedPreferences): MoWooriPrefDataSource =
+        MoWooriPrefDataSourceImpl(preferences)
 }

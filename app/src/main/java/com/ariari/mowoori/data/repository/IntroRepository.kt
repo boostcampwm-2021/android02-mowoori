@@ -4,6 +4,10 @@ import android.net.Uri
 import com.ariari.mowoori.ui.register.entity.UserInfo
 
 interface IntroRepository {
+    fun setUserRegistered(isRegistered:Boolean)
+
+    fun getUserRegistered(): Boolean
+
     suspend fun checkUserRegistered(userUid: String): Boolean
 
     suspend fun getRandomNickName(): String

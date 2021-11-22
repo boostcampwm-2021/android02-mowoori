@@ -12,7 +12,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.ariari.mowoori.BuildConfig
 import com.ariari.mowoori.R
-import com.ariari.mowoori.data.preference.MoWooriPreference
 import com.ariari.mowoori.databinding.ActivityIntroBinding
 import com.ariari.mowoori.ui.main.MainActivity
 import com.ariari.mowoori.ui.register.RegisterActivity
@@ -23,7 +22,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class IntroActivity : AppCompatActivity() {
@@ -44,9 +42,6 @@ class IntroActivity : AppCompatActivity() {
         android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
         android.Manifest.permission.READ_EXTERNAL_STORAGE
     )
-
-    @Inject
-    lateinit var preference: MoWooriPreference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,7 +75,7 @@ class IntroActivity : AppCompatActivity() {
         introViewModel.isUserRegistered.observe(this, EventObserver {
             if (it) {
                 introViewModel.updateFcmToken()
-                preference.setUserRegistered(true)
+                introViewModel.setUserRegistered(true)
                 moveToMain()
             } else {
                 moveToRegister()
@@ -134,7 +129,7 @@ class IntroActivity : AppCompatActivity() {
     }
 
     private fun autoLogin() {
-        if (auth.currentUser != null && preference.getUserRegistered()) {
+        if (auth.currentUser != null && introViewModel.getUserRegistered()) {
             signIn()
         }
         else{
