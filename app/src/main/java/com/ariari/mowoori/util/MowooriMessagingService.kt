@@ -31,7 +31,7 @@ class MowooriMessagingService : FirebaseMessagingService() {
         intent.putExtra("openFromFcm", true)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         val pendingIntent =
-            PendingIntent.getActivity(this, FLOAT_NOTIFICATION, intent, PendingIntent.FLAG_ONE_SHOT)
+            PendingIntent.getActivity(this, FLOAT_NOTIFICATION, intent, PendingIntent.FLAG_MUTABLE)
         val builder =
             NotificationCompat.Builder(this, getString(R.string.app_name))
                 .setContentTitle(remoteMessage.data["title"])
