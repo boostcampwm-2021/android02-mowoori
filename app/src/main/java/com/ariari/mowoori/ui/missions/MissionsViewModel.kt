@@ -12,6 +12,7 @@ import com.ariari.mowoori.util.getCurrentDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,7 +20,7 @@ class MissionsViewModel @Inject constructor(
     private val missionsRepository: MissionsRepository
 ) : ViewModel() {
     private val _loadingEvent = MutableLiveData<Event<Boolean>>()
-    val loadingEvent: LiveData<Event<Boolean>> get() = _loadingEvent
+    val loadingEvent: LiveData<Event<Boolean>> = _loadingEvent
 
     private val _plusBtnClick = MutableLiveData<Event<Boolean>>()
     val plusBtnClick: LiveData<Event<Boolean>> = _plusBtnClick
@@ -27,14 +28,17 @@ class MissionsViewModel @Inject constructor(
     private val _itemClick = MutableLiveData<Event<Mission>>()
     val itemClick: LiveData<Event<Mission>> = _itemClick
 
-    private val _missionsType = MutableLiveData(Event(NOT_DONE_TYPE))
-    val missionsType: LiveData<Event<Int>> = _missionsType
+    private val _missionsType = MutableLiveData(NOT_DONE_TYPE)
+    val missionsType: LiveData<Int> = _missionsType
 
-    private val _missionsList = MutableLiveData<List<Mission>>()
-    val missionsList: LiveData<List<Mission>> = _missionsList
+    private val _missionsList = MutableLiveData<Event<List<Mission>>>()
+    val missionsList: LiveData<Event<List<Mission>>> = _missionsList
 
     private val _user = MutableLiveData<Event<User>>()
-    val user: LiveData<Event<User>> get() = _user
+    val user: LiveData<Event<User>> = _user
+
+    private val _errorMessage = MutableLiveData<Event<String>>()
+    val errorMessage: LiveData<Event<String>> = _errorMessage
 
     fun setLoadingEvent(isLoading: Boolean) {
         _loadingEvent.value = Event(isLoading)
@@ -49,17 +53,17 @@ class MissionsViewModel @Inject constructor(
     }
 
     fun setNotDoneType() {
-        _missionsType.value = Event(NOT_DONE_TYPE)
+        _missionsType.value = NOT_DONE_TYPE
         setLoadingEvent(true)
     }
 
     fun setDoneType() {
-        _missionsType.value = Event(DONE_TYPE)
+        _missionsType.value = DONE_TYPE
         setLoadingEvent(true)
     }
 
     fun setFailType() {
-        _missionsType.value = Event(FAIL_TYPE)
+        _missionsType.value = FAIL_TYPE
         setLoadingEvent(true)
     }
 
@@ -72,18 +76,34 @@ class MissionsViewModel @Inject constructor(
                 missionsRepository.getUser().onSuccess { user ->
                     loadUser(user)
                     loadMissionsList(user)
-                }.onFailure { throw Exception("get User Exception!!") }
+                }.onFailure { exception ->
+                    Timber.e(exception)
+                    _errorMessage.postValue(Event("getUser"))
+                }
             }
         }
     }
 
     private fun loadMissionsList(user: User) {
         viewModelScope.launch(Dispatchers.IO) {
-            val missionIdList =
-                missionsRepository.getMissionIdList(user.userInfo.currentGroupId)
-            val missions = missionsRepository.getMissions(user.userId)
-            _missionsList.postValue(
-                when (requireNotNull(missionsType.value).peekContent()) {
+            missionsRepository.getMissionIdList(user.userInfo.currentGroupId)
+                .onSuccess { missionIdList ->
+                    missionsRepository.getMissions(user.userId)
+                        .onSuccess { missions ->
+                            loadTypedMissions(missionIdList, missions)
+                        }
+                }
+                .onFailure { exception ->
+                    Timber.e(exception)
+                    _errorMessage.postValue(Event("loadMissionList"))
+                }
+        }
+    }
+
+    private fun loadTypedMissions(missionIdList: List<String>, missions: List<Mission>) {
+        _missionsList.postValue(
+            Event(
+                when (requireNotNull(missionsType.value)) {
                     NOT_DONE_TYPE -> {
                         missions.filter {
                             (missionIdList.contains(it.missionId)) &&
@@ -104,9 +124,13 @@ class MissionsViewModel @Inject constructor(
                                     (it.missionInfo.curStamp < it.missionInfo.totalStamp)
                         }
                     }
-                    else -> throw IllegalStateException()
-                })
-        }
+                    else -> {
+                        Timber.e("missionList postValue Error!!")
+                        emptyList()
+                    }
+                }
+            )
+        )
     }
 
     private fun loadUser(user: User) {

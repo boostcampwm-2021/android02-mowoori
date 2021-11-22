@@ -55,18 +55,16 @@ class MissionsAddViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             missionsRepository.getUser().onSuccess { user ->
                 val missionInfo = getMissionInfo(user.userId, missionName)
-                var missionIdList =
-                    missionsRepository.getMissionIdList(user.userInfo.currentGroupId)
-
-                // missions에 missionInfo 추가, currentGroup의 missionList에 missionInfo 추가
-                missionsRepository.postMission(
-                    missionInfo,
-                    user.userInfo.currentGroupId,
-                    missionIdList
-                )
-
-                // 화면 종료 Event 실행
-                _isMissionPosted.postValue(Event(Unit))
+                missionsRepository.getMissionIdList(user.userInfo.currentGroupId)
+                    .onSuccess { missionIdList ->
+                        // missions에 missionInfo 추가, currentGroup의 missionList에 missionInfo 추가
+                        missionsRepository.postMission(
+                            missionInfo,
+                            user.userInfo.currentGroupId,
+                            missionIdList
+                        )
+                        _isMissionPosted.postValue(Event(Unit))
+                    }
             }.onFailure {
                 throw Exception("get User Exception!!")
             }
