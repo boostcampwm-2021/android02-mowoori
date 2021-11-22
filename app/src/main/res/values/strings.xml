@@ -116,4 +116,8 @@
     <string name="dialog_picture_camera">CAMERA</string>
     <string name="desc_dialog_picture_camera_icon">카메라 아이콘</string>
     <string name="desc_dialog_picture_gallery_icon">갤러리 아이콘</string>
+
+    <!-- NetworkDialogFragment -->
+    <string name="dialog_network_retry">재시도</string>
+    <string name="dialog_network_content">데이터 요청에 실패하였습니다.\n사용중인 네트워크 상태를 확인해주세요.\n다시 요청 하시겠습니까?</string>
 </resources>
