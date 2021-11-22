@@ -87,4 +87,7 @@ dependencies {
 
     // Gson
     implementation "com.google.code.gson:gson:$gsonVersion"
+
+    // EncryptedSharedPreferences
+    implementation "androidx.security:security-crypto:1.1.0-alpha03"
 }

@@ -2,6 +2,8 @@ package com.ariari.mowoori.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import com.ariari.mowoori.data.preference.MoWooriPreference
 import com.ariari.mowoori.data.preference.MoWooriPreferenceImpl
 import dagger.Binds
@@ -18,7 +20,13 @@ object DataSourceModule {
     @Provides
     @Singleton
     fun provideSharedPreference(@ApplicationContext context: Context): SharedPreferences =
-        context.getSharedPreferences(context.applicationInfo.packageName, Context.MODE_PRIVATE)
+        EncryptedSharedPreferences.create(
+            context,
+            context.packageName,
+            MasterKey.Builder(context).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build(),
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
 
     @Provides
     fun provideMowooriPreference(preferences: SharedPreferences): MoWooriPreference =
