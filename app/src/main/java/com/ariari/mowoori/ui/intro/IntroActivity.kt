@@ -28,7 +28,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class IntroActivity : AppCompatActivity() {
 
-    private val viewModel: IntroViewModel by viewModels()
+    private val introViewModel: IntroViewModel by viewModels()
     private lateinit var auth: FirebaseAuth
     private val binding by lazy {
         ActivityIntroBinding.inflate(layoutInflater)
@@ -51,11 +51,10 @@ class IntroActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
         auth = FirebaseAuth.getInstance()
-//        autoLogin()
-        binding.viewModel = viewModel
-
+        autoLogin()
+        binding.viewModel = introViewModel
+        introViewModel.initFcmToken()
         setListeners()
         setObservers()
         requestPermissions(permissionList)
@@ -78,25 +77,15 @@ class IntroActivity : AppCompatActivity() {
     }
 
     private fun setObservers() {
-        viewModel.isUserRegistered.observe(this, EventObserver {
+        introViewModel.isUserRegistered.observe(this, EventObserver {
             if (it) {
+                introViewModel.updateFcmToken()
                 preference.setUserRegistered(true)
                 moveToMain()
             } else {
                 moveToRegister()
             }
         })
-    }
-
-    override fun onStart() {
-        super.onStart()
-        showSignInButton()
-    }
-
-    private fun showSignInButton() {
-        val animation = AlphaAnimation(0f, 1f).apply { duration = 2000 }
-        binding.btnSplashSignIn.animation = animation
-        binding.btnSplashSignIn.isVisible = true
     }
 
     private fun signIn() {
@@ -124,7 +113,7 @@ class IntroActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     task.result.user?.let {
-                        viewModel.checkUserRegistered(it.uid)
+                        introViewModel.checkUserRegistered(it.uid)
                     }
                 } else {
                     Toast.makeText(this, "로그인 할 수 없습니다.", Toast.LENGTH_SHORT).show()
@@ -146,8 +135,17 @@ class IntroActivity : AppCompatActivity() {
 
     private fun autoLogin() {
         if (auth.currentUser != null && preference.getUserRegistered()) {
-            moveToMain()
+            signIn()
         }
+        else{
+            showSignInButton()
+        }
+    }
+
+    private fun showSignInButton() {
+        val animation = AlphaAnimation(0f, 1f).apply { duration = 2000 }
+        binding.btnSplashSignIn.animation = animation
+        binding.btnSplashSignIn.isVisible = true
     }
 
     private fun requestPermissions(permissions: List<String>) {

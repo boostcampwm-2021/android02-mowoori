@@ -47,4 +47,8 @@ class IntroRepositoryImpl @Inject constructor(
         val uploadUrl = task.storage.downloadUrl.await()
         return uploadUrl.toString()
     }
+
+    override suspend fun updateFcmToken(token: String) {
+        firebaseReference.child("users/${getUserUid()}/fcmToken").setValue(token)
+    }
 }
