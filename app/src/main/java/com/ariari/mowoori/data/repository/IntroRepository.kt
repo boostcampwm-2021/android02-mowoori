@@ -13,4 +13,6 @@ interface IntroRepository {
     suspend fun userRegister(userInfo: UserInfo): Boolean
 
     suspend fun putUserProfile(uri: Uri): String
+
+    suspend fun updateFcmToken(token:String)
 }
