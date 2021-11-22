@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.ImageView
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
@@ -20,6 +21,7 @@ import com.ariari.mowoori.ui.stamp.entity.DetailInfo
 import com.ariari.mowoori.ui.stamp.entity.DetailMode
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
 import com.ariari.mowoori.util.EventObserver
+import com.ariari.mowoori.widget.NetworkDialogFragment
 import com.ariari.mowoori.widget.ProgressDialogManager
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
@@ -127,6 +129,7 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         setBackBtnObserver()
         setSpanCountObserver()
         setStampListObserver()
+        setNetworkDialogObserver()
     }
 
     private fun setLoadingObserver() {
@@ -159,6 +162,24 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         viewModel.stampList.observe(viewLifecycleOwner, EventObserver { stampList ->
             viewModel.setLoadingEvent(false)
             adapter.submitList(stampList)
+        })
+    }
+
+    private fun setNetworkDialogObserver() {
+        viewModel.networkDialogEvent.observe(viewLifecycleOwner, EventObserver {
+            if (it) {
+                NetworkDialogFragment(object: NetworkDialogFragment.NetworkDialogListener {
+                    override fun onCancelClick(dialog: DialogFragment) {
+                        // TODO: 홈 프래그먼트로 이동
+                        dialog.dismiss()
+                    }
+
+                    override fun onRetryClick(dialog: DialogFragment) {
+                        dialog.dismiss()
+                        loadMissionInfo()
+                    }
+                }).show(requireActivity().supportFragmentManager, "NetworkDialogFragment")
+            }
         })
     }
 }
