@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:onInviteClick="@{viewModel::clickPlusButton}"
-            app:text="@string/members_title"
+            app:titleViewText="@{viewModel.currentGroup.groupInfo.groupName}"
             app:titleViewMode="@{TitleViewMode.TITLE_VIEW_INVITE_BUTTON}" />
 
         <androidx.recyclerview.widget.RecyclerView
