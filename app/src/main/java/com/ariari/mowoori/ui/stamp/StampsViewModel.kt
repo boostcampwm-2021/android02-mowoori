@@ -44,9 +44,6 @@ class StampsViewModel @Inject constructor(
     private val _isMyMission = MutableLiveData<Event<Boolean>>()
     val isMyMission: LiveData<Event<Boolean>> get() = _isMyMission
 
-    private val _user = MutableLiveData<User>()
-    val user: LiveData<User> get() = _user
-
     fun setLoadingEvent(flag: Boolean) {
         _loadingEvent.postValue(Event(flag))
     }
@@ -85,7 +82,6 @@ class StampsViewModel @Inject constructor(
     }
 
     fun setIsMyMission(userId: String) {
-        LogUtil.log("setIsMyMission", user.value?.userId.toString())
         stampsRepository.getUserId()
             .onSuccess { uid ->
                 _isMyMission.value = Event(uid == userId)
@@ -101,6 +97,7 @@ class StampsViewModel @Inject constructor(
                 .onSuccess {
                     _mission.postValue(Mission(missionId, it))
                 }.onFailure {
+                    // TODO: 네트워크 연결 끊김 처리
                     Timber.e("$it")
                 }
         }

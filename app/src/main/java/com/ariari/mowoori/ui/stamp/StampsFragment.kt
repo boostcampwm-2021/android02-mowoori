@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.ariari.mowoori.R
 import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentStampsBinding
+import com.ariari.mowoori.ui.missions.entity.Mission
 import com.ariari.mowoori.ui.register.entity.User
 import com.ariari.mowoori.ui.stamp.adapter.StampsAdapter
 import com.ariari.mowoori.ui.stamp.entity.DetailInfo
@@ -27,6 +28,7 @@ import timber.log.Timber
 class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_stamps) {
     private val safeArgs: StampsFragmentArgs by navArgs()
     private val user: User by lazy { safeArgs.user }
+    private lateinit var mission: Mission
     private lateinit var adapter: StampsAdapter
     private val viewModel: StampsViewModel by viewModels()
 
@@ -43,11 +45,6 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         setObserver()
     }
 
-    private fun loadMissionInfo() {
-        viewModel.setLoadingEvent(true)
-        viewModel.loadMissionInfo(safeArgs.missionId)
-    }
-
     private fun setStartEnterTransition() {
         // 리사이클러 뷰가 측정이 완료될 때까지 트랜지션 지연
         postponeEnterTransition()
@@ -55,6 +52,15 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
             startPostponedEnterTransition()
             true
         }
+    }
+
+    private fun setCompleteBtnVisible() {
+        viewModel.setIsMyMission(user.userId)
+    }
+
+    private fun loadMissionInfo() {
+        viewModel.setLoadingEvent(true)
+        viewModel.loadMissionInfo(safeArgs.missionId)
     }
 
     private fun setAdapter() {
@@ -70,8 +76,8 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
                         StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
                             DetailInfo(
                                 user.userInfo.nickname,
-                                viewModel.mission.value!!.missionId,
-                                viewModel.mission.value!!.missionInfo.missionName,
+                                mission.missionId,
+                                mission.missionInfo.missionName,
                                 DetailMode.INQUIRY,
                                 stampInfo
                             )
@@ -80,54 +86,6 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
             }
         })
         binding.rvStamps.adapter = adapter
-    }
-
-    private fun setObserver() {
-        setLoadingObserver()
-        setBackBtnObserver()
-        setSpanCountObserver()
-        setStampListObserver()
-    }
-
-    private fun setCompleteBtnVisible() {
-        viewModel.setIsMyMission(user.userId)
-    }
-
-    private fun setCompleteClick() {
-        binding.btnStampsComplete.setOnClickListener {
-            it.findNavController()
-                .navigate(
-                    StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
-                        DetailInfo(
-                            user.userInfo.nickname,
-                            viewModel.mission.value!!.missionId,
-                            viewModel.mission.value!!.missionInfo.missionName,
-                            DetailMode.CERTIFY,
-                            StampInfo()
-                        )
-                    )
-                )
-        }
-    }
-
-    private fun setLoadingObserver() {
-        viewModel.loadingEvent.observe(viewLifecycleOwner, EventObserver {
-            if (it) ProgressDialogManager.instance.show(requireContext())
-            else ProgressDialogManager.instance.clear()
-        })
-    }
-
-    private fun setBackBtnObserver() {
-        viewModel.backBtnClick.observe(viewLifecycleOwner, EventObserver {
-            this.findNavController().popBackStack()
-        })
-    }
-
-    private fun setSpanCountObserver() {
-        viewModel.spanCount.observe(viewLifecycleOwner, EventObserver { spanCount ->
-            val gridLayoutManager = GridLayoutManager(requireContext(), spanCount)
-            binding.rvStamps.layoutManager = gridLayoutManager
-        })
     }
 
     private fun setSpanCount() {
@@ -143,6 +101,57 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
                     resources.getDimension(R.dimen.stamp_width) + resources.getDimension(R.dimen.stamp_padding)
                 viewModel.setSpanCount(recyclerViewWidth / itemWidth)
             }
+        })
+    }
+
+    private fun setCompleteClick() {
+        binding.btnStampsComplete.setOnClickListener {
+            it.findNavController()
+                .navigate(
+                    StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
+                        DetailInfo(
+                            user.userInfo.nickname,
+                            mission.missionId,
+                            mission.missionInfo.missionName,
+                            DetailMode.CERTIFY,
+                            StampInfo()
+                        )
+                    )
+                )
+        }
+    }
+
+    private fun setObserver() {
+        setLoadingObserver()
+        setMissionObserver()
+        setBackBtnObserver()
+        setSpanCountObserver()
+        setStampListObserver()
+    }
+
+    private fun setLoadingObserver() {
+        viewModel.loadingEvent.observe(viewLifecycleOwner, EventObserver {
+            if (it) ProgressDialogManager.instance.show(requireContext())
+            else ProgressDialogManager.instance.clear()
+        })
+    }
+
+    private fun setMissionObserver() {
+        viewModel.mission.observe(viewLifecycleOwner, {
+            mission = it
+        })
+    }
+
+    private fun setBackBtnObserver() {
+        viewModel.backBtnClick.observe(viewLifecycleOwner, EventObserver {
+            this.findNavController().popBackStack()
+        })
+    }
+
+    private fun setSpanCountObserver() {
+        viewModel.spanCount.observe(viewLifecycleOwner, EventObserver { spanCount ->
+            val gridLayoutManager = GridLayoutManager(requireContext(), spanCount)
+            binding.rvStamps.layoutManager = gridLayoutManager
         })
     }
 
