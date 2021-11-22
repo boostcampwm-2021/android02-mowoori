@@ -13,12 +13,12 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.ariari.mowoori.R
 import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentStampsBinding
+import com.ariari.mowoori.ui.register.entity.User
 import com.ariari.mowoori.ui.stamp.adapter.StampsAdapter
 import com.ariari.mowoori.ui.stamp.entity.DetailInfo
 import com.ariari.mowoori.ui.stamp.entity.DetailMode
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
 import com.ariari.mowoori.util.EventObserver
-import com.ariari.mowoori.util.LogUtil
 import com.ariari.mowoori.widget.ProgressDialogManager
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
@@ -26,6 +26,7 @@ import timber.log.Timber
 @AndroidEntryPoint
 class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_stamps) {
     private val safeArgs: StampsFragmentArgs by navArgs()
+    private val user: User by lazy { safeArgs.user }
     private lateinit var adapter: StampsAdapter
     private val viewModel: StampsViewModel by viewModels()
 
@@ -34,11 +35,17 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
         setStartEnterTransition()
-        setUser()
+        setCompleteBtnVisible()
+        loadMissionInfo()
         setAdapter()
         setSpanCount()
         setCompleteClick()
         setObserver()
+    }
+
+    private fun loadMissionInfo() {
+        viewModel.setLoadingEvent(true)
+        viewModel.loadMissionInfo(safeArgs.missionId)
     }
 
     private fun setStartEnterTransition() {
@@ -47,25 +54,6 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         binding.rvStamps.viewTreeObserver.addOnPreDrawListener {
             startPostponedEnterTransition()
             true
-        }
-    }
-
-    private fun setUser() {
-        viewModel.setLoadingEvent(true)
-        viewModel.setUser(safeArgs.user)
-    }
-
-    private fun setUserObserver() {
-        viewModel.user.observe(viewLifecycleOwner) {
-            LogUtil.log("setUserObserver", safeArgs.missionId)
-            viewModel.loadMissionInfo(safeArgs.missionId)
-            setCompleteBtnVisible()
-        }
-    }
-
-    private fun setMissionObserver() {
-        viewModel.mission.observe(viewLifecycleOwner) {
-            viewModel.setStampList()
         }
     }
 
@@ -81,7 +69,7 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
                     .navigate(
                         StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
                             DetailInfo(
-                                viewModel.user.value!!.userInfo.nickname,
+                                user.userInfo.nickname,
                                 viewModel.mission.value!!.missionId,
                                 viewModel.mission.value!!.missionInfo.missionName,
                                 DetailMode.INQUIRY,
@@ -89,7 +77,6 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
                             )
                         ), extras
                     )
-//                viewModel.setSelectedStampInfo(position, missionInfo.curStamp)
             }
         })
         binding.rvStamps.adapter = adapter
@@ -100,13 +87,10 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         setBackBtnObserver()
         setSpanCountObserver()
         setStampListObserver()
-        setSelectedStampInfoObserver()
-        setUserObserver()
-        setMissionObserver()
     }
 
     private fun setCompleteBtnVisible() {
-        viewModel.setIsMyMission()
+        viewModel.setIsMyMission(user.userId)
     }
 
     private fun setCompleteClick() {
@@ -115,7 +99,7 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
                 .navigate(
                     StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
                         DetailInfo(
-                            viewModel.user.value!!.userInfo.nickname,
+                            user.userInfo.nickname,
                             viewModel.mission.value!!.missionId,
                             viewModel.mission.value!!.missionInfo.missionName,
                             DetailMode.CERTIFY,
@@ -163,30 +147,9 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
     }
 
     private fun setStampListObserver() {
-        viewModel.stampList.observe(viewLifecycleOwner, { stampList ->
-            Timber.d("submitList")
+        viewModel.stampList.observe(viewLifecycleOwner, EventObserver { stampList ->
+            viewModel.setLoadingEvent(false)
             adapter.submitList(stampList)
-        })
-
-        viewModel.curStampList.observe(viewLifecycleOwner, { stampList ->
-            viewModel.fillEmptyStamps(viewModel.mission.value!!.missionInfo.totalStamp - stampList.size)
-        })
-    }
-
-    private fun setSelectedStampInfoObserver() {
-        viewModel.selectedStampInfo.observe(viewLifecycleOwner, EventObserver { stampInfo ->
-            this.findNavController()
-                .navigate(
-                    StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
-                        DetailInfo(
-                            viewModel.user.value!!.userInfo.nickname,
-                            viewModel.mission.value!!.missionId,
-                            viewModel.mission.value!!.missionInfo.missionName,
-                            DetailMode.INQUIRY,
-                            stampInfo
-                        )
-                    )
-                )
         })
     }
 }
