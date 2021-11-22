@@ -33,6 +33,8 @@ object BindingAdapters {
             if (isCircle) {
                 Glide.with(this.context)
                     .load(url)
+                    .placeholder(R.drawable.ic_stamp)
+                    .thumbnail(0.1f)
                     .circleCrop()
                     .into(this)
             } else {
