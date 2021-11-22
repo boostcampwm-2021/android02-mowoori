@@ -69,6 +69,8 @@ class StampsViewModel @Inject constructor(
                         tempStampList.add(Stamp(stampId, stampInfo))
                     }
                     .onFailure {
+                        setLoadingEvent(false)
+                        _networkDialogEvent.postValue(Event(true))
                         Timber.e("stampInfo Error: $it")
                     }
             }
@@ -95,13 +97,13 @@ class StampsViewModel @Inject constructor(
     }
 
     fun loadMissionInfo(missionId: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             missionsRepository.getMissionInfo(missionId)
                 .onSuccess {
                     _mission.postValue(Mission(missionId, it))
                 }.onFailure {
                     setLoadingEvent(false)
-                    _networkDialogEvent.value = Event(true)
+                    _networkDialogEvent.postValue(Event(true))
                     Timber.e("$it")
                 }
         }

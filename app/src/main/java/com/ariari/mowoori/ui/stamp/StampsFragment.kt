@@ -170,8 +170,8 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
             if (it) {
                 NetworkDialogFragment(object: NetworkDialogFragment.NetworkDialogListener {
                     override fun onCancelClick(dialog: DialogFragment) {
-                        // TODO: 홈 프래그먼트로 이동
                         dialog.dismiss()
+                        findNavController().navigate(R.id.action_stampsFragment_to_homeFragment)
                     }
 
                     override fun onRetryClick(dialog: DialogFragment) {
