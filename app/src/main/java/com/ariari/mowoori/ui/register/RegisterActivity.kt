@@ -45,6 +45,7 @@ class RegisterActivity : AppCompatActivity() {
         setRootClick()
         setCompleteClick()
         viewModel.createNickName()
+        viewModel.initFcmToken()
     }
 
     private fun setObservers() {
