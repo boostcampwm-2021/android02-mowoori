@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.StampsRepository
 import com.ariari.mowoori.ui.missions.entity.Mission
+import com.ariari.mowoori.ui.stamp.entity.DetailInfo
 import com.ariari.mowoori.ui.stamp.entity.DetailMode
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
 import com.ariari.mowoori.util.Event
@@ -20,22 +21,22 @@ import javax.inject.Inject
 
 @HiltViewModel
 class StampDetailViewModel @Inject constructor(
-    private val stampsRepository: StampsRepository
+    private val stampsRepository: StampsRepository,
 ) : ViewModel() {
+    lateinit var detailInfo: DetailInfo
+        private set
+
     private val _loadingEvent = MutableLiveData<Event<Boolean>>()
     val loadingEvent: LiveData<Event<Boolean>> get() = _loadingEvent
 
-    private val _closeBtnClick = MutableLiveData<Event<Boolean>>()
-    val closeBtnClick: LiveData<Event<Boolean>> get() = _closeBtnClick
+    private val _closeBtnClick = MutableLiveData<Boolean>()
+    val closeBtnClick: LiveData<Boolean> = _closeBtnClick
 
     private val _isCertify = MutableLiveData<Event<Boolean>>()
     val isCertify: LiveData<Event<Boolean>> get() = _isCertify
 
     private val _userName = MutableLiveData<String>()
     val userName: LiveData<String> get() = _userName
-
-    private val _missionId = MutableLiveData<String>()
-    val missionId: LiveData<String> get() = _missionId
 
     private val _missionName = MutableLiveData<String>()
     val missionName: LiveData<String> get() = _missionName
@@ -49,24 +50,27 @@ class StampDetailViewModel @Inject constructor(
     private val _isStampPosted = MutableLiveData<Event<Unit>>()
     val isStampPosted: LiveData<Event<Unit>> get() = _isStampPosted
 
+    private val _networkDialogEvent = MutableLiveData<Boolean>()
+    val networkDialogEvent: LiveData<Boolean> get() = _networkDialogEvent
+
+    fun setDetailInfo(_detailInfo: DetailInfo) {
+        detailInfo = _detailInfo
+    }
+
     fun setLoadingEvent(flag: Boolean) {
         _loadingEvent.postValue(Event(flag))
     }
 
     fun setCloseBtnClick() {
-        _closeBtnClick.value = Event(true)
+        _closeBtnClick.value = true
     }
 
-    fun setUserName(userName: String) {
-        _userName.value = userName
+    fun setUserName() {
+        _userName.value = detailInfo.userName
     }
 
-    fun setMissionId(missionId: String) {
-        _missionId.value = missionId
-    }
-
-    fun setMissionName(missionName: String) {
-        _missionName.value = missionName
+    fun setMissionName() {
+        _missionName.value = detailInfo.missionName
     }
 
     fun setComment(comment: String) {
@@ -79,9 +83,8 @@ class StampDetailViewModel @Inject constructor(
         }
     }
 
-    fun setIsCertify(detailMode: DetailMode) {
-        println("StampDetail - $detailMode")
-        when (detailMode) {
+    fun setIsCertify() {
+        when (detailInfo.detailMode) {
             DetailMode.INQUIRY -> _isCertify.value = Event(false)
             DetailMode.CERTIFY -> _isCertify.value = Event(true)
         }
@@ -90,27 +93,28 @@ class StampDetailViewModel @Inject constructor(
     fun postStamp() {
         setLoadingEvent(true)
         viewModelScope.launch(IO) {
-            stampsRepository.putCertificationImage(pictureUri.value!!, missionId.value!!)
+            stampsRepository.putCertificationImage(pictureUri.value!!, detailInfo.missionId)
                 .onSuccess { uri ->
-                    LogUtil.log("stamp",uri)
-                    stampsRepository.getMissionInfo(missionId.value!!.toString())
+                    LogUtil.log("stamp", uri)
+                    stampsRepository.getMissionInfo(detailInfo.missionId)
                         .onSuccess {
                             val stampInfo = StampInfo(
                                 uri, comment.value!!, getCurrentDate()
                             )
-
-                            stampsRepository.postStamp(stampInfo, Mission(missionId.value!!, it))
+                            stampsRepository.postStamp(stampInfo, Mission(detailInfo.missionId, it))
                                 .onSuccess {
                                     _isStampPosted.postValue(Event(Unit))
                                     setLoadingEvent(false)
-                                }.onFailure {
-                                    throw Exception("stampInfo is not Posted.")
-                                }
+                                }.onFailure { showNetworkDialog() }
                         }
+                        .onFailure { showNetworkDialog() }
                 }
-                .onFailure {
-                    throw Exception("put image is failed.")
-                }
+                .onFailure { showNetworkDialog() }
         }
+    }
+
+    private fun showNetworkDialog() {
+        setLoadingEvent(false)
+        _networkDialogEvent.postValue(true)
     }
 }

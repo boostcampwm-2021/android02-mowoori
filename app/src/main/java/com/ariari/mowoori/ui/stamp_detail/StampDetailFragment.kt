@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -19,13 +20,13 @@ import androidx.transition.TransitionInflater
 import com.ariari.mowoori.R
 import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentStampDetailBinding
-import com.ariari.mowoori.ui.stamp.entity.DetailInfo
 import com.ariari.mowoori.ui.stamp.entity.DetailMode
 import com.ariari.mowoori.ui.stamp_detail.entity.PictureType
 import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.util.LogUtil
 import com.ariari.mowoori.util.getCurrentDateTime
 import com.ariari.mowoori.util.toastMessage
+import com.ariari.mowoori.widget.NetworkDialogFragment
 import com.ariari.mowoori.widget.PictureDialogFragment
 import com.ariari.mowoori.widget.ProgressDialogManager
 import com.bumptech.glide.Glide
@@ -40,8 +41,6 @@ class StampDetailFragment :
     BaseFragment<FragmentStampDetailBinding>(R.layout.fragment_stamp_detail) {
     private val stampViewModel: StampDetailViewModel by viewModels()
     private val safeArgs: StampDetailFragmentArgs by navArgs()
-    private lateinit var detailInfo: DetailInfo
-
     private var currentPhotoPath: String? = null
     private var providerUri: Uri? = null
 
@@ -77,6 +76,7 @@ class StampDetailFragment :
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = stampViewModel
+        stampViewModel.setDetailInfo(safeArgs.detailInfo)
         init()
         setListener()
         setObserver()
@@ -84,11 +84,9 @@ class StampDetailFragment :
     }
 
     private fun init() {
-        setDetailInfo()
         setEditMode()
         setBtnVisible()
         setUserName()
-        setMissionId()
         setMissionName()
         setComment()
     }
@@ -105,50 +103,39 @@ class StampDetailFragment :
         setCloseBtnClickObserver()
         setIsCertifyObserver()
         setCommentObserver()
-    }
-
-    private fun setDetailInfo() {
-        detailInfo = safeArgs.detailInfo
+        setNetworkDialogObserver()
     }
 
     private fun setEditMode() {
-        if (detailInfo.detailMode == DetailMode.INQUIRY) {
+        if (stampViewModel.detailInfo.detailMode == DetailMode.INQUIRY) {
             binding.etStampDetailComment.keyListener = null
         }
     }
 
     private fun setBtnVisible() {
-        stampViewModel.setIsCertify(detailInfo.detailMode)
+        stampViewModel.setIsCertify()
     }
 
     private fun setDetailTransitionName() {
-        binding.ivStampDetail.transitionName = detailInfo.stampInfo.pictureUrl
+        binding.ivStampDetail.transitionName = stampViewModel.detailInfo.stampInfo.pictureUrl
     }
 
     private fun setUserName() {
-        stampViewModel.setUserName(detailInfo.userName)
-    }
-
-    private fun setMissionId() {
-        stampViewModel.setMissionId(detailInfo.missionId)
+        stampViewModel.setUserName()
     }
 
     private fun setMissionName() {
-        stampViewModel.setMissionName(detailInfo.missionName)
+        stampViewModel.setMissionName()
     }
 
     private fun setComment() {
-        stampViewModel.setComment(detailInfo.stampInfo.comment)
+        stampViewModel.setComment(stampViewModel.detailInfo.stampInfo.comment)
     }
 
     private fun setPictureClickListener() {
-        if (detailInfo.stampInfo.pictureUrl != "") {
-            Glide.with(requireContext())
-                .load(detailInfo.stampInfo.pictureUrl)
-                .override(300, 300)
-                .transform(CenterCrop(), RoundedCorners(16))
-                .into(binding.ivStampDetail)
-            binding.tvStampDetailIcon.isInvisible = true
+        val pictureUrl = stampViewModel.detailInfo.stampInfo.pictureUrl
+        if (pictureUrl != "") {
+            loadPicture(pictureUrl)
         } else {
             binding.ivStampDetail.setOnClickListener {
                 PictureDialogFragment(onClick).show(
@@ -157,6 +144,15 @@ class StampDetailFragment :
                 )
             }
         }
+    }
+
+    private fun loadPicture(pictureUrl: String) {
+        Glide.with(requireContext())
+            .load(pictureUrl)
+            .override(300, 300)
+            .transform(CenterCrop(), RoundedCorners(16))
+            .into(binding.ivStampDetail)
+        binding.tvStampDetailIcon.isInvisible = true
     }
 
     private fun setBtnCertifyListener() {
@@ -208,7 +204,7 @@ class StampDetailFragment :
         Timber.d("createImageFile Start")
         val timeStamp = getCurrentDateTime()
         Timber.d(timeStamp)
-        val imageFileName = "${detailInfo.missionId}_$timeStamp.jpg"
+        val imageFileName = "${stampViewModel.detailInfo.missionId}_$timeStamp.jpg"
         Timber.d(imageFileName)
         val storageDir = File(
             requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
@@ -264,7 +260,7 @@ class StampDetailFragment :
     }
 
     private fun setCloseBtnClickObserver() {
-        stampViewModel.closeBtnClick.observe(viewLifecycleOwner, EventObserver {
+        stampViewModel.closeBtnClick.observe(viewLifecycleOwner, {
             this.findNavController().popBackStack()
         })
     }
@@ -298,6 +294,22 @@ class StampDetailFragment :
         stampViewModel.loadingEvent.observe(viewLifecycleOwner, EventObserver { isLoading ->
             if (isLoading) ProgressDialogManager.instance.show(requireContext())
             else ProgressDialogManager.instance.clear()
+        })
+    }
+
+    private fun setNetworkDialogObserver() {
+        stampViewModel.networkDialogEvent.observe(viewLifecycleOwner, {
+            NetworkDialogFragment(object : NetworkDialogFragment.NetworkDialogListener {
+                override fun onCancelClick(dialog: DialogFragment) {
+                    dialog.dismiss()
+                    findNavController().navigate(R.id.action_stampsFragment_to_homeFragment)
+                }
+
+                override fun onRetryClick(dialog: DialogFragment) {
+                    dialog.dismiss()
+                    stampViewModel.postStamp()
+                }
+            }).show(requireActivity().supportFragmentManager, "NetworkDialogFragment")
         })
     }
 }
