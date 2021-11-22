@@ -1,6 +1,6 @@
-package com.ariari.mowoori.data.preference
+package com.ariari.mowoori.data.local.datasource
 
-interface MoWooriPreference {
+interface MoWooriPrefDataSource {
     fun getUserRegistered(): Boolean
     fun setUserRegistered(boolean: Boolean)
 }

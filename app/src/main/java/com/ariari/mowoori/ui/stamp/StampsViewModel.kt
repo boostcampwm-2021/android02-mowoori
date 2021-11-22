@@ -102,4 +102,15 @@ class StampsViewModel @Inject constructor(
                 }
         }
     }
+
+    fun postFcm() {
+        LogUtil.log("fcm","fcm")
+        viewModelScope.launch {
+            stampsRepository.postFcmMessage().onSuccess {
+                LogUtil.log("fcm", it.success.toString())
+            }.onFailure {
+                LogUtil.log("fcm", it.message.toString())
+            }
+        }
+    }
 }
