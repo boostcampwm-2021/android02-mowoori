@@ -1,12 +1,12 @@
 package com.ariari.mowoori.data.remote.request
 
 data class FcmRequest(
-    val `data`: Data,
+    val to: String,
     val priority: String,
-    val to: String
+    val `data`: FcmData
 )
 
-data class Data(
+data class FcmData(
     val title: String,
-    val message: String
+    val body: String
 )

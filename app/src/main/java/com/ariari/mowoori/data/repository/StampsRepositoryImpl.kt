@@ -1,11 +1,18 @@
 package com.ariari.mowoori.data.repository
 
 import android.net.Uri
+import com.ariari.mowoori.data.remote.datasource.FcmDataSource
+import com.ariari.mowoori.data.remote.request.FcmData
+import com.ariari.mowoori.data.remote.request.FcmRequest
+import com.ariari.mowoori.data.remote.response.FcmResponse
 import com.ariari.mowoori.ui.missions.entity.Mission
 import com.ariari.mowoori.ui.missions.entity.MissionInfo
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
@@ -14,7 +21,8 @@ import javax.inject.Inject
 class StampsRepositoryImpl @Inject constructor(
     private val databaseReference: DatabaseReference,
     private val storageReference: StorageReference,
-    private val firebaseAuth: FirebaseAuth
+    private val firebaseAuth: FirebaseAuth,
+    private val fcmDataSource: FcmDataSource
 ) : StampsRepository {
 
     override suspend fun getStampInfo(stampId: String): Result<StampInfo> = kotlin.runCatching {
@@ -67,5 +75,17 @@ class StampsRepositoryImpl @Inject constructor(
             Timber.i(uriString)
             Timber.i("error: ${storageReference.child("$uriString.jpg").downloadUrl.result}")
             storageReference.child("$uriString.jpg").downloadUrl.result.toString()
+        }
+
+    override suspend fun postFcmMessage(): Result<FcmResponse> =
+        kotlin.runCatching {
+            val fcmToken = FirebaseMessaging.getInstance().token.await()
+            fcmDataSource.postFcmMessage(
+                FcmRequest(
+                    to = fcmToken,
+                    priority = "high",
+                    data = FcmData(title = "모우리", body = "알람 성공")
+                )
+            )
         }
 }

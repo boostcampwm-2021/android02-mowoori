@@ -6,6 +6,9 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.ariari.mowoori.data.local.datasource.MoWooriPrefDataSource
 import com.ariari.mowoori.data.local.datasource.MoWooriPrefDataSourceImpl
+import com.ariari.mowoori.data.remote.datasource.FcmDataSource
+import com.ariari.mowoori.data.remote.datasource.FcmDataSourceImpl
+import com.ariari.mowoori.data.remote.service.FcmService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,6 +31,10 @@ object DataSourceModule {
         )
 
     @Provides
-    fun provideMowooriPreference(preferences: SharedPreferences): MoWooriPrefDataSource =
+    fun provideMowooriPrefDataSource(preferences: SharedPreferences): MoWooriPrefDataSource =
         MoWooriPrefDataSourceImpl(preferences)
+
+    @Provides
+    fun provideFcmDataSource(fcmService: FcmService): FcmDataSource =
+        FcmDataSourceImpl(fcmService)
 }

@@ -6,6 +6,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -13,6 +14,6 @@ import javax.inject.Singleton
 object RetrofitServiceModule {
     @Provides
     @Singleton
-    fun providesFcmService(retrofit: Retrofit): FcmService =
+    fun providesFcmService(@Named("FcmRetrofit") retrofit: Retrofit): FcmService =
         retrofit.create(FcmService::class.java)
 }
