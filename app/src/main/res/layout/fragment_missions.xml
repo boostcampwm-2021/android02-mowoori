@@ -30,7 +30,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:onPlusClick="@{viewModel::setPlusBtnClick}"
             app:titleViewMode="@{TitleViewMode.TITLE_VIEW_PLUS_BUTTON}"
-            app:titleViewText="@{@string/missions_my_mission(viewModel.user.peekContent().userInfo.nickname)}" />
+            app:titleViewText="@{viewModel.user.peekContent() == null? @string/empty : @string/missions_my_mission(viewModel.user.peekContent().userInfo.nickname)}" />
 
         <TextView
             android:id="@+id/tv_missions_not_done"
