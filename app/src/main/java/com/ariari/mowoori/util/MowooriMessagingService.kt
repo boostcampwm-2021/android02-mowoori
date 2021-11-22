@@ -34,8 +34,8 @@ class MowooriMessagingService : FirebaseMessagingService() {
             PendingIntent.getActivity(this, FLOAT_NOTIFICATION, intent, PendingIntent.FLAG_MUTABLE)
         val builder =
             NotificationCompat.Builder(this, getString(R.string.app_name))
-                .setContentTitle(remoteMessage.data["title"])
-                .setContentText(remoteMessage.data["body"])
+                .setContentTitle(remoteMessage.data[TITLE])
+                .setContentText(remoteMessage.data[MSG])
                 .setSmallIcon(R.mipmap.ic_app_logo)
                 .setContentIntent(pendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
@@ -56,5 +56,7 @@ class MowooriMessagingService : FirebaseMessagingService() {
 
     companion object {
         const val FLOAT_NOTIFICATION = 0
+        const val TITLE = "title"
+        const val MSG = "message"
     }
 }

@@ -12,7 +12,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object RetrofitModule {
-    private const val FCM_URL = "https://fcm.googleapis.com/fcm/send"
+    private const val FCM_URL = "https://fcm.googleapis.com"
 
     @Provides
     @Singleton
