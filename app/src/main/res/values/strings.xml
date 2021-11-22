@@ -55,6 +55,8 @@
     <string name="desc_home_heart">하트</string>
     <string name="desc_home_snowman_right_hand">눈사람 오른손</string>
     <string name="desc_home_big_heart">왕 하트</string>
+    <string name="home_new_group">새로운 그룹을 추가해주세요.</string>
+    <string name="home_no_group">그룹이 없어요.</string>
 
     <!-- MissionsFragment -->
     <string name="item_missions_stamp_count">%d/%d</string>
@@ -62,6 +64,7 @@
     <string name="missions_not_done">미완료</string>
     <string name="missions_done">완료</string>
     <string name="missions_fail">실패</string>
+    <string name="missions_no_missions">해당하는 미션이 없어요.</string>
 
     <!-- StampFragment -->
     <string name="stamps_mission">매일 잔디 채우기</string>
@@ -102,6 +105,7 @@
     <string name="members_share">공유하기</string>
     <string name="members_invite_code_title">초대코드</string>
     <string name="members_invite_code_copy_complete">초대코드가 클립보드에 복사되었습니다.</string>
+    <string name="members_no_members">구성원이 없어요.</string>
 
     <!-- StampDetailFragment -->
     <string name="stamp_detail_user">%s님의</string>
@@ -116,4 +120,5 @@
     <string name="dialog_picture_camera">CAMERA</string>
     <string name="desc_dialog_picture_camera_icon">카메라 아이콘</string>
     <string name="desc_dialog_picture_gallery_icon">갤러리 아이콘</string>
+
 </resources>

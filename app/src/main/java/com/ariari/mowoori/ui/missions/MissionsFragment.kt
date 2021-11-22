@@ -2,6 +2,7 @@ package com.ariari.mowoori.ui.missions
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -66,7 +67,12 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
 
     private fun setMissionsListObserver() {
         missionsViewModel.missionsList.observe(viewLifecycleOwner) { missionsList ->
-            missionsAdapter.submitList(missionsList)
+            if (missionsList.isEmpty()) {
+                binding.tvMissionsEmpty.isVisible = true
+            } else {
+                binding.tvMissionsEmpty.isVisible = false
+                missionsAdapter.submitList(missionsList)
+            }
             missionsViewModel.setLoadingEvent(false)
         }
     }

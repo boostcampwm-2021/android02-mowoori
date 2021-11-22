@@ -6,16 +6,15 @@ import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import com.ariari.mowoori.R
 import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentMembersBinding
 import com.ariari.mowoori.ui.members.adapter.MembersAdapter
 import com.ariari.mowoori.ui.register.entity.User
-import com.ariari.mowoori.ui.register.entity.UserInfo
 import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.util.toastMessage
 import com.ariari.mowoori.widget.InviteDialogFragment
@@ -63,7 +62,12 @@ class MembersFragment : BaseFragment<FragmentMembersBinding>(R.layout.fragment_m
 
     private fun setMembersListObserver() {
         membersViewModel.membersList.observe(viewLifecycleOwner) {
-            membersAdapter.submitList(it)
+            if (it.isEmpty()) {
+                binding.tvMembersEmpty.isVisible = true
+            } else {
+                binding.tvMembersEmpty.isVisible = false
+                membersAdapter.submitList(it)
+            }
             membersViewModel.setLoadingEvent(false)
         }
     }

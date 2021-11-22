@@ -70,19 +70,25 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         snowmanLv2Animator =
             SnowmanLv2Animator(binding.ivHomeSnowmanFaceLv2, homeViewModel, requireContext())
         snowmanLv3Animator =
-            SnowmanLv3Animator(binding.ivHomeSnowmanFaceLv3, binding.ivHomeSnowmanBody,
+            SnowmanLv3Animator(
+                binding.ivHomeSnowmanFaceLv3, binding.ivHomeSnowmanBody,
                 arrayOf(
                     binding.ivHomeSnowmanButtonTop,
                     binding.ivHomeSnowmanButtonMiddle,
                     binding.ivHomeSnowmanButtonBottom
                 ),
-                homeViewModel, requireContext())
-        snowmanLv4Animator = SnowmanLv4Animator(Lv4Component(binding.layoutHomeSnowmanFaceLv4,
-            listOf(binding.ivHomeSnowmanLeftHand, binding.ivHomeSnowmanRightHand),
-            binding.ivHomeSnowmanBody,
-            listOf(binding.ivHomeFirstExclamation, binding.ivHomeSecondExclamation),
-            listOf(binding.ivHomeLeftHeart, binding.ivHomeRightHeart)),
-            homeViewModel, requireContext())
+                homeViewModel, requireContext()
+            )
+        snowmanLv4Animator = SnowmanLv4Animator(
+            Lv4Component(
+                binding.layoutHomeSnowmanFaceLv4,
+                listOf(binding.ivHomeSnowmanLeftHand, binding.ivHomeSnowmanRightHand),
+                binding.ivHomeSnowmanBody,
+                listOf(binding.ivHomeFirstExclamation, binding.ivHomeSecondExclamation),
+                listOf(binding.ivHomeLeftHeart, binding.ivHomeRightHeart)
+            ),
+            homeViewModel, requireContext()
+        )
     }
 
     override fun onDestroyView() {
@@ -105,7 +111,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
     private fun setGroupInfoListObserver() {
         homeViewModel.groupList.observe(viewLifecycleOwner, { groupList ->
-            adapter.submitList(groupList)
+            if (groupList.isEmpty()) {
+                binding.tvHomeEmpty.isVisible = true
+                binding.tvHomeEmptyDrawer.isVisible = true
+            } else {
+                binding.tvHomeEmpty.isVisible = false
+                binding.tvHomeEmptyDrawer.isVisible = false
+                adapter.submitList(groupList)
+                homeViewModel.updateIsSnowing()
+            }
         })
     }
 
@@ -193,7 +207,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
                 }
             } else {
                 LogUtil.log("cancel", snowJob.toString())
-                snowJob!!.cancelAndJoin()
+                snowJob?.cancelAndJoin()
             }
         }
     }
