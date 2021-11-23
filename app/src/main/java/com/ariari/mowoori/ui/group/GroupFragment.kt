@@ -96,22 +96,22 @@ class GroupFragment : Fragment() {
 
     private fun setOnCompleteClickListener() {
         binding.btnGroupComplete.setOnClickListener {
-            if (requireContext().isNetWorkAvailable()) {
-                joinOrAddGroup(args.groupMode)
-            } else {
-                showNetworkDialog()
-            }
+            joinOrAddGroup()
         }
     }
 
-    private fun joinOrAddGroup(groupMode: GroupMode) {
-        when (groupMode) {
-            GroupMode.INVITE -> {
-                viewModel.joinGroup()
+    private fun joinOrAddGroup() {
+        if (requireContext().isNetWorkAvailable()) {
+            when (args.groupMode) {
+                GroupMode.INVITE -> {
+                    viewModel.joinGroup()
+                }
+                GroupMode.NEW -> {
+                    viewModel.addNewGroup()
+                }
             }
-            GroupMode.NEW -> {
-                viewModel.addNewGroup()
-            }
+        } else {
+            showNetworkDialog()
         }
     }
 
@@ -132,7 +132,7 @@ class GroupFragment : Fragment() {
 
             override fun onRetryClick(dialog: DialogFragment) {
                 dialog.dismiss()
-                joinOrAddGroup(args.groupMode)
+                joinOrAddGroup()
             }
         }).show(requireActivity().supportFragmentManager, "NetworkDialogFragment")
     }

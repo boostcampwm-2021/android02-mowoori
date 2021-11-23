@@ -42,14 +42,12 @@ class MembersFragment : BaseFragment<FragmentMembersBinding>(R.layout.fragment_m
     }
 
     private fun setGroupInfo() {
-//        if (requireContext().isNetWorkAvailable()) {
-//            membersViewModel.setLoadingEvent(true)
-//            membersViewModel.fetchGroupInfo()
-//        } else {
-//            showNetworkDialog()
-//        }
-        membersViewModel.setLoadingEvent(true)
-        membersViewModel.fetchGroupInfo()
+        if (requireContext().isNetWorkAvailable()) {
+            membersViewModel.setLoadingEvent(true)
+            membersViewModel.fetchGroupInfo()
+        } else {
+            showNetworkDialog()
+        }
     }
 
     private fun setLoadingObserver() {
@@ -143,7 +141,7 @@ class MembersFragment : BaseFragment<FragmentMembersBinding>(R.layout.fragment_m
 
             override fun onRetryClick(dialog: DialogFragment) {
                 dialog.dismiss()
-                membersViewModel.fetchGroupInfo()
+                setGroupInfo()
             }
         }).show(requireActivity().supportFragmentManager, "NetworkDialogFragment")
     }

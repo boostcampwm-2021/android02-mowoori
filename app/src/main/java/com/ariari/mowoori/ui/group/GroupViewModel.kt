@@ -42,7 +42,7 @@ class GroupViewModel @Inject constructor(
     }
 
     private fun checkRequestCount() {
-        if (requestCount > 1) {
+        if (requestCount == 1) {
             setNetworkDialogEvent()
         }
     }

@@ -109,15 +109,19 @@ class MissionsAddFragment :
         missionsAddViewModel.checkMissionValidEvent.observe(viewLifecycleOwner, {
             if (isMissionNameValid() && isMissionDateValid()) {
                 Timber.d("success")
-                if (requireContext().isNetWorkAvailable()) {
-                    missionsAddViewModel.postMission(binding.etMissionsAddWhat.text.toString())
-                } else {
-                    showNetworkDialog()
-                }
+                postMission()
             } else {
                 Timber.d("fail")
             }
         })
+    }
+
+    private fun postMission() {
+        if (requireContext().isNetWorkAvailable()) {
+            missionsAddViewModel.postMission(binding.etMissionsAddWhat.text.toString())
+        } else {
+            showNetworkDialog()
+        }
     }
 
     private fun setButtonListener() {
@@ -216,7 +220,7 @@ class MissionsAddFragment :
 
             override fun onRetryClick(dialog: DialogFragment) {
                 dialog.dismiss()
-                missionsAddViewModel.postMission(binding.etMissionsAddWhat.text.toString())
+                postMission()
             }
         }).show(requireActivity().supportFragmentManager, "NetworkDialogFragment")
     }
