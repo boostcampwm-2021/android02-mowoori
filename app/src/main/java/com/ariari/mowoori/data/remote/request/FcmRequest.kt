@@ -8,5 +8,9 @@ data class FcmRequest(
 
 data class FcmData(
     val title: String,
-    val body: String
+    val body: String,
+    val userName: String = "",
+    val missionName: String = "",
+    val pictureUrl: String = "",
+    val comment: String = "",
 )

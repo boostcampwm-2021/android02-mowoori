@@ -32,14 +32,6 @@
                 app:onCloseClick="@{viewModel::setCloseBtnClick}"
                 app:titleViewMode="@{TitleViewMode.TITLE_VIEW_CLOSE_BUTTON}" />
 
-            <Button
-                android:onClick="@{()->viewModel.postFcm()}"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                android:text="fcm"/>
-            
             <TextView
                 android:id="@+id/tv_stamp_detail_user"
                 android:layout_width="wrap_content"

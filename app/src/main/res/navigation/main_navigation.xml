@@ -17,6 +17,9 @@
         <action
             android:id="@+id/action_homeFragment_to_notificationFragment"
             app:destination="@id/notificationFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_stampDetailFragment"
+            app:destination="@id/stampDetailFragment" />
     </fragment>
     <fragment
         android:id="@+id/membersFragment"

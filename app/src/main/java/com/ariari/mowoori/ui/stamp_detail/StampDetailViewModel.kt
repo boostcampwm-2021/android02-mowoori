@@ -29,6 +29,9 @@ class StampDetailViewModel @Inject constructor(
     lateinit var detailInfo: DetailInfo
         private set
 
+    lateinit var stampInfo: StampInfo
+        private set
+
     private val _loadingEvent = MutableLiveData<Event<Boolean>>()
     val loadingEvent: LiveData<Event<Boolean>> get() = _loadingEvent
 
@@ -106,7 +109,7 @@ class StampDetailViewModel @Inject constructor(
                     LogUtil.log("stamp", uri)
                     stampsRepository.getMissionInfo(detailInfo.missionId)
                         .onSuccess {
-                            val stampInfo = StampInfo(
+                            stampInfo = StampInfo(
                                 uri, comment.value!!, getCurrentDate()
                             )
                             stampsRepository.postStamp(stampInfo, Mission(detailInfo.missionId, it))
@@ -135,11 +138,16 @@ class StampDetailViewModel @Inject constructor(
     }
 
     fun postFcm() {
-        LogUtil.log("fcm", "fcm")
         viewModelScope.launch {
             groupMembersTokenList.value?.let { tokenList ->
                 tokenList.forEach { fcmToken ->
-                    stampsRepository.postFcmMessage(fcmToken).onSuccess {
+                    stampsRepository.postFcmMessage(
+                        fcmToken,
+                        detailInfo.copy(
+                            detailMode = DetailMode.INQUIRY,
+                            stampInfo = stampInfo
+                        )
+                    ).onSuccess {
                         LogUtil.log("fcm", it.success.toString())
                         LogUtil.log("fcm", it.failure.toString())
                     }.onFailure {
