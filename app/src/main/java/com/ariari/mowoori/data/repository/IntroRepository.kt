@@ -10,7 +10,7 @@ interface IntroRepository {
 
     suspend fun checkUserRegistered(userUid: String): Boolean
 
-    suspend fun getRandomNickName(): String
+    suspend fun getRandomNickName(): Result<String>
 
     fun getUserUid(): String?
 

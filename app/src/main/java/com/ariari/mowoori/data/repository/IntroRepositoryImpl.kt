@@ -8,6 +8,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.GenericTypeIndicator
 import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.tasks.await
+import java.lang.NullPointerException
 import javax.inject.Inject
 
 class IntroRepositoryImpl @Inject constructor(
@@ -27,14 +28,14 @@ class IntroRepositoryImpl @Inject constructor(
         return snapshot.value != null
     }
 
-    override suspend fun getRandomNickName(): String {
+    override suspend fun getRandomNickName(): Result<String> = runCatching {
         val namesRef = firebaseReference.child("names").get().await()
         val map =
             namesRef.getValue(object : GenericTypeIndicator<HashMap<String, List<String>>>() {})
-                ?: return ""
-        val prefixList = map["prefix"] ?: return ""
-        val nameList = map["name"] ?: return ""
-        return "${prefixList.random()} ${nameList.random()}"
+                ?: throw NullPointerException("invalid path")
+        val prefixList = map["prefix"] ?: throw NullPointerException("invalid key")
+        val nameList = map["name"] ?: throw NullPointerException("invalid key")
+        "${prefixList.random()} ${nameList.random()}"
     }
 
     override fun getUserUid(): String? {
