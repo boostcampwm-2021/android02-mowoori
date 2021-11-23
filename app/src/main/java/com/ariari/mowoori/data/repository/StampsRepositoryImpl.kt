@@ -65,7 +65,7 @@ class StampsRepositoryImpl @Inject constructor(
             val ref = storageReference.child("images/$missionId/${uri.lastPathSegment}")
             val task = ref.putFile(uri).await()
             val uploadUri = task.storage.downloadUrl.await()
-            Timber.i(uploadUri.toString())
+            Timber.d("putCert - $uploadUri")
             uploadUri.toString()
         }
 

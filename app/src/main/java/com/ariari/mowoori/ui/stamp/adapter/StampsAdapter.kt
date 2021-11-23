@@ -47,19 +47,25 @@ class StampsAdapter(private val listener: OnItemClickListener) :
             ViewCompat.setTransitionName(binding.ivItemStamps, stampInfo.pictureUrl)
             Timber.d(adapterPosition.toString())
             binding.tvItemStampsIndex.text = (adapterPosition + 1).toString()
-            // TODO: 이런 로직은 뷰모델에서 해야하는데, 어댑터에 대한 뷰모델을 만들어아 할까?
-            when {
-                stampInfo.pictureUrl.contains("default") -> {
-                    // TODO: 기본 이미지 적용
+            when (stampInfo.pictureUrl) {
+                "empty" -> {
+                    // 빈 스탬프
+                    binding.ivItemStamps.setImageResource(R.drawable.border_sky_blue_line_oval)
+                    binding.tvItemStampsIndex.isVisible = true
+                    binding.containerItemStamps.isClickable = false
+                }
+                "" -> {
+                    // picture url이 없는 스탬프
                     Glide.with(binding.ivItemStamps)
-                        .load(R.drawable.ic_launcher_background)
+                        .load(R.drawable.ic_stamp)
                         .circleCrop()
                         .into(binding.ivItemStamps)
 
                     binding.tvItemStampsIndex.isInvisible = true
                     binding.containerItemStamps.isClickable = true
                 }
-                stampInfo.pictureUrl != "" -> {
+                else -> {
+                    // picture url이 있는 스탬프
                     LogUtil.log("adapter url", stampInfo.pictureUrl)
 
                     Glide.with(binding.ivItemStamps)
@@ -68,11 +74,6 @@ class StampsAdapter(private val listener: OnItemClickListener) :
                         .into(binding.ivItemStamps)
                     binding.tvItemStampsIndex.isInvisible = true
                     binding.containerItemStamps.isClickable = true
-                }
-                else -> {
-                    binding.ivItemStamps.setImageResource(R.drawable.border_sky_blue_line_oval)
-                    binding.tvItemStampsIndex.isVisible = true
-                    binding.containerItemStamps.isClickable = false
                 }
             }
         }

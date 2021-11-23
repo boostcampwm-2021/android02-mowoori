@@ -1,6 +1,7 @@
 package com.ariari.mowoori.ui.stamp_detail
 
 import android.app.Activity
+import android.content.ContentResolver
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -85,7 +86,6 @@ class StampDetailFragment :
     }
 
     private fun init() {
-        setEditMode()
         setBtnVisible()
         setUserName()
         setMissionName()
@@ -103,16 +103,24 @@ class StampDetailFragment :
         setIsMissionPostedObserver()
         setCloseBtnClickObserver()
         setIsCertifyObserver()
-        setCommentObserver()
         setNetworkDialogObserver()
         setGroupMembersFcmTokenListObserver()
         setIsFcmSentObserver()
     }
 
-    private fun setEditMode() {
-        if (stampDetailViewModel.detailInfo.detailMode == DetailMode.INQUIRY) {
-            binding.etStampDetailComment.keyListener = null
-        }
+    private fun setDefaultImageUri() {
+        val pictureUrl = Uri.Builder()
+            .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+            .authority(resources.getResourcePackageName(R.drawable.ic_stamp))
+            .appendPath(resources.getResourceTypeName(R.drawable.ic_stamp))
+            .appendPath(resources.getResourceEntryName(R.drawable.ic_stamp))
+            .build()
+
+        Glide.with(requireContext())
+            .load(pictureUrl)
+            .override(300, 300)
+            .transform(CenterCrop(), RoundedCorners(16))
+            .into(binding.ivStampDetail)
     }
 
     private fun setBtnVisible() {
@@ -132,30 +140,47 @@ class StampDetailFragment :
     }
 
     private fun setComment() {
-        stampDetailViewModel.setComment(stampDetailViewModel.detailInfo.stampInfo.comment)
+        if (stampDetailViewModel.detailInfo.detailMode == DetailMode.INQUIRY) {
+            stampDetailViewModel.setComment(stampDetailViewModel.detailInfo.stampInfo.comment)
+            binding.etStampDetailComment.setText(stampDetailViewModel.detailInfo.stampInfo.comment)
+            binding.etStampDetailComment.hint = "입력한 한줄평이 없어요."
+            binding.etStampDetailComment.keyListener = null
+        }
     }
 
     private fun setPictureClickListener() {
         val pictureUrl = stampDetailViewModel.detailInfo.stampInfo.pictureUrl
-        if (pictureUrl != "") {
-            loadPicture(pictureUrl)
-        } else {
+        val mode = stampDetailViewModel.detailInfo.detailMode
+
+        if (mode == DetailMode.CERTIFY) {
             binding.ivStampDetail.setOnClickListener {
                 PictureDialogFragment(onClick).show(
                     requireActivity().supportFragmentManager,
                     "PictureDialogFragment"
                 )
             }
+        } else {
+            loadPicture(pictureUrl)
         }
     }
 
     private fun loadPicture(pictureUrl: String) {
-        Glide.with(requireContext())
-            .load(pictureUrl)
-            .override(300, 300)
-            .transform(CenterCrop(), RoundedCorners(16))
-            .into(binding.ivStampDetail)
         binding.tvStampDetailIcon.isInvisible = true
+        if (pictureUrl == "") {
+            // setDefaultImageUri()
+            // 기본 이미지일 경우
+            Glide.with(requireContext())
+                .load(R.drawable.ic_stamp)
+                .override(300, 300)
+                .transform(CenterCrop(), RoundedCorners(16))
+                .into(binding.ivStampDetail)
+        } else {
+            Glide.with(requireContext())
+                .load(pictureUrl)
+                .override(300, 300)
+                .transform(CenterCrop(), RoundedCorners(16))
+                .into(binding.ivStampDetail)
+        }
     }
 
     private fun setBtnCertifyListener() {
@@ -194,15 +219,13 @@ class StampDetailFragment :
         val photoFile: File?
         try {
             photoFile = createImageFile()
-            if (photoFile != null) {
-                providerUri = FileProvider.getUriForFile(
-                    requireContext(),
-                    "com.ariari.mowoori.fileProvider",
-                    photoFile
-                )
-                LogUtil.log("providerUri", providerUri.toString())
-                activityPictureLauncher.launch(providerUri)
-            }
+            providerUri = FileProvider.getUriForFile(
+                requireContext(),
+                "com.ariari.mowoori.fileProvider",
+                photoFile
+            )
+            LogUtil.log("providerUri", providerUri.toString())
+            activityPictureLauncher.launch(providerUri)
         } catch (exception: Exception) {
             Timber.e("create Image File Error~~")
         }
@@ -234,11 +257,20 @@ class StampDetailFragment :
 
     private fun saveCurrentPicture(uri: Uri?) {
         stampDetailViewModel.setPictureUri(uri)
-        Glide.with(requireContext())
-            .load(uri)
-            .override(300, 300)
-            .transform(CenterCrop(), RoundedCorners(16))
-            .into(binding.ivStampDetail)
+
+        if (uri == null) {
+            Glide.with(requireContext())
+                .load(R.drawable.ic_stamp)
+                .override(300, 300)
+                .transform(CenterCrop(), RoundedCorners(16))
+                .into(binding.ivStampDetail)
+        } else {
+            Glide.with(requireContext())
+                .load(uri)
+                .override(300, 300)
+                .transform(CenterCrop(), RoundedCorners(16))
+                .into(binding.ivStampDetail)
+        }
         binding.tvStampDetailIcon.isVisible = false
     }
 
@@ -283,12 +315,6 @@ class StampDetailFragment :
                 binding.tvStampDetailComment.isFocusable = false
             }
         })
-    }
-
-    private fun setCommentObserver() {
-        stampDetailViewModel.comment.observe(viewLifecycleOwner) {
-            binding.etStampDetailComment.setText(it)
-        }
     }
 
     private fun setIsMissionPostedObserver() {
