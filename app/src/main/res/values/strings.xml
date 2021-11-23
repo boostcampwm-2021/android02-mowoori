@@ -70,7 +70,7 @@
     <!-- StampFragment -->
     <string name="stamps_mission">매일 잔디 채우기</string>
     <string name="stamps_number">1</string>
-    <string name="stamps_complete">오늘도 완료!</string>
+    <string name="stamps_complete">미션인증</string>
     <string name="desc_item_stamps_stamp">스탬프</string>
     <string name="desc_item_stamps_icon">스탬프 아이콘</string>
 
@@ -114,7 +114,7 @@
     <string name="stamp_detail_comment">한줄평</string>
     <string name="stamp_detail_hint">한줄평을 작성해주세요</string>
     <string name="stamp_detail_valid">(5자 이상 100자 이하)</string>
-    <string name="stamp_detail_complete">인증하기</string>
+    <string name="stamp_detail_complete">인증완료</string>
 
     <!-- PictureDialogFragment -->
     <string name="dialog_picture_gallery">GALLERY</string>
