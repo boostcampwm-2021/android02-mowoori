@@ -28,8 +28,7 @@ class StampDetailViewModel @Inject constructor(
     lateinit var detailInfo: DetailInfo
         private set
 
-    lateinit var stampInfo: StampInfo
-        private set
+    private var stampInfo = StampInfo()
 
     private val _loadingEvent = MutableLiveData<Event<Boolean>>()
     val loadingEvent: LiveData<Event<Boolean>> = _loadingEvent
@@ -177,24 +176,16 @@ class StampDetailViewModel @Inject constructor(
     }
 
     private suspend fun postStampInfo(uriString: String) {
-        LogUtil.log("stampuri", uriString.toString())
+        LogUtil.log("stamp", uriString)
         initRequestCount()
         stampsRepository.getMissionInfo(detailInfo.missionId)
             .onSuccess {
-                LogUtil.log("commentLiveData", comment.value.toString())
-                LogUtil.log("commentMutableLiveData", _comment.value.toString())
-
-                stampInfo = StampInfo(
-                    pictureUrl = uriString,
-                    comment = comment.value!!,
-                    timeStamp = getCurrentDate()
-                )
-                LogUtil.log("stampinfo", stampInfo.toString())
-
+                val stampInfo = StampInfo(uriString, comment.value!!, getCurrentDate())
                 initRequestCount()
                 stampsRepository.postStamp(stampInfo, Mission(detailInfo.missionId, it))
                     .onSuccess {
                         _isStampPosted.postValue(Event(Unit))
+                        setLoadingEvent(false)
                     }.onFailure {
                         addRequestCount()
                         checkRequestCount()
