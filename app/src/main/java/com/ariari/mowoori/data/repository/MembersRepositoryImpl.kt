@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 class MembersRepositoryImpl @Inject constructor(
     private val databaseReference: DatabaseReference,
-    private val firebaseAuth: FirebaseAuth
+    private val firebaseAuth: FirebaseAuth,
 ) : MembersRepository {
     override suspend fun getCurrentGroupInfo(): Result<Group> = kotlin.runCatching {
         val uid = getUserUid() ?: throw NullPointerException("userId is Null")
@@ -28,12 +28,12 @@ class MembersRepositoryImpl @Inject constructor(
 
     override fun getUserUid(): String? = firebaseAuth.currentUser?.uid
 
-    override suspend fun getUserInfo(userId: String): User? =
+    override suspend fun getUserInfo(userId: String): Result<User> =
         kotlin.runCatching {
             val userSnapshot = databaseReference.child("users/$userId").get().await()
             User(
                 userId,
                 userSnapshot.getValue(UserInfo::class.java) ?: UserInfo()
             )
-        }.getOrNull()
+        }
 }
