@@ -12,6 +12,7 @@ import com.ariari.mowoori.util.getCurrentDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,7 +20,7 @@ class MissionsViewModel @Inject constructor(
     private val missionsRepository: MissionsRepository,
 ) : ViewModel() {
     private val _loadingEvent = MutableLiveData<Event<Boolean>>()
-    val loadingEvent: LiveData<Event<Boolean>> get() = _loadingEvent
+    val loadingEvent: LiveData<Event<Boolean>> = _loadingEvent
 
     private val _plusBtnClick = MutableLiveData<Event<Boolean>>()
     val plusBtnClick: LiveData<Event<Boolean>> = _plusBtnClick
@@ -27,14 +28,17 @@ class MissionsViewModel @Inject constructor(
     private val _itemClick = MutableLiveData<Event<Mission>>()
     val itemClick: LiveData<Event<Mission>> = _itemClick
 
-    private val _missionsType = MutableLiveData(Event(NOT_DONE_TYPE))
-    val missionsType: LiveData<Event<Int>> = _missionsType
+    private val _missionsType = MutableLiveData(NOT_DONE_TYPE)
+    val missionsType: LiveData<Int> = _missionsType
 
-    private val _missionsList = MutableLiveData<List<Mission>>()
-    val missionsList: LiveData<List<Mission>> = _missionsList
+    private val _missionsList = MutableLiveData<Event<List<Mission>>>()
+    val missionsList: LiveData<Event<List<Mission>>> = _missionsList
 
     private val _user = MutableLiveData<Event<User>>()
-    val user: LiveData<Event<User>> get() = _user
+    val user: LiveData<Event<User>> = _user
+
+    private val _errorMessage = MutableLiveData<Event<String>>()
+    val errorMessage: LiveData<Event<String>> = _errorMessage
 
     private val _networkDialogEvent = MutableLiveData<Event<Boolean>>()
     val networkDialogEvent: LiveData<Event<Boolean>> get() = _networkDialogEvent
@@ -52,17 +56,17 @@ class MissionsViewModel @Inject constructor(
     }
 
     fun setNotDoneType() {
-        _missionsType.value = Event(NOT_DONE_TYPE)
+        _missionsType.value = NOT_DONE_TYPE
         setLoadingEvent(true)
     }
 
     fun setDoneType() {
-        _missionsType.value = Event(DONE_TYPE)
+        _missionsType.value = DONE_TYPE
         setLoadingEvent(true)
     }
 
     fun setFailType() {
-        _missionsType.value = Event(FAIL_TYPE)
+        _missionsType.value = FAIL_TYPE
         setLoadingEvent(true)
     }
 
@@ -75,7 +79,11 @@ class MissionsViewModel @Inject constructor(
                 missionsRepository.getUser().onSuccess { user ->
                     loadUser(user)
                     loadMissionIdList(user)
-                }.onFailure { setNetworkDialogEvent() }
+                }.onFailure { exception ->
+                  Timber.e(exception)
+                  setNetworkDialogEvent() 
+                  _errorMessage.postValue(Event("getUser")
+                }
             }
         }
     }
@@ -86,7 +94,9 @@ class MissionsViewModel @Inject constructor(
                 .onSuccess { missionIdList ->
                     loadMissionList(user.userId, missionIdList)
                 }
-                .onFailure {
+                .onFailure { exception ->
+                    Timber.e(exception)
+                    _errorMessage.postValue(Event("loadMissionList"))
                     setNetworkDialogEvent()
                 }
         }
@@ -117,14 +127,14 @@ class MissionsViewModel @Inject constructor(
                                         (it.missionInfo.curStamp < it.missionInfo.totalStamp)
                             }
                         }
-                        else -> throw IllegalStateException()
+                        else -> emptyList()
                     })
             }
             .onFailure {
                 setNetworkDialogEvent()
             }
     }
-
+    
     private fun loadUser(user: User) {
         _user.postValue(Event(user))
     }

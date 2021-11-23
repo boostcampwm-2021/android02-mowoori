@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:onInviteClick="@{viewModel::clickPlusButton}"
-            app:text="@string/members_title"
+            app:titleViewText="@{viewModel.currentGroup.groupInfo.groupName}"
             app:titleViewMode="@{TitleViewMode.TITLE_VIEW_INVITE_BUTTON}" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -38,6 +38,18 @@
             app:layout_constraintTop_toBottomOf="@id/title_view_members"
             app:spanCount="2"
             tools:listitem="@layout/item_members" />
+
+        <TextView
+            android:id="@+id/tv_members_empty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/members_no_members"
+            android:textColor="@color/gray_A3A3A3"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title_view_members" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

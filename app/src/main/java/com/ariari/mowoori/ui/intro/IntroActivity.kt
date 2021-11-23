@@ -12,7 +12,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.ariari.mowoori.BuildConfig
 import com.ariari.mowoori.R
-import com.ariari.mowoori.data.preference.MoWooriPreference
 import com.ariari.mowoori.databinding.ActivityIntroBinding
 import com.ariari.mowoori.ui.main.MainActivity
 import com.ariari.mowoori.ui.register.RegisterActivity
@@ -23,12 +22,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class IntroActivity : AppCompatActivity() {
 
-    private val viewModel: IntroViewModel by viewModels()
+    private val introViewModel: IntroViewModel by viewModels()
     private lateinit var auth: FirebaseAuth
     private val binding by lazy {
         ActivityIntroBinding.inflate(layoutInflater)
@@ -45,17 +43,13 @@ class IntroActivity : AppCompatActivity() {
         android.Manifest.permission.READ_EXTERNAL_STORAGE
     )
 
-    @Inject
-    lateinit var preference: MoWooriPreference
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
         auth = FirebaseAuth.getInstance()
-//        autoLogin()
-        binding.viewModel = viewModel
-
+        autoLogin()
+        binding.viewModel = introViewModel
+        introViewModel.initFcmToken()
         setListeners()
         setObservers()
         requestPermissions(permissionList)
@@ -78,25 +72,15 @@ class IntroActivity : AppCompatActivity() {
     }
 
     private fun setObservers() {
-        viewModel.isUserRegistered.observe(this, EventObserver {
+        introViewModel.isUserRegistered.observe(this, EventObserver {
             if (it) {
-                preference.setUserRegistered(true)
+                introViewModel.updateFcmToken()
+                introViewModel.setUserRegistered(true)
                 moveToMain()
             } else {
                 moveToRegister()
             }
         })
-    }
-
-    override fun onStart() {
-        super.onStart()
-        showSignInButton()
-    }
-
-    private fun showSignInButton() {
-        val animation = AlphaAnimation(0f, 1f).apply { duration = 2000 }
-        binding.btnSplashSignIn.animation = animation
-        binding.btnSplashSignIn.isVisible = true
     }
 
     private fun signIn() {
@@ -124,7 +108,7 @@ class IntroActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     task.result.user?.let {
-                        viewModel.checkUserRegistered(it.uid)
+                        introViewModel.checkUserRegistered(it.uid)
                     }
                 } else {
                     Toast.makeText(this, "로그인 할 수 없습니다.", Toast.LENGTH_SHORT).show()
@@ -145,9 +129,18 @@ class IntroActivity : AppCompatActivity() {
     }
 
     private fun autoLogin() {
-        if (auth.currentUser != null && preference.getUserRegistered()) {
-            moveToMain()
+        if (auth.currentUser != null && introViewModel.getUserRegistered()) {
+            signIn()
         }
+        else{
+            showSignInButton()
+        }
+    }
+
+    private fun showSignInButton() {
+        val animation = AlphaAnimation(0f, 1f).apply { duration = 2000 }
+        binding.btnSplashSignIn.animation = animation
+        binding.btnSplashSignIn.isVisible = true
     }
 
     private fun requestPermissions(permissions: List<String>) {

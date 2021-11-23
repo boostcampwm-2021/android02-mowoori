@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.IntroRepository
 import com.ariari.mowoori.ui.register.entity.UserInfo
 import com.ariari.mowoori.util.Event
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,6 +32,8 @@ class RegisterViewModel @Inject constructor(
     private val _profileImageUri = MutableLiveData<Uri>()
     val profileImageUri: LiveData<Uri> = _profileImageUri
 
+    private var fcmToken = ""
+
     private val _loadingEvent = MutableLiveData<Event<Boolean>>()
     val loadingEvent: LiveData<Event<Boolean>> = _loadingEvent
 
@@ -48,6 +52,10 @@ class RegisterViewModel @Inject constructor(
         _profileImageUri.postValue(uri)
     }
 
+    fun setUserRegistered(isRegistered:Boolean){
+        introRepository.setUserRegistered(isRegistered)
+    }
+
     fun registerUserInfo() {
         _loadingEvent.value = Event(true)
         val nickname = profileText.value ?: ""
@@ -63,11 +71,21 @@ class RegisterViewModel @Inject constructor(
             val success = introRepository.userRegister(
                 UserInfo(
                     nickname = nickname,
-                    profileImage = uploadUrl
+                    profileImage = uploadUrl,
+                    fcmToken = fcmToken
                 )
             )
             _registerSuccessEvent.postValue(Event(success))
         }
+    }
+
+    fun initFcmToken() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                return@OnCompleteListener
+            }
+            fcmToken = task.result.toString()
+        })
     }
 
     private fun checkNicknameValid(nickname: String): Boolean {

@@ -37,7 +37,7 @@ class HomeViewModel @Inject constructor(
     private val _groupList = MutableLiveData<List<Group>>()
     val groupList: LiveData<List<Group>> = _groupList
 
-    private var _isSnowing = MutableLiveData(true)
+    private var _isSnowing = MutableLiveData(false)
     val isSnowing: LiveData<Boolean> = _isSnowing
 
     private var _alphaForLv4 = MutableLiveData(0f)

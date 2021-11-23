@@ -16,7 +16,8 @@ class MissionsRepositoryImpl @Inject constructor(
     private val firebaseReference: DatabaseReference,
     private val firebaseAuth: FirebaseAuth
 ) : MissionsRepository {
-    override suspend fun getMissionIdList(groupId: String): Result<List<String>> = kotlin.runCatching {
+
+    override suspend fun getMissionIdList(groupId: String): Result<List<String>> = runCatching {
         val groupsRef = firebaseReference.child("groups")
             .child(groupId)
             .child("missionList")
@@ -26,7 +27,7 @@ class MissionsRepositoryImpl @Inject constructor(
         missionIdList ?: emptyList()
     }
 
-    override suspend fun getMissions(userId: String): Result<List<Mission>> = kotlin.runCatching {
+    override suspend fun getMissions(userId: String): Result<List<Mission>> = runCatching {
         val missionList = mutableListOf<Mission>()
         val missionsRef = firebaseReference.child("missions")
             .get().await()

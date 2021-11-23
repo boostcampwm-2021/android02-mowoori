@@ -3,6 +3,7 @@ package com.ariari.mowoori.ui.missions
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.DialogFragment
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -13,6 +14,7 @@ import com.ariari.mowoori.ui.missions.adapter.MissionsAdapter
 import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.util.isNetWorkAvailable
 import com.ariari.mowoori.widget.NetworkDialogFragment
+import com.ariari.mowoori.util.toastMessage
 import com.ariari.mowoori.widget.ProgressDialogManager
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -39,6 +41,8 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
         setMissionsListObserver()
         setItemClickObserver()
         setNetworkDialogObserver()
+        setUserNameObserver()
+        setErrorMessageObserver()
     }
 
     private fun setLoadingObserver() {
@@ -65,16 +69,17 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
     }
 
     private fun setMissionsTypeObserver() {
-        missionsViewModel.missionsType.observe(viewLifecycleOwner, EventObserver {
+        missionsViewModel.missionsType.observe(viewLifecycleOwner) {
             missionsViewModel.sendUserToLoadMissions(args.user)
-        })
+        }
     }
 
     private fun setMissionsListObserver() {
-        missionsViewModel.missionsList.observe(viewLifecycleOwner) { missionsList ->
+        missionsViewModel.missionsList.observe(viewLifecycleOwner, EventObserver { missionsList ->
             missionsAdapter.submitList(missionsList)
+            binding.tvMissionsEmpty.isVisible = missionsList.isEmpty()
             missionsViewModel.setLoadingEvent(false)
-        }
+        })
     }
 
     private fun setItemClickObserver() {
@@ -107,5 +112,21 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
                 missionsViewModel.sendUserToLoadMissions(args.user)
             }
         }).show(requireActivity().supportFragmentManager, "NetworkDialogFragment")
+    }
+    
+    private fun setErrorMessageObserver() {
+        missionsViewModel.errorMessage.observe(viewLifecycleOwner, EventObserver {
+            when (it) {
+                "loadMissionList" -> {
+                    toastMessage("에러가 발생했습니다. 잠시 후 다시 시도해주세요.")
+                }
+                "getUser" -> {
+                    toastMessage("사용자 정보를 가져올 수 없습니다. 잠시 후 다시 시도해주세요.")
+                }
+                else -> {
+                    toastMessage("에러가 발생했습니다. 잠시 후 다시 시도해주세요.")
+                }
+            }
+        })
     }
 }

@@ -68,6 +68,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-database-ktx'
     implementation 'com.google.firebase:firebase-storage-ktx'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutinePlayServices"
+    implementation 'com.google.firebase:firebase-messaging-ktx'
+    implementation 'com.google.firebase:firebase-analytics-ktx'
 
     // Glide
     implementation "com.github.bumptech.glide:glide:$glideVersion"
@@ -85,4 +87,11 @@ dependencies {
 
     // Gson
     implementation "com.google.code.gson:gson:$gsonVersion"
+
+    // EncryptedSharedPreferences
+    implementation "androidx.security:security-crypto:1.1.0-alpha03"
+
+    // Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 }
