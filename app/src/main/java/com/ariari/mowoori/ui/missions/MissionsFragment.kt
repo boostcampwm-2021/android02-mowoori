@@ -2,6 +2,7 @@ package com.ariari.mowoori.ui.missions
 
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.DialogFragment
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -11,6 +12,8 @@ import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentMissionsBinding
 import com.ariari.mowoori.ui.missions.adapter.MissionsAdapter
 import com.ariari.mowoori.util.EventObserver
+import com.ariari.mowoori.util.isNetWorkAvailable
+import com.ariari.mowoori.widget.NetworkDialogFragment
 import com.ariari.mowoori.util.toastMessage
 import com.ariari.mowoori.widget.ProgressDialogManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,13 +25,11 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
         MissionsAdapter(missionsViewModel)
     }
     private val args by navArgs<MissionsFragmentArgs>()
-    private lateinit var userName: String
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = missionsViewModel
-        missionsViewModel.setLoadingEvent(true)
         setMissionsRvAdapter()
         setObserver()
     }
@@ -39,6 +40,7 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
         setMissionsTypeObserver()
         setMissionsListObserver()
         setItemClickObserver()
+        setNetworkDialogObserver()
         setUserNameObserver()
         setErrorMessageObserver()
     }
@@ -52,6 +54,12 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
 
     private fun setMissionsRvAdapter() {
         binding.rvMissions.adapter = missionsAdapter
+        if (requireContext().isNetWorkAvailable()) {
+            missionsViewModel.setLoadingEvent(true)
+            missionsViewModel.sendUserToLoadMissions(args.user)
+        } else {
+            showNetworkDialog()
+        }
     }
 
     private fun setPlusBtnClickObserver() {
@@ -84,12 +92,28 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
         })
     }
 
-    private fun setUserNameObserver() {
-        missionsViewModel.user.observe(viewLifecycleOwner, EventObserver {
-            userName = it.userInfo.nickname
+    private fun setNetworkDialogObserver() {
+        missionsViewModel.networkDialogEvent.observe(viewLifecycleOwner, EventObserver {
+            if (it) {
+                showNetworkDialog()
+            }
         })
     }
 
+    private fun showNetworkDialog() {
+        NetworkDialogFragment(object : NetworkDialogFragment.NetworkDialogListener {
+            override fun onCancelClick(dialog: DialogFragment) {
+                dialog.dismiss()
+                findNavController().navigate(R.id.action_stampsFragment_to_homeFragment)
+            }
+
+            override fun onRetryClick(dialog: DialogFragment) {
+                dialog.dismiss()
+                missionsViewModel.sendUserToLoadMissions(args.user)
+            }
+        }).show(requireActivity().supportFragmentManager, "NetworkDialogFragment")
+    }
+    
     private fun setErrorMessageObserver() {
         missionsViewModel.errorMessage.observe(viewLifecycleOwner, EventObserver {
             when (it) {

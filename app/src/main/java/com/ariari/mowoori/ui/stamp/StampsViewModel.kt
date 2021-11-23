@@ -9,11 +9,9 @@ import com.ariari.mowoori.data.repository.MissionsRepository
 import com.ariari.mowoori.data.repository.StampsRepository
 import com.ariari.mowoori.ui.missions.entity.Mission
 import com.ariari.mowoori.ui.missions.entity.MissionInfo
-import com.ariari.mowoori.ui.register.entity.User
 import com.ariari.mowoori.ui.stamp.entity.Stamp
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
 import com.ariari.mowoori.util.Event
-import com.ariari.mowoori.util.LogUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -44,6 +42,9 @@ class StampsViewModel @Inject constructor(
     private val _isMyMission = MutableLiveData<Event<Boolean>>()
     val isMyMission: LiveData<Event<Boolean>> get() = _isMyMission
 
+    private val _networkDialogEvent = MutableLiveData<Event<Boolean>>()
+    val networkDialogEvent: LiveData<Event<Boolean>> get() = _networkDialogEvent
+
     fun setLoadingEvent(flag: Boolean) {
         _loadingEvent.postValue(Event(flag))
     }
@@ -66,6 +67,7 @@ class StampsViewModel @Inject constructor(
                         tempStampList.add(Stamp(stampId, stampInfo))
                     }
                     .onFailure {
+                        setNetworkDialogEvent()
                         Timber.e("stampInfo Error: $it")
                     }
             }
@@ -92,17 +94,22 @@ class StampsViewModel @Inject constructor(
     }
 
     fun loadMissionInfo(missionId: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             missionsRepository.getMissionInfo(missionId)
                 .onSuccess {
                     _mission.postValue(Mission(missionId, it))
                 }.onFailure {
-                    // TODO: 네트워크 연결 끊김 처리
+                    setNetworkDialogEvent()
                     Timber.e("$it")
                 }
         }
     }
 
+    private fun setNetworkDialogEvent() {
+        setLoadingEvent(false)
+        _networkDialogEvent.postValue(Event(true))
+    }
+    
     fun postFcm() {
         LogUtil.log("fcm","fcm")
         viewModelScope.launch {

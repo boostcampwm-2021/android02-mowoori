@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.MissionsRepository
 import com.ariari.mowoori.ui.missions.entity.MissionInfo
+import com.ariari.mowoori.ui.register.entity.User
 import com.ariari.mowoori.util.Event
 import com.ariari.mowoori.util.LogUtil
 import com.ariari.mowoori.util.getCurrentDate
@@ -18,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MissionsAddViewModel @Inject constructor(
-    private val missionsRepository: MissionsRepository
+    private val missionsRepository: MissionsRepository,
 ) : ViewModel() {
     private val _backBtnClick = MutableLiveData<Event<Boolean>>()
     val backBtnClick: LiveData<Event<Boolean>> = _backBtnClick
@@ -41,6 +42,9 @@ class MissionsAddViewModel @Inject constructor(
     private val _isMissionPosted = MutableLiveData<Event<Unit>>()
     val isMissionPosted: LiveData<Event<Unit>> = _isMissionPosted
 
+    private val _networkDialogEvent = MutableLiveData<Event<Boolean>>()
+    val networkDialogEvent: LiveData<Event<Boolean>> get() = _networkDialogEvent
+
     init {
         _missionStartDate.value = getCurrentDate()
         _missionEndDate.value = getCurrentDatePlusMonths(1)
@@ -54,21 +58,28 @@ class MissionsAddViewModel @Inject constructor(
     fun postMission(missionName: String) {
         viewModelScope.launch(Dispatchers.IO) {
             missionsRepository.getUser().onSuccess { user ->
-                val missionInfo = getMissionInfo(user.userId, missionName)
-                missionsRepository.getMissionIdList(user.userInfo.currentGroupId)
-                    .onSuccess { missionIdList ->
-                        // missions에 missionInfo 추가, currentGroup의 missionList에 missionInfo 추가
-                        missionsRepository.postMission(
-                            missionInfo,
-                            user.userInfo.currentGroupId,
-                            missionIdList
-                        )
-                        _isMissionPosted.postValue(Event(Unit))
-                    }
+                loadMissionIdList(getMissionInfo(user.userId, missionName), user)
             }.onFailure {
-                throw Exception("get User Exception!!")
+                setNetworkDialogEvent()
             }
         }
+    }
+
+    private suspend fun loadMissionIdList(missionInfo: MissionInfo, user: User) {
+        missionsRepository.getMissionIdList(user.userInfo.currentGroupId)
+            .onSuccess { missionIdList ->
+                // missions에 missionInfo 추가, currentGroup의 missionList에 missionInfo 추가
+                missionsRepository.postMission(
+                    missionInfo,
+                    user.userInfo.currentGroupId,
+                    missionIdList
+                )
+                // 화면 종료 Event 실행
+                _isMissionPosted.postValue(Event(Unit))
+            }
+            .onFailure {
+                setNetworkDialogEvent()
+            }
     }
 
     private fun getMissionInfo(userId: String, missionName: String): MissionInfo {
@@ -100,5 +111,9 @@ class MissionsAddViewModel @Inject constructor(
 
     fun checkMissionValid() {
         _checkMissionValidEvent.postValue(Event(Unit))
+    }
+
+    private fun setNetworkDialogEvent() {
+        _networkDialogEvent.postValue(Event(true))
     }
 }

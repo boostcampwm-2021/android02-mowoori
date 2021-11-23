@@ -16,6 +16,7 @@ class MissionsRepositoryImpl @Inject constructor(
     private val firebaseReference: DatabaseReference,
     private val firebaseAuth: FirebaseAuth
 ) : MissionsRepository {
+
     override suspend fun getMissionIdList(groupId: String): Result<List<String>> = runCatching {
         val groupsRef = firebaseReference.child("groups")
             .child(groupId)

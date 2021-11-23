@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MissionsViewModel @Inject constructor(
-    private val missionsRepository: MissionsRepository
+    private val missionsRepository: MissionsRepository,
 ) : ViewModel() {
     private val _loadingEvent = MutableLiveData<Event<Boolean>>()
     val loadingEvent: LiveData<Event<Boolean>> = _loadingEvent
@@ -39,6 +39,9 @@ class MissionsViewModel @Inject constructor(
 
     private val _errorMessage = MutableLiveData<Event<String>>()
     val errorMessage: LiveData<Event<String>> = _errorMessage
+
+    private val _networkDialogEvent = MutableLiveData<Event<Boolean>>()
+    val networkDialogEvent: LiveData<Event<Boolean>> get() = _networkDialogEvent
 
     fun setLoadingEvent(isLoading: Boolean) {
         _loadingEvent.value = Event(isLoading)
@@ -70,71 +73,75 @@ class MissionsViewModel @Inject constructor(
     fun sendUserToLoadMissions(user: User?) {
         if (user != null) {
             loadUser(user)
-            loadMissionsList(user)
+            loadMissionIdList(user)
         } else {
             viewModelScope.launch(Dispatchers.IO) {
                 missionsRepository.getUser().onSuccess { user ->
                     loadUser(user)
-                    loadMissionsList(user)
+                    loadMissionIdList(user)
                 }.onFailure { exception ->
-                    Timber.e(exception)
-                    _errorMessage.postValue(Event("getUser"))
+                  Timber.e(exception)
+                  setNetworkDialogEvent() 
+                  _errorMessage.postValue(Event("getUser")
                 }
             }
         }
     }
 
-    private fun loadMissionsList(user: User) {
+    private fun loadMissionIdList(user: User) {
         viewModelScope.launch(Dispatchers.IO) {
             missionsRepository.getMissionIdList(user.userInfo.currentGroupId)
                 .onSuccess { missionIdList ->
-                    missionsRepository.getMissions(user.userId)
-                        .onSuccess { missions ->
-                            loadTypedMissions(missionIdList, missions)
-                        }
+                    loadMissionList(user.userId, missionIdList)
                 }
                 .onFailure { exception ->
                     Timber.e(exception)
                     _errorMessage.postValue(Event("loadMissionList"))
+                    setNetworkDialogEvent()
                 }
         }
     }
 
-    private fun loadTypedMissions(missionIdList: List<String>, missions: List<Mission>) {
-        _missionsList.postValue(
-            Event(
-                when (requireNotNull(missionsType.value)) {
-                    NOT_DONE_TYPE -> {
-                        missions.filter {
-                            (missionIdList.contains(it.missionId)) &&
-                                    (getCurrentDate() <= it.missionInfo.dueDate) &&
-                                    (it.missionInfo.curStamp < it.missionInfo.totalStamp)
+    private suspend fun loadMissionList(userId: String, missionIdList: List<String>) {
+        missionsRepository.getMissions(userId)
+            .onSuccess { missionList ->
+                _missionsList.postValue(
+                    when (requireNotNull(missionsType.value).peekContent()) {
+                        NOT_DONE_TYPE -> {
+                            missionList.filter {
+                                (missionIdList.contains(it.missionId)) &&
+                                        (getCurrentDate() <= it.missionInfo.dueDate) &&
+                                        (it.missionInfo.curStamp < it.missionInfo.totalStamp)
+                            }
                         }
-                    }
-                    DONE_TYPE -> {
-                        missions.filter {
-                            (missionIdList.contains(it.missionId)) &&
-                                    (it.missionInfo.curStamp == it.missionInfo.totalStamp)
+                        DONE_TYPE -> {
+                            missionList.filter {
+                                (missionIdList.contains(it.missionId)) &&
+                                        (it.missionInfo.curStamp == it.missionInfo.totalStamp)
+                            }
                         }
-                    }
-                    FAIL_TYPE -> {
-                        missions.filter {
-                            (missionIdList.contains(it.missionId)) &&
-                                    (getCurrentDate() > it.missionInfo.dueDate) &&
-                                    (it.missionInfo.curStamp < it.missionInfo.totalStamp)
+                        FAIL_TYPE -> {
+                            missionList.filter {
+                                (missionIdList.contains(it.missionId)) &&
+                                        (getCurrentDate() > it.missionInfo.dueDate) &&
+                                        (it.missionInfo.curStamp < it.missionInfo.totalStamp)
+                            }
                         }
-                    }
-                    else -> {
-                        Timber.e("missionList postValue Error!!")
-                        emptyList()
-                    }
-                }
-            )
-        )
+                        else -> emptyList()
+                    })
+            }
+            .onFailure {
+                setNetworkDialogEvent()
+            }
     }
-
+    
     private fun loadUser(user: User) {
         _user.postValue(Event(user))
+    }
+
+    private fun setNetworkDialogEvent() {
+        setLoadingEvent(false)
+        _networkDialogEvent.postValue(Event(true))
     }
 
     companion object {

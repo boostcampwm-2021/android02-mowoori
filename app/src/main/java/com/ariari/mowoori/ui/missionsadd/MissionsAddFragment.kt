@@ -15,9 +15,11 @@ import com.ariari.mowoori.R
 import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentMissionsAddBinding
 import com.ariari.mowoori.util.EventObserver
+import com.ariari.mowoori.util.isNetWorkAvailable
 import com.ariari.mowoori.util.toastMessage
 import com.ariari.mowoori.widget.BaseDialogFragment
 import com.ariari.mowoori.widget.DatePickerDialogFragment
+import com.ariari.mowoori.widget.NetworkDialogFragment
 import com.ariari.mowoori.widget.NumberPickerDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
@@ -40,6 +42,7 @@ class MissionsAddFragment :
         setCompleteEventObserver()
         setCountEventObserver()
         setValidationObserver()
+        setNetworkDialogObserver()
     }
 
     private fun setClickListener() {
@@ -62,14 +65,14 @@ class MissionsAddFragment :
 
     private fun setBackBtnClickObserver() {
         missionsAddViewModel.backBtnClick.observe(viewLifecycleOwner, EventObserver {
-            this.findNavController().navigateUp()
+            this.findNavController().popBackStack()
         })
     }
 
     private fun setCompleteEventObserver() {
         missionsAddViewModel.isMissionPosted.observe(viewLifecycleOwner, EventObserver {
             toastMessage("미션이 성공적으로 추가되었습니다.")
-            this.findNavController().navigateUp()
+            this.findNavController().popBackStack()
         })
     }
 
@@ -106,7 +109,11 @@ class MissionsAddFragment :
         missionsAddViewModel.checkMissionValidEvent.observe(viewLifecycleOwner, {
             if (isMissionNameValid() && isMissionDateValid()) {
                 Timber.d("success")
-                missionsAddViewModel.postMission(binding.etMissionsAddWhat.text.toString())
+                if (requireContext().isNetWorkAvailable()) {
+                    missionsAddViewModel.postMission(binding.etMissionsAddWhat.text.toString())
+                } else {
+                    showNetworkDialog()
+                }
             } else {
                 Timber.d("fail")
             }
@@ -190,6 +197,28 @@ class MissionsAddFragment :
 
     private fun getVibrateAnimInstance(): Animator {
         return AnimatorInflater.loadAnimator(requireContext(), R.animator.animator_invalid_vibrate)
+    }
+
+    private fun setNetworkDialogObserver() {
+        missionsAddViewModel.networkDialogEvent.observe(viewLifecycleOwner, EventObserver {
+            if (it) {
+                showNetworkDialog()
+            }
+        })
+    }
+
+    private fun showNetworkDialog() {
+        NetworkDialogFragment(object : NetworkDialogFragment.NetworkDialogListener {
+            override fun onCancelClick(dialog: DialogFragment) {
+                dialog.dismiss()
+                findNavController().navigate(R.id.action_stampsFragment_to_homeFragment)
+            }
+
+            override fun onRetryClick(dialog: DialogFragment) {
+                dialog.dismiss()
+                missionsAddViewModel.postMission(binding.etMissionsAddWhat.text.toString())
+            }
+        }).show(requireActivity().supportFragmentManager, "NetworkDialogFragment")
     }
 }
 
