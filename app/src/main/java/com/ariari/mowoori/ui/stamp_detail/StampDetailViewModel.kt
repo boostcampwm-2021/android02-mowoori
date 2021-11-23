@@ -91,7 +91,6 @@ class StampDetailViewModel @Inject constructor(
     }
 
     fun postStamp() {
-        setLoadingEvent(true)
         viewModelScope.launch(IO) {
             stampsRepository.putCertificationImage(pictureUri.value!!, detailInfo.missionId)
                 .onSuccess { uri ->
@@ -105,15 +104,15 @@ class StampDetailViewModel @Inject constructor(
                                 .onSuccess {
                                     _isStampPosted.postValue(Event(Unit))
                                     setLoadingEvent(false)
-                                }.onFailure { showNetworkDialog() }
+                                }.onFailure { setNetworkDialogEvent() }
                         }
-                        .onFailure { showNetworkDialog() }
+                        .onFailure { setNetworkDialogEvent() }
                 }
-                .onFailure { showNetworkDialog() }
+                .onFailure { setNetworkDialogEvent() }
         }
     }
 
-    private fun showNetworkDialog() {
+    private fun setNetworkDialogEvent() {
         setLoadingEvent(false)
         _networkDialogEvent.postValue(true)
     }

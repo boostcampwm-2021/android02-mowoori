@@ -9,11 +9,9 @@ import com.ariari.mowoori.data.repository.MissionsRepository
 import com.ariari.mowoori.data.repository.StampsRepository
 import com.ariari.mowoori.ui.missions.entity.Mission
 import com.ariari.mowoori.ui.missions.entity.MissionInfo
-import com.ariari.mowoori.ui.register.entity.User
 import com.ariari.mowoori.ui.stamp.entity.Stamp
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
 import com.ariari.mowoori.util.Event
-import com.ariari.mowoori.util.LogUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -69,8 +67,7 @@ class StampsViewModel @Inject constructor(
                         tempStampList.add(Stamp(stampId, stampInfo))
                     }
                     .onFailure {
-                        setLoadingEvent(false)
-                        _networkDialogEvent.postValue(Event(true))
+                        setNetworkDialogEvent()
                         Timber.e("stampInfo Error: $it")
                     }
             }
@@ -102,10 +99,14 @@ class StampsViewModel @Inject constructor(
                 .onSuccess {
                     _mission.postValue(Mission(missionId, it))
                 }.onFailure {
-                    setLoadingEvent(false)
-                    _networkDialogEvent.postValue(Event(true))
+                    setNetworkDialogEvent()
                     Timber.e("$it")
                 }
         }
+    }
+
+    private fun setNetworkDialogEvent() {
+        setLoadingEvent(false)
+        _networkDialogEvent.postValue(Event(true))
     }
 }

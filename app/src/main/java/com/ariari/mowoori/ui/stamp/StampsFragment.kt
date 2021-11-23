@@ -21,7 +21,7 @@ import com.ariari.mowoori.ui.stamp.entity.DetailInfo
 import com.ariari.mowoori.ui.stamp.entity.DetailMode
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
 import com.ariari.mowoori.util.EventObserver
-import com.ariari.mowoori.util.NetworkCallBack
+import com.ariari.mowoori.util.isNetWorkAvailable
 import com.ariari.mowoori.widget.NetworkDialogFragment
 import com.ariari.mowoori.widget.ProgressDialogManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -39,7 +39,6 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
-        registerDefaultNetworkCallback()
         setStartEnterTransition()
         setCompleteBtnVisible()
         loadMissionInfo()
@@ -47,10 +46,6 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         setSpanCount()
         setCompleteClick()
         setObserver()
-    }
-
-    private fun registerDefaultNetworkCallback() {
-        NetworkCallBack.setDoLost { showNetworkDialog() }
     }
 
     private fun setStartEnterTransition() {
@@ -67,8 +62,12 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
     }
 
     private fun loadMissionInfo() {
-        viewModel.setLoadingEvent(true)
-        viewModel.loadMissionInfo(safeArgs.missionId)
+        if (requireContext().isNetWorkAvailable()) {
+            viewModel.setLoadingEvent(true)
+            viewModel.loadMissionInfo(safeArgs.missionId)
+        } else {
+            showNetworkDialog()
+        }
     }
 
     private fun setAdapter() {
@@ -173,12 +172,14 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
 
     private fun setNetworkDialogObserver() {
         viewModel.networkDialogEvent.observe(viewLifecycleOwner, EventObserver {
-            if (it) { showNetworkDialog() }
+            if (it) {
+                showNetworkDialog()
+            }
         })
     }
 
     private fun showNetworkDialog() {
-        NetworkDialogFragment(object: NetworkDialogFragment.NetworkDialogListener {
+        NetworkDialogFragment(object : NetworkDialogFragment.NetworkDialogListener {
             override fun onCancelClick(dialog: DialogFragment) {
                 dialog.dismiss()
                 findNavController().navigate(R.id.action_stampsFragment_to_homeFragment)

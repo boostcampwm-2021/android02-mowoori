@@ -25,6 +25,7 @@ import com.ariari.mowoori.ui.stamp_detail.entity.PictureType
 import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.util.LogUtil
 import com.ariari.mowoori.util.getCurrentDateTime
+import com.ariari.mowoori.util.isNetWorkAvailable
 import com.ariari.mowoori.util.toastMessage
 import com.ariari.mowoori.widget.NetworkDialogFragment
 import com.ariari.mowoori.widget.PictureDialogFragment
@@ -158,7 +159,12 @@ class StampDetailFragment :
     private fun setBtnCertifyListener() {
         binding.btnStampDetailCertify.setOnClickListener {
             stampViewModel.setComment(binding.etStampDetailComment.text.toString())
-            stampViewModel.postStamp()
+            if (requireContext().isNetWorkAvailable()) {
+                stampViewModel.setLoadingEvent(true)
+                stampViewModel.postStamp()
+            } else {
+                showNetworkDialog()
+            }
         }
     }
 
@@ -299,17 +305,23 @@ class StampDetailFragment :
 
     private fun setNetworkDialogObserver() {
         stampViewModel.networkDialogEvent.observe(viewLifecycleOwner, {
-            NetworkDialogFragment(object : NetworkDialogFragment.NetworkDialogListener {
-                override fun onCancelClick(dialog: DialogFragment) {
-                    dialog.dismiss()
-                    findNavController().navigate(R.id.action_stampsFragment_to_homeFragment)
-                }
-
-                override fun onRetryClick(dialog: DialogFragment) {
-                    dialog.dismiss()
-                    stampViewModel.postStamp()
-                }
-            }).show(requireActivity().supportFragmentManager, "NetworkDialogFragment")
+            if (it) {
+                showNetworkDialog()
+            }
         })
+    }
+
+    private fun showNetworkDialog() {
+        NetworkDialogFragment(object : NetworkDialogFragment.NetworkDialogListener {
+            override fun onCancelClick(dialog: DialogFragment) {
+                dialog.dismiss()
+                findNavController().navigate(R.id.action_stampsFragment_to_homeFragment)
+            }
+
+            override fun onRetryClick(dialog: DialogFragment) {
+                dialog.dismiss()
+                stampViewModel.postStamp()
+            }
+        }).show(requireActivity().supportFragmentManager, "NetworkDialogFragment")
     }
 }
