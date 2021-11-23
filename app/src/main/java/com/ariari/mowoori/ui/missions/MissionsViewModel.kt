@@ -82,7 +82,7 @@ class MissionsViewModel @Inject constructor(
                 }.onFailure { exception ->
                   Timber.e(exception)
                   setNetworkDialogEvent() 
-                  _errorMessage.postValue(Event("getUser")
+                  _errorMessage.postValue(Event("getUser"))
                 }
             }
         }
@@ -105,8 +105,8 @@ class MissionsViewModel @Inject constructor(
     private suspend fun loadMissionList(userId: String, missionIdList: List<String>) {
         missionsRepository.getMissions(userId)
             .onSuccess { missionList ->
-                _missionsList.postValue(
-                    when (requireNotNull(missionsType.value).peekContent()) {
+                _missionsList.postValue(Event(
+                    when (requireNotNull(missionsType.value)) {
                         NOT_DONE_TYPE -> {
                             missionList.filter {
                                 (missionIdList.contains(it.missionId)) &&
@@ -128,7 +128,7 @@ class MissionsViewModel @Inject constructor(
                             }
                         }
                         else -> emptyList()
-                    })
+                    }))
             }
             .onFailure {
                 setNetworkDialogEvent()
