@@ -44,19 +44,18 @@ class IntroRepositoryImpl @Inject constructor(
         return firebaseAuth.currentUser?.uid
     }
 
-    override suspend fun userRegister(userInfo: UserInfo): Boolean {
-        getUserUid()?.let {
-            firebaseReference.child("users").child(it).setValue(userInfo)
-            return true
-        } ?: run { return false }
+    override suspend fun userRegister(userInfo: UserInfo): Result<Boolean> = runCatching {
+        val uid = getUserUid() ?: throw NullPointerException("uid is null")
+        firebaseReference.child("users").child(uid).setValue(userInfo)
+        true
     }
 
-    override suspend fun putUserProfile(uri: Uri): String {
+    override suspend fun putUserProfile(uri: Uri): Result<String> = runCatching {
         val uid = getUserUid()
         val ref = storageReference.child("images/$uid/${uri.lastPathSegment}")
         val task = ref.putFile(uri).await()
         val uploadUrl = task.storage.downloadUrl.await()
-        return uploadUrl.toString()
+        uploadUrl.toString()
     }
 
     override suspend fun updateFcmToken(token: String) {

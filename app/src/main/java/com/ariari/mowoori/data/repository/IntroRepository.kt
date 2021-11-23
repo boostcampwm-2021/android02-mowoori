@@ -16,9 +16,9 @@ interface IntroRepository {
 
     fun getUserUid(): String?
 
-    suspend fun userRegister(userInfo: UserInfo): Boolean
+    suspend fun userRegister(userInfo: UserInfo): Result<Boolean>
 
-    suspend fun putUserProfile(uri: Uri): String
+    suspend fun putUserProfile(uri: Uri): Result<String>
 
     suspend fun updateFcmToken(token: String)
 

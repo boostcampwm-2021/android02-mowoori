@@ -37,13 +37,41 @@ class RegisterViewModel @Inject constructor(
     private val _loadingEvent = MutableLiveData<Event<Boolean>>()
     val loadingEvent: LiveData<Event<Boolean>> = _loadingEvent
 
+    private val _networkDialogEvent = MutableLiveData<Boolean>()
+    val networkDialogEvent: LiveData<Boolean> get() = _networkDialogEvent
+
+    private var _requestCount = 0
+    private val requestCount get() = _requestCount
+
+    private fun initRequestCount() {
+        _requestCount = 0
+    }
+
+    private fun addRequestCount() {
+        _requestCount++
+    }
+
+    private fun checkRequestCount() {
+        if (requestCount == 1) {
+            setNetworkDialogEvent()
+        }
+    }
+
+    private fun setLoadingEvent(flag: Boolean) {
+        _loadingEvent.postValue(Event(flag))
+    }
+
     fun createNickName() {
         viewModelScope.launch(Dispatchers.IO) {
+            initRequestCount()
             introRepository.getRandomNickName()
                 .onSuccess { nickname ->
                     profileText.postValue(nickname)
                 }
-                .onFailure { }
+                .onFailure {
+                    addRequestCount()
+                    checkRequestCount()
+                }
         }
     }
 
@@ -60,25 +88,41 @@ class RegisterViewModel @Inject constructor(
     }
 
     fun registerUserInfo() {
-        _loadingEvent.value = Event(true)
+        setLoadingEvent(true)
         val nickname = profileText.value ?: ""
         if (!checkNicknameValid(nickname)) {
+            setLoadingEvent(false)
             _invalidNicknameEvent.value = Event(Unit)
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
+            initRequestCount()
             var uploadUrl = ""
             profileImageUri.value?.let {
-                uploadUrl = introRepository.putUserProfile(it)
+                introRepository.putUserProfile(it)
+                    .onSuccess { url ->
+                        uploadUrl = url
+                    }
+                    .onFailure {
+                        addRequestCount()
+                        checkRequestCount()
+                        return@launch
+                    }
             }
-            val success = introRepository.userRegister(
+            initRequestCount()
+            introRepository.userRegister(
                 UserInfo(
                     nickname = nickname,
                     profileImage = uploadUrl,
                     fcmToken = fcmToken
                 )
-            )
-            _registerSuccessEvent.postValue(Event(success))
+            ).onSuccess {
+                setLoadingEvent(false)
+                _registerSuccessEvent.postValue(Event(it))
+            }.onFailure {
+                addRequestCount()
+                checkRequestCount()
+            }
         }
     }
 
@@ -93,5 +137,10 @@ class RegisterViewModel @Inject constructor(
 
     private fun checkNicknameValid(nickname: String): Boolean {
         return (nickname.length <= 11 && nickname.isNotEmpty())
+    }
+
+    private fun setNetworkDialogEvent() {
+        setLoadingEvent(false)
+        _networkDialogEvent.postValue(true)
     }
 }
