@@ -15,7 +15,10 @@ import com.ariari.mowoori.util.Event
 import com.ariari.mowoori.util.LogUtil
 import com.ariari.mowoori.util.getCurrentDate
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,6 +27,9 @@ class StampDetailViewModel @Inject constructor(
     private val stampsRepository: StampsRepository,
 ) : ViewModel() {
     lateinit var detailInfo: DetailInfo
+        private set
+
+    lateinit var stampInfo: StampInfo
         private set
 
     private val _loadingEvent = MutableLiveData<Event<Boolean>>()
@@ -52,6 +58,12 @@ class StampDetailViewModel @Inject constructor(
 
     private val _networkDialogEvent = MutableLiveData<Boolean>()
     val networkDialogEvent: LiveData<Boolean> get() = _networkDialogEvent
+
+    private val _groupMembersTokenList = MutableLiveData<List<String>>()
+    val groupMembersTokenList: LiveData<List<String>> = _groupMembersTokenList
+
+    private val _isFcmSent = MutableLiveData<Event<Unit>>()
+    val isFcmSent: LiveData<Event<Unit>> = _isFcmSent
 
     private var _requestCount = 0
     private val requestCount get() = _requestCount
@@ -116,13 +128,13 @@ class StampDetailViewModel @Inject constructor(
                     initRequestCount()
                     stampsRepository.getMissionInfo(detailInfo.missionId)
                         .onSuccess {
-                            val stampInfo = StampInfo(uri, comment.value!!, getCurrentDate())
-                            initRequestCount()
+                            stampInfo = StampInfo(
+                                uri, comment.value!!, getCurrentDate()
+                            )
                             stampsRepository.postStamp(stampInfo, Mission(detailInfo.missionId, it))
                                 .onSuccess {
                                     _isStampPosted.postValue(Event(Unit))
-                                    setLoadingEvent(false)
-                                }.onFailure {
+                                }.onFailure { 
                                     addRequestCount()
                                     checkRequestCount()
                                 }
@@ -136,6 +148,43 @@ class StampDetailViewModel @Inject constructor(
                     addRequestCount()
                     checkRequestCount()
                 }
+        }
+    }
+
+    fun getGroupMembersFcmToken() {
+        viewModelScope.launch(Dispatchers.IO) {
+            stampsRepository.getGroupMembersUserId().onSuccess { idList ->
+                val deferredMembersUserIdList = idList.map { userId ->
+                    async { stampsRepository.getGroupMembersFcmToken(userId) }
+                }
+                _groupMembersTokenList.postValue(
+                    deferredMembersUserIdList.awaitAll().map { result -> result.getOrNull() ?: "" })
+            }.onFailure {
+                LogUtil.log(it.message.toString())
+            }
+        }
+    }
+
+    fun postFcm() {
+        viewModelScope.launch {
+            groupMembersTokenList.value?.let { tokenList ->
+                tokenList.forEach { fcmToken ->
+                    stampsRepository.postFcmMessage(
+                        fcmToken,
+                        detailInfo.copy(
+                            detailMode = DetailMode.INQUIRY,
+                            stampInfo = stampInfo
+                        )
+                    ).onSuccess {
+                        LogUtil.log("fcm", it.success.toString())
+                        LogUtil.log("fcm", it.failure.toString())
+                    }.onFailure {
+                        LogUtil.log("fcm", it.message.toString())
+                    }
+                }
+                setLoadingEvent(false)
+                _isFcmSent.postValue(Event(Unit))
+            }
         }
     }
 

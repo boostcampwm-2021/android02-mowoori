@@ -7,12 +7,11 @@ import com.ariari.mowoori.data.remote.request.FcmRequest
 import com.ariari.mowoori.data.remote.response.FcmResponse
 import com.ariari.mowoori.ui.missions.entity.Mission
 import com.ariari.mowoori.ui.missions.entity.MissionInfo
+import com.ariari.mowoori.ui.stamp.entity.DetailInfo
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.database.ktx.getValue
 import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
@@ -62,7 +61,7 @@ class StampsRepositoryImpl @Inject constructor(
         }
 
     override suspend fun putCertificationImage(uri: Uri, missionId: String): Result<String> =
-        runCatching {
+        kotlin.runCatching {
             val ref = storageReference.child("images/$missionId/${uri.lastPathSegment}")
             val task = ref.putFile(uri).await()
             val uploadUri = task.storage.downloadUrl.await()
@@ -77,15 +76,44 @@ class StampsRepositoryImpl @Inject constructor(
             storageReference.child("$uriString.jpg").downloadUrl.result.toString()
         }
 
-    override suspend fun postFcmMessage(): Result<FcmResponse> =
+    override suspend fun postFcmMessage(
+        fcmToken: String,
+        detailInfo: DetailInfo
+    ): Result<FcmResponse> =
         kotlin.runCatching {
-            val fcmToken = FirebaseMessaging.getInstance().token.await()
             fcmDataSource.postFcmMessage(
                 FcmRequest(
                     to = fcmToken,
                     priority = "high",
-                    data = FcmData(title = "모우리", body = "알람 성공")
+                    data = FcmData(
+                        title = "그룹원의 미션인증",
+                        body = "${detailInfo.userName}님이 [${detailInfo.missionName}]에 스탬프를 찍었어요!",
+                        userName = detailInfo.userName,
+                        missionName = detailInfo.missionName,
+                        pictureUrl = detailInfo.stampInfo.pictureUrl,
+                        comment = detailInfo.stampInfo.comment
+                    )
                 )
             )
         }
+
+    override suspend fun getGroupMembersUserId(): Result<List<String>> =
+        kotlin.runCatching {
+            val uid = getUserId().getOrNull() ?: throw NullPointerException("userId is null")
+            val groupIdSnapshot = databaseReference.child("users/$uid/currentGroupId").get().await()
+            val groupId = groupIdSnapshot.getValue<String>()
+                ?: throw NullPointerException("currentGroupId is null")
+            val userListSnapshot = databaseReference.child("groups/$groupId/userList").get().await()
+            val userList = userListSnapshot.getValue<MutableList<String>>()
+                ?: throw NullPointerException("userList is null")
+            userList.remove(uid)
+            userList
+        }
+
+    override suspend fun getGroupMembersFcmToken(userId: String): Result<String> =
+        kotlin.runCatching {
+            val snapshot = databaseReference.child("users/$userId/fcmToken").get().await()
+            snapshot.getValue<String>() ?: ""
+        }
+
 }

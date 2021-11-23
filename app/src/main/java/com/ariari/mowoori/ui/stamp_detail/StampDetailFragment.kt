@@ -40,7 +40,7 @@ import java.io.File
 @AndroidEntryPoint
 class StampDetailFragment :
     BaseFragment<FragmentStampDetailBinding>(R.layout.fragment_stamp_detail) {
-    private val stampViewModel: StampDetailViewModel by viewModels()
+    private val stampDetailViewModel: StampDetailViewModel by viewModels()
     private val safeArgs: StampDetailFragmentArgs by navArgs()
     private var currentPhotoPath: String? = null
     private var providerUri: Uri? = null
@@ -76,8 +76,8 @@ class StampDetailFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = stampViewModel
-        stampViewModel.setDetailInfo(safeArgs.detailInfo)
+        binding.viewModel = stampDetailViewModel
+        stampDetailViewModel.setDetailInfo(safeArgs.detailInfo)
         init()
         setListener()
         setObserver()
@@ -105,36 +105,38 @@ class StampDetailFragment :
         setIsCertifyObserver()
         setCommentObserver()
         setNetworkDialogObserver()
+        setGroupMembersFcmTokenListObserver()
+        setIsFcmSentObserver()
     }
 
     private fun setEditMode() {
-        if (stampViewModel.detailInfo.detailMode == DetailMode.INQUIRY) {
+        if (stampDetailViewModel.detailInfo.detailMode == DetailMode.INQUIRY) {
             binding.etStampDetailComment.keyListener = null
         }
     }
 
     private fun setBtnVisible() {
-        stampViewModel.setIsCertify()
+        stampDetailViewModel.setIsCertify()
     }
 
     private fun setDetailTransitionName() {
-        binding.ivStampDetail.transitionName = stampViewModel.detailInfo.stampInfo.pictureUrl
+        binding.ivStampDetail.transitionName = stampDetailViewModel.detailInfo.stampInfo.pictureUrl
     }
 
     private fun setUserName() {
-        stampViewModel.setUserName()
+        stampDetailViewModel.setUserName()
     }
 
     private fun setMissionName() {
-        stampViewModel.setMissionName()
+        stampDetailViewModel.setMissionName()
     }
 
     private fun setComment() {
-        stampViewModel.setComment(stampViewModel.detailInfo.stampInfo.comment)
+        stampDetailViewModel.setComment(stampDetailViewModel.detailInfo.stampInfo.comment)
     }
 
     private fun setPictureClickListener() {
-        val pictureUrl = stampViewModel.detailInfo.stampInfo.pictureUrl
+        val pictureUrl = stampDetailViewModel.detailInfo.stampInfo.pictureUrl
         if (pictureUrl != "") {
             loadPicture(pictureUrl)
         } else {
@@ -158,10 +160,10 @@ class StampDetailFragment :
 
     private fun setBtnCertifyListener() {
         binding.btnStampDetailCertify.setOnClickListener {
-            stampViewModel.setComment(binding.etStampDetailComment.text.toString())
+            stampDetailViewModel.setComment(binding.etStampDetailComment.text.toString())
             if (requireContext().isNetWorkAvailable()) {
-                stampViewModel.setLoadingEvent(true)
-                stampViewModel.postStamp()
+                stampDetailViewModel.setLoadingEvent(true)
+                stampDetailViewModel.postStamp()
             } else {
                 showNetworkDialog()
             }
@@ -210,7 +212,7 @@ class StampDetailFragment :
         Timber.d("createImageFile Start")
         val timeStamp = getCurrentDateTime()
         Timber.d(timeStamp)
-        val imageFileName = "${stampViewModel.detailInfo.missionId}_$timeStamp.jpg"
+        val imageFileName = "${stampDetailViewModel.detailInfo.missionId}_$timeStamp.jpg"
         Timber.d(imageFileName)
         val storageDir = File(
             requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
@@ -231,7 +233,7 @@ class StampDetailFragment :
     }
 
     private fun saveCurrentPicture(uri: Uri?) {
-        stampViewModel.setPictureUri(uri)
+        stampDetailViewModel.setPictureUri(uri)
         Glide.with(requireContext())
             .load(uri)
             .override(300, 300)
@@ -266,13 +268,13 @@ class StampDetailFragment :
     }
 
     private fun setCloseBtnClickObserver() {
-        stampViewModel.closeBtnClick.observe(viewLifecycleOwner, {
+        stampDetailViewModel.closeBtnClick.observe(viewLifecycleOwner, {
             this.findNavController().popBackStack()
         })
     }
 
     private fun setIsCertifyObserver() {
-        stampViewModel.isCertify.observe(viewLifecycleOwner, EventObserver {
+        stampDetailViewModel.isCertify.observe(viewLifecycleOwner, EventObserver {
             if (it) {
                 binding.btnStampDetailCertify.isVisible = true
                 binding.tvStampDetailComment.isFocusable = true
@@ -284,27 +286,40 @@ class StampDetailFragment :
     }
 
     private fun setCommentObserver() {
-        stampViewModel.comment.observe(viewLifecycleOwner) {
+        stampDetailViewModel.comment.observe(viewLifecycleOwner) {
             binding.etStampDetailComment.setText(it)
         }
     }
 
     private fun setIsMissionPostedObserver() {
-        stampViewModel.isStampPosted.observe(viewLifecycleOwner, EventObserver {
+        stampDetailViewModel.isStampPosted.observe(viewLifecycleOwner, EventObserver {
             // TODO: 알림 발생
+            stampDetailViewModel.getGroupMembersFcmToken()
+            //this.findNavController().popBackStack()
+        })
+    }
+
+    private fun setGroupMembersFcmTokenListObserver() {
+        stampDetailViewModel.groupMembersTokenList.observe(viewLifecycleOwner) {
+            stampDetailViewModel.postFcm()
+        }
+    }
+
+    private fun setIsFcmSentObserver() {
+        stampDetailViewModel.isFcmSent.observe(viewLifecycleOwner, EventObserver {
             this.findNavController().popBackStack()
         })
     }
 
     private fun setLoadingObserver() {
-        stampViewModel.loadingEvent.observe(viewLifecycleOwner, EventObserver { isLoading ->
+        stampDetailViewModel.loadingEvent.observe(viewLifecycleOwner, EventObserver { isLoading ->
             if (isLoading) ProgressDialogManager.instance.show(requireContext())
             else ProgressDialogManager.instance.clear()
         })
     }
 
     private fun setNetworkDialogObserver() {
-        stampViewModel.networkDialogEvent.observe(viewLifecycleOwner, {
+        stampDetailViewModel.networkDialogEvent.observe(viewLifecycleOwner, {
             if (it) {
                 showNetworkDialog()
             }
@@ -320,7 +335,7 @@ class StampDetailFragment :
 
             override fun onRetryClick(dialog: DialogFragment) {
                 dialog.dismiss()
-                stampViewModel.postStamp()
+                stampDetailViewModel.postStamp()
             }
         }).show(requireActivity().supportFragmentManager, "NetworkDialogFragment")
     }
