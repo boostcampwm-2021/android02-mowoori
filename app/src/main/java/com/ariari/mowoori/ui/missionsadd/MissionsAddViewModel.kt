@@ -45,6 +45,23 @@ class MissionsAddViewModel @Inject constructor(
     private val _networkDialogEvent = MutableLiveData<Event<Boolean>>()
     val networkDialogEvent: LiveData<Event<Boolean>> get() = _networkDialogEvent
 
+    private var _requestCount = 0
+    private val requestCount get() = _requestCount
+
+    private fun initRequestCount() {
+        _requestCount = 0
+    }
+
+    private fun addRequestCount() {
+        _requestCount++
+    }
+
+    private fun checkRequestCount() {
+        if (requestCount > 1) {
+            setNetworkDialogEvent()
+        }
+    }
+
     init {
         _missionStartDate.value = getCurrentDate()
         _missionEndDate.value = getCurrentDatePlusMonths(1)
@@ -57,15 +74,18 @@ class MissionsAddViewModel @Inject constructor(
 
     fun postMission(missionName: String) {
         viewModelScope.launch(Dispatchers.IO) {
+            initRequestCount()
             missionsRepository.getUser().onSuccess { user ->
                 loadMissionIdList(getMissionInfo(user.userId, missionName), user)
             }.onFailure {
-                setNetworkDialogEvent()
+                addRequestCount()
+                checkRequestCount()
             }
         }
     }
 
     private suspend fun loadMissionIdList(missionInfo: MissionInfo, user: User) {
+        initRequestCount()
         missionsRepository.getMissionIdList(user.userInfo.currentGroupId)
             .onSuccess { missionIdList ->
                 // missions에 missionInfo 추가, currentGroup의 missionList에 missionInfo 추가
@@ -78,7 +98,8 @@ class MissionsAddViewModel @Inject constructor(
                 _isMissionPosted.postValue(Event(Unit))
             }
             .onFailure {
-                setNetworkDialogEvent()
+                addRequestCount()
+                checkRequestCount()
             }
     }
 

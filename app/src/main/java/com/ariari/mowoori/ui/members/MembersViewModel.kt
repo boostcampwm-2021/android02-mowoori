@@ -35,18 +35,37 @@ class MembersViewModel @Inject constructor(
     private val _networkDialogEvent = MutableLiveData<Event<Boolean>>()
     val networkDialogEvent: LiveData<Event<Boolean>> get() = _networkDialogEvent
 
+    private var _requestCount = 0
+    private val requestCount get() = _requestCount
+
+    private fun initRequestCount() {
+        _requestCount = 0
+    }
+
+    private fun addRequestCount() {
+        _requestCount++
+    }
+
+    private fun checkRequestCount() {
+        if (requestCount > 1) {
+            setNetworkDialogEvent()
+        }
+    }
+
     fun setLoadingEvent(isLoading: Boolean) {
         _loadingEvent.postValue(Event(isLoading))
     }
 
     fun fetchGroupInfo() {
         viewModelScope.launch(Dispatchers.IO) {
+            initRequestCount()
             membersRepository.getCurrentGroupInfo()
                 .onSuccess {
                     _currentGroup.postValue(it)
                 }
                 .onFailure {
-                    setNetworkDialogEvent()
+                    addRequestCount()
+                    checkRequestCount()
                 }
         }
     }
@@ -59,7 +78,12 @@ class MembersViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val deferredMemberList =
                 requireNotNull(currentGroup.value).groupInfo.userList.map { userId ->
-                    async { membersRepository.getUserInfo(userId) }
+                    async {
+                        membersRepository.getUserInfo(userId)
+                            .onFailure {
+
+                            }
+                    }
                 }
             _membersList.postValue(
                 deferredMemberList.awaitAll().map { result ->

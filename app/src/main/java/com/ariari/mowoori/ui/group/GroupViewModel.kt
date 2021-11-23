@@ -30,11 +30,32 @@ class GroupViewModel @Inject constructor(
     private val _networkDialogEvent = MutableLiveData<Boolean>()
     val networkDialogEvent: LiveData<Boolean> get() = _networkDialogEvent
 
+    private var _requestCount = 0
+    private val requestCount get() = _requestCount
+
+    private fun initRequestCount() {
+        _requestCount = 0
+    }
+
+    private fun addRequestCount() {
+        _requestCount++
+    }
+
+    private fun checkRequestCount() {
+        if (requestCount > 1) {
+            setNetworkDialogEvent()
+        }
+    }
+
     fun setGroupName() {
         viewModelScope.launch(Dispatchers.IO) {
+            initRequestCount()
             introRepository.getRandomNickName()
                 .onSuccess { randomName -> groupName.postValue(randomName + "들") }
-                .onFailure { setNetworkDialogEvent() }
+                .onFailure {
+                    addRequestCount()
+                    checkRequestCount()
+                }
         }
     }
 
@@ -45,19 +66,23 @@ class GroupViewModel @Inject constructor(
             if (!exist) {
                 _inValidEvent.postValue(Event(Unit))
             } else {
+                initRequestCount()
                 groupRepository.getUser()
                     .onSuccess {
+                        initRequestCount()
                         groupRepository.addUserToGroup(name, it)
                             .onSuccess { newGroupId ->
                                 _addGroupCompleteEvent.postValue(Event(newGroupId))
                             }
                             .onFailure {
+                                addRequestCount()
+                                checkRequestCount()
                                 _addGroupCompleteEvent.postValue(Event(""))
-                                setNetworkDialogEvent()
                             }
                     }.onFailure {
+                        addRequestCount()
+                        checkRequestCount()
                         _addGroupCompleteEvent.postValue(Event(""))
-                        setNetworkDialogEvent()
                     }
             }
         }
@@ -65,21 +90,25 @@ class GroupViewModel @Inject constructor(
 
     fun addNewGroup() {
         viewModelScope.launch(Dispatchers.IO) {
+            initRequestCount()
             groupRepository.getUser()
                 .onSuccess {
                     val name = groupName.value ?: return@launch
                     val groupInfo = GroupInfo(0, name, listOf(it.userId))
+                    initRequestCount()
                     groupRepository.putGroupInfo(groupInfo, it)
                         .onSuccess { newGroupId ->
                             _addGroupCompleteEvent.postValue(Event(newGroupId))
                         }
                         .onFailure {
+                            addRequestCount()
+                            checkRequestCount()
                             _addGroupCompleteEvent.postValue(Event(""))
-                            setNetworkDialogEvent()
                         }
                 }
                 .onFailure {
-                    setNetworkDialogEvent()
+                    addRequestCount()
+                    checkRequestCount()
                 }
         }
     }

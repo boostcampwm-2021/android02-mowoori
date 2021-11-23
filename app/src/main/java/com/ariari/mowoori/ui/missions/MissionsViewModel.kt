@@ -43,8 +43,25 @@ class MissionsViewModel @Inject constructor(
     private val _networkDialogEvent = MutableLiveData<Event<Boolean>>()
     val networkDialogEvent: LiveData<Event<Boolean>> get() = _networkDialogEvent
 
+    private var _requestCount = 0
+    private val requestCount get() = _requestCount
+
+    private fun initRequestCount() {
+        _requestCount = 0
+    }
+
+    private fun addRequestCount() {
+        _requestCount++
+    }
+
+    private fun checkRequestCount() {
+        if (requestCount > 1) {
+            setNetworkDialogEvent()
+        }
+    }
+
     fun setLoadingEvent(isLoading: Boolean) {
-        _loadingEvent.value = Event(isLoading)
+        _loadingEvent.postValue(Event(isLoading))
     }
 
     fun setPlusBtnClick() {
@@ -76,13 +93,15 @@ class MissionsViewModel @Inject constructor(
             loadMissionIdList(user)
         } else {
             viewModelScope.launch(Dispatchers.IO) {
+                initRequestCount()
                 missionsRepository.getUser().onSuccess { user ->
                     loadUser(user)
                     loadMissionIdList(user)
                 }.onFailure { exception ->
-                  Timber.e(exception)
-                  setNetworkDialogEvent() 
-                  _errorMessage.postValue(Event("getUser"))
+                    Timber.e(exception)
+                    addRequestCount()
+                    checkRequestCount()
+                    _errorMessage.postValue(Event("getUser"))
                 }
             }
         }
@@ -90,19 +109,22 @@ class MissionsViewModel @Inject constructor(
 
     private fun loadMissionIdList(user: User) {
         viewModelScope.launch(Dispatchers.IO) {
+            initRequestCount()
             missionsRepository.getMissionIdList(user.userInfo.currentGroupId)
                 .onSuccess { missionIdList ->
                     loadMissionList(user.userId, missionIdList)
                 }
                 .onFailure { exception ->
                     Timber.e(exception)
+                    addRequestCount()
+                    checkRequestCount()
                     _errorMessage.postValue(Event("loadMissionList"))
-                    setNetworkDialogEvent()
                 }
         }
     }
 
     private suspend fun loadMissionList(userId: String, missionIdList: List<String>) {
+        initRequestCount()
         missionsRepository.getMissions(userId)
             .onSuccess { missionList ->
                 _missionsList.postValue(Event(
@@ -131,10 +153,11 @@ class MissionsViewModel @Inject constructor(
                     }))
             }
             .onFailure {
-                setNetworkDialogEvent()
+                addRequestCount()
+                checkRequestCount()
             }
     }
-    
+
     private fun loadUser(user: User) {
         _user.postValue(Event(user))
     }
