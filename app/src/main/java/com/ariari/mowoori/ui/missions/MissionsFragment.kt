@@ -41,7 +41,6 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
         setMissionsListObserver()
         setItemClickObserver()
         setNetworkDialogObserver()
-        setUserNameObserver()
         setErrorMessageObserver()
     }
 
