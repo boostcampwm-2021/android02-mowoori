@@ -31,6 +31,7 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = missionsViewModel
         setMissionsRvAdapter()
+        loadMissions()
         setObserver()
     }
 
@@ -53,6 +54,9 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
 
     private fun setMissionsRvAdapter() {
         binding.rvMissions.adapter = missionsAdapter
+    }
+
+    private fun loadMissions() {
         if (requireContext().isNetWorkAvailable()) {
             missionsViewModel.setLoadingEvent(true)
             missionsViewModel.sendUserToLoadMissions(args.user)
@@ -103,12 +107,12 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
         NetworkDialogFragment(object : NetworkDialogFragment.NetworkDialogListener {
             override fun onCancelClick(dialog: DialogFragment) {
                 dialog.dismiss()
-                findNavController().navigate(R.id.action_stampsFragment_to_homeFragment)
+                findNavController().navigate(R.id.action_missionsFragment_to_homeFragment)
             }
 
             override fun onRetryClick(dialog: DialogFragment) {
                 dialog.dismiss()
-                missionsViewModel.sendUserToLoadMissions(args.user)
+                loadMissions()
             }
         }).show(requireActivity().supportFragmentManager, "NetworkDialogFragment")
     }

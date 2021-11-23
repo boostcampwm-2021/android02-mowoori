@@ -9,14 +9,17 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
+import androidx.navigation.fragment.findNavController
 import com.ariari.mowoori.R
 import com.ariari.mowoori.data.local.datasource.MoWooriPrefDataSource
 import com.ariari.mowoori.databinding.ActivityRegisterBinding
 import com.ariari.mowoori.ui.main.MainActivity
 import com.ariari.mowoori.util.EventObserver
+import com.ariari.mowoori.util.isNetWorkAvailable
 import com.ariari.mowoori.util.toastMessage
 import com.ariari.mowoori.widget.BaseDialogFragment
 import com.ariari.mowoori.widget.ConfirmDialogFragment
+import com.ariari.mowoori.widget.NetworkDialogFragment
 import com.ariari.mowoori.widget.ProgressDialogManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -51,6 +54,7 @@ class RegisterActivity : AppCompatActivity() {
         setRegisterSuccessObserver()
         setProfileClickObserver()
         setLoadingEventObserver()
+        setNetworkDialogObserver()
     }
 
     private fun setRootClick() {
@@ -72,7 +76,8 @@ class RegisterActivity : AppCompatActivity() {
         binding.btnRegisterComplete.setOnClickListener {
             ConfirmDialogFragment(object : BaseDialogFragment.NoticeDialogListener {
                 override fun onDialogPositiveClick(dialog: DialogFragment) {
-                    registerViewModel.registerUserInfo()
+                    dialog.dismiss()
+                    registerUserInfo()
                 }
 
                 override fun onDialogNegativeClick(dialog: DialogFragment) {
@@ -82,16 +87,22 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
+    private fun registerUserInfo() {
+        if (this.isNetWorkAvailable()) {
+            registerViewModel.registerUserInfo()
+        } else {
+            showNetworkDialog()
+        }
+    }
+
     private fun setInvalidNickNameObserver() {
         registerViewModel.invalidNicknameEvent.observe(this, EventObserver {
-            ProgressDialogManager.instance.clear()
             toastMessage(getString(R.string.register_nickname_error_msg))
         })
     }
 
     private fun setRegisterSuccessObserver() {
         registerViewModel.registerSuccessEvent.observe(this, EventObserver {
-            ProgressDialogManager.instance.clear()
             if (it) {
                 registerViewModel.setUserRegistered(true)
                 moveToMain()
@@ -123,5 +134,26 @@ class RegisterActivity : AppCompatActivity() {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
         }
         startActivity(intent)
+    }
+
+    private fun setNetworkDialogObserver() {
+        registerViewModel.networkDialogEvent.observe(this, {
+            if (it) {
+                showNetworkDialog()
+            }
+        })
+    }
+
+    private fun showNetworkDialog() {
+        NetworkDialogFragment(object : NetworkDialogFragment.NetworkDialogListener {
+            override fun onCancelClick(dialog: DialogFragment) {
+                dialog.dismiss()
+            }
+
+            override fun onRetryClick(dialog: DialogFragment) {
+                dialog.dismiss()
+                registerUserInfo()
+            }
+        }).show(supportFragmentManager, "NetworkDialogFragment")
     }
 }

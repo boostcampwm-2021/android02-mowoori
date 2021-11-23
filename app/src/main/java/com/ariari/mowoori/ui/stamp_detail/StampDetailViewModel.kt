@@ -65,6 +65,23 @@ class StampDetailViewModel @Inject constructor(
     private val _isFcmSent = MutableLiveData<Event<Unit>>()
     val isFcmSent: LiveData<Event<Unit>> = _isFcmSent
 
+    private var _requestCount = 0
+    private val requestCount get() = _requestCount
+
+    private fun initRequestCount() {
+        _requestCount = 0
+    }
+
+    private fun addRequestCount() {
+        _requestCount++
+    }
+
+    private fun checkRequestCount() {
+        if (requestCount == 1) {
+            setNetworkDialogEvent()
+        }
+    }
+
     fun setDetailInfo(_detailInfo: DetailInfo) {
         detailInfo = _detailInfo
     }
@@ -104,9 +121,11 @@ class StampDetailViewModel @Inject constructor(
 
     fun postStamp() {
         viewModelScope.launch(IO) {
+            initRequestCount()
             stampsRepository.putCertificationImage(pictureUri.value!!, detailInfo.missionId)
                 .onSuccess { uri ->
                     LogUtil.log("stamp", uri)
+                    initRequestCount()
                     stampsRepository.getMissionInfo(detailInfo.missionId)
                         .onSuccess {
                             stampInfo = StampInfo(
@@ -115,11 +134,20 @@ class StampDetailViewModel @Inject constructor(
                             stampsRepository.postStamp(stampInfo, Mission(detailInfo.missionId, it))
                                 .onSuccess {
                                     _isStampPosted.postValue(Event(Unit))
-                                }.onFailure { setNetworkDialogEvent() }
+                                }.onFailure { 
+                                    addRequestCount()
+                                    checkRequestCount()
+                                }
                         }
-                        .onFailure { setNetworkDialogEvent() }
+                        .onFailure {
+                            addRequestCount()
+                            checkRequestCount()
+                        }
                 }
-                .onFailure { setNetworkDialogEvent() }
+                .onFailure {
+                    addRequestCount()
+                    checkRequestCount()
+                }
         }
     }
 

@@ -4,12 +4,12 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.animation.AlphaAnimation
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.DialogFragment
 import com.ariari.mowoori.BuildConfig
 import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.ActivityIntroBinding
@@ -17,9 +17,9 @@ import com.ariari.mowoori.ui.main.MainActivity
 import com.ariari.mowoori.ui.register.RegisterActivity
 import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.util.LogUtil
+import com.ariari.mowoori.util.isNetWorkAvailable
 import com.ariari.mowoori.util.toastMessage
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
+import com.ariari.mowoori.widget.NetworkDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
@@ -27,14 +27,13 @@ import timber.log.Timber
 class IntroActivity : AppCompatActivity() {
 
     private val introViewModel: IntroViewModel by viewModels()
-    private lateinit var auth: FirebaseAuth
     private val binding by lazy {
         ActivityIntroBinding.inflate(layoutInflater)
     }
     private val signLauncher =
         registerForActivityResult(SignInIntentContract()) { tokenId: String? ->
             tokenId?.let {
-                firebaseAuthWithGoogle(it)
+                introViewModel.firebaseAuthWithGoogle(it)
             }
         }
 
@@ -46,7 +45,7 @@ class IntroActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        auth = FirebaseAuth.getInstance()
+        introViewModel.setFirebaseAuth()
         autoLogin()
         binding.viewModel = introViewModel
         introViewModel.initFcmToken()
@@ -81,39 +80,28 @@ class IntroActivity : AppCompatActivity() {
                 moveToRegister()
             }
         })
+
+        introViewModel.isTestLoginSuccess.observe(this, {
+            if (it) {
+                moveToMain()
+            } else {
+                binding.llTest.isVisible = true
+            }
+        })
+        setNetworkDialogObserver()
     }
 
     private fun signIn() {
-        signLauncher.launch(getString(R.string.default_web_client_id))
+        if (this.isNetWorkAvailable()) {
+            signLauncher.launch(getString(R.string.default_web_client_id))
+        } else {
+            showNetworkDialog()
+        }
     }
 
     private fun signInTester(num: Int) {
         binding.llTest.isVisible = false
-        auth.signInWithEmailAndPassword("testid$num@test.com", "testid$num")
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    task.result.user?.let {
-                        moveToMain()
-                    }
-                } else {
-                    Toast.makeText(this, "로그인 할 수 없습니다.", Toast.LENGTH_SHORT).show()
-                    binding.llTest.isVisible = true
-                }
-            }
-    }
-
-    private fun firebaseAuthWithGoogle(idToken: String) {
-        val credential = GoogleAuthProvider.getCredential(idToken, null)
-        auth.signInWithCredential(credential)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    task.result.user?.let {
-                        introViewModel.checkUserRegistered(it.uid)
-                    }
-                } else {
-                    Toast.makeText(this, "로그인 할 수 없습니다.", Toast.LENGTH_SHORT).show()
-                }
-            }
+        introViewModel.firebaseAuthWithGoogle(null, "testid$num@test.com", "testid$num")
     }
 
     private fun moveToRegister() {
@@ -129,10 +117,9 @@ class IntroActivity : AppCompatActivity() {
     }
 
     private fun autoLogin() {
-        if (auth.currentUser != null && introViewModel.getUserRegistered()) {
+        if (introViewModel.auth.currentUser != null && introViewModel.getUserRegistered()) {
             signIn()
-        }
-        else{
+        } else {
             showSignInButton()
         }
     }
@@ -184,4 +171,25 @@ class IntroActivity : AppCompatActivity() {
                 }
             }
         }
+
+    private fun setNetworkDialogObserver() {
+        introViewModel.networkDialogEvent.observe(this, {
+            if (it) {
+                showNetworkDialog()
+            }
+        })
+    }
+
+    private fun showNetworkDialog() {
+        NetworkDialogFragment(object : NetworkDialogFragment.NetworkDialogListener {
+            override fun onCancelClick(dialog: DialogFragment) {
+                dialog.dismiss()
+            }
+
+            override fun onRetryClick(dialog: DialogFragment) {
+                dialog.dismiss()
+                signIn()
+            }
+        }).show(supportFragmentManager, "NetworkDialogFragment")
+    }
 }

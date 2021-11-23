@@ -46,6 +46,23 @@ class StampsViewModel @Inject constructor(
     private val _networkDialogEvent = MutableLiveData<Event<Boolean>>()
     val networkDialogEvent: LiveData<Event<Boolean>> get() = _networkDialogEvent
 
+    private var _requestCount = 0
+    private val requestCount get() = _requestCount
+
+    private fun initRequestCount() {
+        _requestCount = 0
+    }
+
+    private fun addRequestCount() {
+        _requestCount++
+    }
+
+    private fun checkRequestCount() {
+        if (requestCount == 1) {
+            setNetworkDialogEvent()
+        }
+    }
+
     fun setLoadingEvent(flag: Boolean) {
         _loadingEvent.postValue(Event(flag))
     }
@@ -63,12 +80,14 @@ class StampsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val tempStampList = mutableListOf<Stamp>()
             missionInfo.stampList.forEach { stampId ->
+                initRequestCount()
                 stampsRepository.getStampInfo(stampId)
                     .onSuccess { stampInfo ->
                         tempStampList.add(Stamp(stampId, stampInfo))
                     }
                     .onFailure {
-                        setNetworkDialogEvent()
+                        addRequestCount()
+                        checkRequestCount()
                         Timber.e("stampInfo Error: $it")
                     }
             }
@@ -96,11 +115,13 @@ class StampsViewModel @Inject constructor(
 
     fun loadMissionInfo(missionId: String) {
         viewModelScope.launch(Dispatchers.IO) {
+            initRequestCount()
             missionsRepository.getMissionInfo(missionId)
                 .onSuccess {
                     _mission.postValue(Mission(missionId, it))
                 }.onFailure {
-                    setNetworkDialogEvent()
+                    addRequestCount()
+                    checkRequestCount()
                     Timber.e("$it")
                 }
         }
@@ -108,6 +129,22 @@ class StampsViewModel @Inject constructor(
 
     private fun setNetworkDialogEvent() {
         setLoadingEvent(false)
+
         _networkDialogEvent.postValue(Event(true))
     }
+
+    fun postFcm() {
+        LogUtil.log("fcm", "fcm")
+        viewModelScope.launch(Dispatchers.IO) {
+            initRequestCount()
+            stampsRepository.postFcmMessage().onSuccess {
+                LogUtil.log("fcm", it.success.toString())
+            }.onFailure {
+                addRequestCount()
+                checkRequestCount()
+                LogUtil.log("fcm", it.message.toString())
+            }
+        }
+    }
+
 }
