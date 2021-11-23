@@ -315,7 +315,7 @@ class StampDetailFragment :
         NetworkDialogFragment(object : NetworkDialogFragment.NetworkDialogListener {
             override fun onCancelClick(dialog: DialogFragment) {
                 dialog.dismiss()
-                findNavController().navigate(R.id.action_stampsFragment_to_homeFragment)
+                findNavController().navigate(R.id.action_stampDetailFragment_to_homeFragment)
             }
 
             override fun onRetryClick(dialog: DialogFragment) {

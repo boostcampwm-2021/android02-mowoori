@@ -39,8 +39,11 @@ class RegisterViewModel @Inject constructor(
 
     fun createNickName() {
         viewModelScope.launch(Dispatchers.IO) {
-            val nickname = introRepository.getRandomNickName()
-            profileText.postValue(nickname)
+            introRepository.getRandomNickName()
+                .onSuccess { nickname ->
+                    profileText.postValue(nickname)
+                }
+                .onFailure { }
         }
     }
 
@@ -52,7 +55,7 @@ class RegisterViewModel @Inject constructor(
         _profileImageUri.postValue(uri)
     }
 
-    fun setUserRegistered(isRegistered:Boolean){
+    fun setUserRegistered(isRegistered: Boolean) {
         introRepository.setUserRegistered(isRegistered)
     }
 

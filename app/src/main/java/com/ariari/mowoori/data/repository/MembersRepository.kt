@@ -8,5 +8,5 @@ interface MembersRepository {
 
     fun getUserUid(): String?
 
-    suspend fun getUserInfo(userId:String): User?
+    suspend fun getUserInfo(userId:String): Result<User>
 }

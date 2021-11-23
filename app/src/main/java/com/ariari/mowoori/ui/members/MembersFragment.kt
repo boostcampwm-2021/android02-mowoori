@@ -16,8 +16,10 @@ import com.ariari.mowoori.databinding.FragmentMembersBinding
 import com.ariari.mowoori.ui.members.adapter.MembersAdapter
 import com.ariari.mowoori.ui.register.entity.User
 import com.ariari.mowoori.util.EventObserver
+import com.ariari.mowoori.util.isNetWorkAvailable
 import com.ariari.mowoori.util.toastMessage
 import com.ariari.mowoori.widget.InviteDialogFragment
+import com.ariari.mowoori.widget.NetworkDialogFragment
 import com.ariari.mowoori.widget.ProgressDialogManager
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -30,13 +32,22 @@ class MembersFragment : BaseFragment<FragmentMembersBinding>(R.layout.fragment_m
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = membersViewModel
-        membersViewModel.setLoadingEvent(true)
-        membersViewModel.fetchGroupInfo()
+        setGroupInfo()
         setLoadingObserver()
         setOpenDialogEventObserver()
         setCurrentGroupObserver()
         setMembersListObserver()
         setMembersRvAdapter()
+        setNetworkDialogObserver()
+    }
+
+    private fun setGroupInfo() {
+        if (requireContext().isNetWorkAvailable()) {
+            membersViewModel.setLoadingEvent(true)
+            membersViewModel.fetchGroupInfo()
+        } else {
+            showNetworkDialog()
+        }
     }
 
     private fun setLoadingObserver() {
@@ -113,4 +124,25 @@ class MembersFragment : BaseFragment<FragmentMembersBinding>(R.layout.fragment_m
         )
     }
 
+    private fun setNetworkDialogObserver() {
+        membersViewModel.networkDialogEvent.observe(viewLifecycleOwner, EventObserver {
+            if (it) {
+                showNetworkDialog()
+            }
+        })
+    }
+
+    private fun showNetworkDialog() {
+        NetworkDialogFragment(object : NetworkDialogFragment.NetworkDialogListener {
+            override fun onCancelClick(dialog: DialogFragment) {
+                dialog.dismiss()
+                findNavController().navigate(R.id.action_membersFragment_to_homeFragment)
+            }
+
+            override fun onRetryClick(dialog: DialogFragment) {
+                dialog.dismiss()
+                setGroupInfo()
+            }
+        }).show(requireActivity().supportFragmentManager, "NetworkDialogFragment")
+    }
 }
