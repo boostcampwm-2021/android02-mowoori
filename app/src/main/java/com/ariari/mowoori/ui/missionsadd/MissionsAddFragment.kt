@@ -126,7 +126,10 @@ class MissionsAddFragment :
 
     private fun setButtonListener() {
         binding.tvMissionsAddWhenStart.setOnClickListener {
-            DatePickerDialogFragment(missionsAddViewModel.missionStartDate.value!!,
+            DatePickerDialogFragment(
+                isStart = true,
+                curDate = missionsAddViewModel.missionStartDate.value!!,
+                startDate = missionsAddViewModel.missionStartDate.value!!,
                 object : BaseDialogFragment.NoticeDialogListener {
                     override fun onDialogPositiveClick(dialog: DialogFragment) {
                         val dp = (dialog as DatePickerDialogFragment).binding.datePickerMissionDate
@@ -149,7 +152,9 @@ class MissionsAddFragment :
         }
         binding.tvMissionsAddWhenEnd.setOnClickListener {
             DatePickerDialogFragment(
-                missionsAddViewModel.missionEndDate.value!!,
+                isStart = false,
+                curDate = missionsAddViewModel.missionEndDate.value!!,
+                startDate = missionsAddViewModel.missionStartDate.value!!,
                 object : BaseDialogFragment.NoticeDialogListener {
                     override fun onDialogPositiveClick(dialog: DialogFragment) {
                         val dp = (dialog as DatePickerDialogFragment).binding.datePickerMissionDate

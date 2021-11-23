@@ -27,13 +27,13 @@ class MissionsAddViewModel @Inject constructor(
     private val _numberCountClick = MutableLiveData<Event<Unit>>()
     val numberCountClick: LiveData<Event<Unit>> = _numberCountClick
 
-    private val _missionCount = MutableLiveData<Int>()
+    private val _missionCount = MutableLiveData<Int>(10)
     val missionCount: LiveData<Int> = _missionCount
 
-    private val _missionStartDate = MutableLiveData<Int>()
+    private val _missionStartDate = MutableLiveData(getCurrentDate())
     val missionStartDate: LiveData<Int> = _missionStartDate
 
-    private val _missionEndDate = MutableLiveData<Int>()
+    private val _missionEndDate = MutableLiveData(getCurrentDatePlusMonths(1))
     val missionEndDate: LiveData<Int> = _missionEndDate
 
     private val _checkMissionValidEvent = MutableLiveData<Event<Unit>>()
