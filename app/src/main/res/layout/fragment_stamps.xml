@@ -28,14 +28,6 @@
             app:titleViewMode="@{TitleViewMode.TITLE_VIEW_BACK_BUTTON}"
             app:titleViewText="@{viewModel.mission.missionInfo.missionName}" />
 
-        <Button
-            android:onClick="@{()->viewModel.postFcm()}"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:text="fcm"/>
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_stamps"
             android:layout_width="match_parent"

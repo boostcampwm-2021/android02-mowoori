@@ -15,5 +15,7 @@ interface StampsRepository {
     suspend fun putCertificationImage(uri: Uri, missionId: String): Result<String>
     suspend fun getStampImageUrl(uriString: String): Result<String>
 
-    suspend fun postFcmMessage(): Result<FcmResponse>
+    suspend fun postFcmMessage(fcmToken: String): Result<FcmResponse>
+    suspend fun getGroupMembersUserId(): Result<List<String>>
+    suspend fun getGroupMembersFcmToken(userId: String): Result<String>
 }
