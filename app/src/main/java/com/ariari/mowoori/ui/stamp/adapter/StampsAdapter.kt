@@ -13,6 +13,7 @@ import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.ItemStampsBinding
 import com.ariari.mowoori.ui.stamp.entity.Stamp
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
+import com.ariari.mowoori.util.BindingAdapters.bindImageUrl
 import com.ariari.mowoori.util.LogUtil
 import com.bumptech.glide.Glide
 import timber.log.Timber
@@ -50,30 +51,37 @@ class StampsAdapter(private val listener: OnItemClickListener) :
             when (stampInfo.pictureUrl) {
                 "empty" -> {
                     // 빈 스탬프
-                    binding.ivItemStamps.setImageResource(R.drawable.border_sky_blue_line_oval)
-                    binding.tvItemStampsIndex.isVisible = true
-                    binding.containerItemStamps.isClickable = false
+                    with(binding) {
+                        ivItemStamps.setImageResource(R.drawable.border_sky_blue_line_oval)
+                        tvItemStampsIndex.isVisible = true
+                        containerItemStamps.isClickable = false
+                    }
                 }
                 "" -> {
                     // picture url이 없는 스탬프
+                    with(binding) {
+                        tvItemStampsIndex.isInvisible = true
+                        containerItemStamps.isClickable = true
+                    }
                     Glide.with(binding.ivItemStamps)
                         .load(R.drawable.ic_stamp)
                         .circleCrop()
                         .into(binding.ivItemStamps)
-
-                    binding.tvItemStampsIndex.isInvisible = true
-                    binding.containerItemStamps.isClickable = true
                 }
                 else -> {
                     // picture url이 있는 스탬프
                     LogUtil.log("adapter url", stampInfo.pictureUrl)
 
-                    Glide.with(binding.ivItemStamps)
-                        .load(stampInfo.pictureUrl)
-                        .circleCrop()
-                        .into(binding.ivItemStamps)
-                    binding.tvItemStampsIndex.isInvisible = true
-                    binding.containerItemStamps.isClickable = true
+                    with(binding) {
+                        tvItemStampsIndex.isInvisible = true
+                        containerItemStamps.isClickable = true
+                        ivItemStamps.bindImageUrl(stampInfo.pictureUrl, true)
+
+//                      Glide.with(binding.ivItemStamps)
+//                        .load(stampInfo.pictureUrl)
+//                        .circleCrop()
+//                        .into(binding.ivItemStamps)
+                    }
                 }
             }
         }
