@@ -133,18 +133,4 @@ class StampsViewModel @Inject constructor(
         _networkDialogEvent.postValue(Event(true))
     }
 
-    fun postFcm() {
-        LogUtil.log("fcm", "fcm")
-        viewModelScope.launch(Dispatchers.IO) {
-            initRequestCount()
-            stampsRepository.postFcmMessage().onSuccess {
-                LogUtil.log("fcm", it.success.toString())
-            }.onFailure {
-                addRequestCount()
-                checkRequestCount()
-                LogUtil.log("fcm", it.message.toString())
-            }
-        }
-    }
-
 }

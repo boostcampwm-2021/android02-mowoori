@@ -167,6 +167,7 @@ class StampDetailViewModel @Inject constructor(
 
     fun postFcm() {
         viewModelScope.launch {
+            initRequestCount()
             groupMembersTokenList.value?.let { tokenList ->
                 tokenList.forEach { fcmToken ->
                     stampsRepository.postFcmMessage(
@@ -179,6 +180,8 @@ class StampDetailViewModel @Inject constructor(
                         LogUtil.log("fcm", it.success.toString())
                         LogUtil.log("fcm", it.failure.toString())
                     }.onFailure {
+                        addRequestCount()
+                        checkRequestCount()
                         LogUtil.log("fcm", it.message.toString())
                     }
                 }
