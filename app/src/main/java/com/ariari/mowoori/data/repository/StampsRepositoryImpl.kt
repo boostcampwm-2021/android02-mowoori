@@ -9,6 +9,7 @@ import com.ariari.mowoori.ui.missions.entity.Mission
 import com.ariari.mowoori.ui.missions.entity.MissionInfo
 import com.ariari.mowoori.ui.stamp.entity.DetailInfo
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
+import com.ariari.mowoori.util.ErrorMessage
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.getValue
@@ -27,7 +28,7 @@ class StampsRepositoryImpl @Inject constructor(
     override suspend fun getStampInfo(stampId: String): Result<StampInfo> = kotlin.runCatching {
         val snapshot = databaseReference.child("stamps/$stampId").get().await()
         snapshot.getValue(StampInfo::class.java)
-            ?: throw NullPointerException("getStampInfo is null")
+            ?: throw NullPointerException(ErrorMessage.StampInfo.message)
     }
 
     override fun getUserId(): Result<String> = kotlin.runCatching {

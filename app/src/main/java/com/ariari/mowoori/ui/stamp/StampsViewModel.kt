@@ -138,11 +138,7 @@ class StampsViewModel @Inject constructor(
             }
             ErrorMessage.MissionInfo.message -> {
             }
-            ErrorMessage.Uid.message -> {
-            }
-            ErrorMessage.GroupId.message -> {
-            }
-            ErrorMessage.GroupInfo.message -> {
+            ErrorMessage.StampInfo.message -> {
             }
             else -> Unit
         }
