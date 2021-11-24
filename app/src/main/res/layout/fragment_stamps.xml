@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -28,23 +29,37 @@
             app:titleViewMode="@{TitleViewMode.TITLE_VIEW_BACK_BUTTON}"
             app:titleViewText="@{viewModel.mission.missionInfo.missionName}" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_stamps"
-            android:layout_width="match_parent"
+        <View
+            android:id="@+id/view_stamps"
+            android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_margin="32dp"
-            android:padding="10dp"
-            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            android:layout_margin="20dp"
+            android:background="@drawable/border_sky_blue_f2f6ff_fill_16"
             app:layout_constraintBottom_toTopOf="@id/btn_stamps_complete"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/title_view_stamps" />
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_stamps"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginHorizontal="12dp"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="22dp"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:layout_constraintTop_toTopOf="@id/view_stamps"
+            app:layout_constraintEnd_toEndOf="@id/view_stamps"
+            app:layout_constraintStart_toStartOf="@id/view_stamps"
+            app:layout_constraintBottom_toBottomOf="@id/view_stamps" />
+
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_stamps_complete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
+            android:layout_marginVertical="20dp"
             android:background="@drawable/border_sky_blue_line_30"
             android:padding="12dp"
             android:text="@string/stamps_complete"
