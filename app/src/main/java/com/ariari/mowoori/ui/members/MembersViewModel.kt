@@ -100,13 +100,7 @@ class MembersViewModel @Inject constructor(
                 addRequestCount()
                 checkRequestCount()
             }
-            ErrorMessage.Uid.message -> {
-            }
-            ErrorMessage.GroupId.message -> {
-            }
-            ErrorMessage.GroupInfo.message -> {
-            }
-            else -> Unit
+            else -> setLoadingEvent(false)
         }
     }
 

@@ -18,7 +18,7 @@ class MembersRepositoryImpl @Inject constructor(
         val uid = getUserUid() ?: throw NullPointerException(ErrorMessage.Uid.message)
         val groupIdSnapshot = databaseReference.child("users/$uid/currentGroupId").get().await()
         val currentGroupId = groupIdSnapshot.getValue(String::class.java)
-            ?: throw NullPointerException(ErrorMessage.GroupId.message)
+            ?: throw NullPointerException(ErrorMessage.CurrentGroupId.message)
 
         val groupInfoSnapshot = databaseReference.child("groups/$currentGroupId").get().await()
         val group = groupInfoSnapshot.getValue(GroupInfo::class.java) ?: throw NullPointerException(
@@ -32,9 +32,9 @@ class MembersRepositoryImpl @Inject constructor(
     override suspend fun getUserInfo(userId: String): Result<User> =
         kotlin.runCatching {
             val userSnapshot = databaseReference.child("users/$userId").get().await()
-            User(
-                userId,
-                userSnapshot.getValue(UserInfo::class.java) ?: UserInfo()
-            )
+            val userInfo =
+                userSnapshot.getValue(UserInfo::class.java) ?: throw NullPointerException(
+                    ErrorMessage.UserInfo.message)
+            User(userId, userInfo)
         }
 }
