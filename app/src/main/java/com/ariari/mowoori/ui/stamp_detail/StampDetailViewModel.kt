@@ -10,6 +10,7 @@ import com.ariari.mowoori.ui.missions.entity.Mission
 import com.ariari.mowoori.ui.stamp.entity.DetailInfo
 import com.ariari.mowoori.ui.stamp.entity.DetailMode
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
+import com.ariari.mowoori.util.ErrorMessage
 import com.ariari.mowoori.util.Event
 import com.ariari.mowoori.util.LogUtil
 import com.ariari.mowoori.util.getCurrentDate
@@ -126,8 +127,7 @@ class StampDetailViewModel @Inject constructor(
                         postStampInfo(uri)
                     }
                     .onFailure {
-                        addRequestCount()
-                        checkRequestCount()
+                        checkThrowableMessage(it)
                     }
             } else {
                 postStampInfo("")
@@ -137,15 +137,25 @@ class StampDetailViewModel @Inject constructor(
 
     fun getGroupMembersFcmToken() {
         viewModelScope.launch(Dispatchers.IO) {
-            stampsRepository.getGroupMembersUserId().onSuccess { idList ->
-                val deferredMembersUserIdList = idList.map { userId ->
-                    async { stampsRepository.getGroupMembersFcmToken(userId) }
+            stampsRepository.getGroupMembersUserId()
+                .onSuccess { idList ->
+                    val deferredMembersUserIdList = idList.map { userId ->
+                        async { stampsRepository.getGroupMembersFcmToken(userId) }
+                    }
+                    _groupMembersTokenList.postValue(
+                        deferredMembersUserIdList.awaitAll().map { result ->
+                            if (result.isSuccess) {
+                                result.getOrNull() ?: ""
+                            } else {
+                                val throwable = result.exceptionOrNull() ?: return@launch
+                                checkThrowableMessage(throwable)
+                                return@launch
+                            }
+                        }
+                    )
+                }.onFailure {
+                    checkThrowableMessage(it)
                 }
-                _groupMembersTokenList.postValue(
-                    deferredMembersUserIdList.awaitAll().map { result -> result.getOrNull() ?: "" })
-            }.onFailure {
-                LogUtil.log(it.message.toString())
-            }
         }
     }
 
@@ -165,8 +175,7 @@ class StampDetailViewModel @Inject constructor(
                             LogUtil.log("fcm_success", it.success.toString())
                             LogUtil.log("fcm_failure", it.failure.toString())
                         }.onFailure {
-                            addRequestCount()
-                            checkRequestCount()
+                            checkThrowableMessage(it)
                             LogUtil.log("fcm_throw_message", it.message.toString())
                         }
                     }
@@ -187,15 +196,23 @@ class StampDetailViewModel @Inject constructor(
                 stampsRepository.postStamp(stampInfo, Mission(detailInfo.missionId, it))
                     .onSuccess {
                         _isStampPosted.postValue(Event(Unit))
-                    }.onFailure {
-                        addRequestCount()
-                        checkRequestCount()
+                    }.onFailure { throwable ->
+                        checkThrowableMessage(throwable)
                     }
             }
             .onFailure {
+                checkThrowableMessage(it)
+            }
+    }
+
+    private fun checkThrowableMessage(throwable: Throwable) {
+        when (throwable.message) {
+            ErrorMessage.Offline.message -> {
                 addRequestCount()
                 checkRequestCount()
             }
+            else -> setLoadingEvent(false)
+        }
     }
 
     private fun setNetworkDialogEvent() {

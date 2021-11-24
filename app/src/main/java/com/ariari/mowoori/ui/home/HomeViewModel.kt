@@ -104,9 +104,9 @@ class HomeViewModel @Inject constructor(
 
     private fun setSnowmanLevel(doneMission: Int): SnowmanLevel {
         return when {
-            doneMission <= 1 -> SnowmanLevel.LV1
-            doneMission == 2 -> SnowmanLevel.LV2
-            doneMission == 3 -> SnowmanLevel.LV3
+            doneMission <= 0 -> SnowmanLevel.LV1
+            doneMission == 1 -> SnowmanLevel.LV2
+            doneMission == 2 -> SnowmanLevel.LV3
             else -> SnowmanLevel.LV4
         }
     }

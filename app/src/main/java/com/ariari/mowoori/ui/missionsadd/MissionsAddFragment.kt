@@ -15,6 +15,7 @@ import com.ariari.mowoori.R
 import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentMissionsAddBinding
 import com.ariari.mowoori.util.EventObserver
+import com.ariari.mowoori.util.hideKeyBoard
 import com.ariari.mowoori.util.isNetWorkAvailable
 import com.ariari.mowoori.util.toastMessage
 import com.ariari.mowoori.widget.BaseDialogFragment
@@ -52,15 +53,9 @@ class MissionsAddFragment :
 
     private fun setRootClick() {
         binding.root.setOnClickListener {
-            hideKeyboard(it)
+            requireContext().hideKeyBoard(it)
             requireActivity().currentFocus?.clearFocus()
         }
-    }
-
-    private fun hideKeyboard(v: View) {
-        val inputMethodManager =
-            requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(v.windowToken, 0)
     }
 
     private fun setBackBtnClickObserver() {

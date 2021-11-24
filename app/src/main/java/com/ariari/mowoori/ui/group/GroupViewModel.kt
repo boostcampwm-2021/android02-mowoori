@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.GroupRepository
 import com.ariari.mowoori.data.repository.IntroRepository
 import com.ariari.mowoori.ui.home.entity.GroupInfo
+import com.ariari.mowoori.util.ErrorMessage
 import com.ariari.mowoori.util.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -53,63 +54,89 @@ class GroupViewModel @Inject constructor(
             introRepository.getRandomNickName()
                 .onSuccess { randomName -> groupName.postValue(randomName + "들") }
                 .onFailure {
-                    addRequestCount()
-                    checkRequestCount()
+                    checkThrowableMessage(it)
                 }
         }
     }
 
     fun joinGroup() {
+        val code = groupName.value ?: ""
+        if (!checkInviteCodeValidation(code)) {
+            _inValidEvent.postValue(Event(Unit))
+            return
+        }
         viewModelScope.launch(Dispatchers.IO) {
-            val name = groupName.value ?: return@launch
-            val exist = groupRepository.isExistGroupId(name)
-            if (!exist) {
-                _inValidEvent.postValue(Event(Unit))
-            } else {
-                initRequestCount()
-                groupRepository.getUser()
-                    .onSuccess {
+            groupRepository.isExistGroupId(code)
+                .onSuccess {
+                    if (it) {
                         initRequestCount()
-                        groupRepository.addUserToGroup(name, it)
-                            .onSuccess { newGroupId ->
-                                _addGroupCompleteEvent.postValue(Event(newGroupId))
+                        groupRepository.getUser()
+                            .onSuccess { user ->
+                                initRequestCount()
+                                groupRepository.addUserToGroup(code, user)
+                                    .onSuccess { newGroupId ->
+                                        _addGroupCompleteEvent.postValue(Event(newGroupId))
+                                    }
+                                    .onFailure { throwable ->
+                                        checkThrowableMessage(throwable)
+                                    }
+                            }.onFailure { throwable ->
+                                checkThrowableMessage(throwable)
                             }
-                            .onFailure {
-                                addRequestCount()
-                                checkRequestCount()
-                                _addGroupCompleteEvent.postValue(Event(""))
-                            }
-                    }.onFailure {
-                        addRequestCount()
-                        checkRequestCount()
-                        _addGroupCompleteEvent.postValue(Event(""))
+                    } else {
+                        _inValidEvent.postValue(Event(Unit))
                     }
-            }
+                }
+                .onFailure {
+                    checkThrowableMessage(it)
+                }
         }
     }
 
     fun addNewGroup() {
+        val name = groupName.value ?: ""
+        if (!checkGroupNameValidation(name)) {
+            _inValidEvent.postValue(Event(Unit))
+            return
+        }
         viewModelScope.launch(Dispatchers.IO) {
             initRequestCount()
             groupRepository.getUser()
                 .onSuccess {
-                    val name = groupName.value ?: return@launch
                     val groupInfo = GroupInfo(0, name, listOf(it.userId))
                     initRequestCount()
                     groupRepository.putGroupInfo(groupInfo, it)
                         .onSuccess { newGroupId ->
                             _addGroupCompleteEvent.postValue(Event(newGroupId))
                         }
-                        .onFailure {
-                            addRequestCount()
-                            checkRequestCount()
-                            _addGroupCompleteEvent.postValue(Event(""))
+                        .onFailure { throwable ->
+                            checkThrowableMessage(throwable)
                         }
                 }
                 .onFailure {
-                    addRequestCount()
-                    checkRequestCount()
+                    checkThrowableMessage(it)
                 }
+        }
+    }
+
+    private fun checkGroupNameValidation(groupName: String): Boolean {
+        return groupName.length <= 11 && groupName.isNotEmpty()
+    }
+
+    private fun checkInviteCodeValidation(code: String): Boolean {
+        return code.isNotEmpty()
+    }
+
+    private fun checkThrowableMessage(throwable: Throwable) {
+        when (throwable.message) {
+            ErrorMessage.Offline.message -> {
+                addRequestCount()
+                checkRequestCount()
+            }
+            ErrorMessage.GroupInfo.message -> {
+                _inValidEvent.postValue(Event(Unit))
+            }
+            else -> Unit
         }
     }
 

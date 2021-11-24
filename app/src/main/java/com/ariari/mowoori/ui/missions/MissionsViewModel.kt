@@ -7,12 +7,12 @@ import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.MissionsRepository
 import com.ariari.mowoori.ui.missions.entity.Mission
 import com.ariari.mowoori.ui.register.entity.User
+import com.ariari.mowoori.util.ErrorMessage
 import com.ariari.mowoori.util.Event
 import com.ariari.mowoori.util.getCurrentDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -97,11 +97,8 @@ class MissionsViewModel @Inject constructor(
                 missionsRepository.getUser().onSuccess { user ->
                     loadUser(user)
                     loadMissionIdList(user)
-                }.onFailure { exception ->
-                    Timber.e(exception)
-                    addRequestCount()
-                    checkRequestCount()
-                    _errorMessage.postValue(Event("getUser"))
+                }.onFailure {
+                    checkThrowableMessage(it)
                 }
             }
         }
@@ -114,11 +111,8 @@ class MissionsViewModel @Inject constructor(
                 .onSuccess { missionIdList ->
                     loadMissionList(user.userId, missionIdList)
                 }
-                .onFailure { exception ->
-                    Timber.e(exception)
-                    addRequestCount()
-                    checkRequestCount()
-                    _errorMessage.postValue(Event("loadMissionList"))
+                .onFailure {
+                    checkThrowableMessage(it)
                 }
         }
     }
@@ -153,13 +147,22 @@ class MissionsViewModel @Inject constructor(
                     }))
             }
             .onFailure {
-                addRequestCount()
-                checkRequestCount()
+                checkThrowableMessage(it)
             }
     }
 
     private fun loadUser(user: User) {
         _user.postValue(Event(user))
+    }
+
+    private fun checkThrowableMessage(throwable: Throwable) {
+        when (throwable.message) {
+            ErrorMessage.Offline.message -> {
+                addRequestCount()
+                checkRequestCount()
+            }
+            else -> setLoadingEvent(false)
+        }
     }
 
     private fun setNetworkDialogEvent() {
