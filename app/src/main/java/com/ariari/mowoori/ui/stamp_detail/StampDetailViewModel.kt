@@ -67,6 +67,9 @@ class StampDetailViewModel @Inject constructor(
     private var _requestCount = 0
     private val requestCount get() = _requestCount
 
+    private val _checkCommentValidEvent = MutableLiveData<Event<Unit>>()
+    val checkCommentValidEvent: LiveData<Event<Unit>> = _checkCommentValidEvent
+
     private fun initRequestCount() {
         _requestCount = 0
     }
@@ -118,6 +121,10 @@ class StampDetailViewModel @Inject constructor(
         }
     }
 
+    fun checkCommentValid() {
+        _checkCommentValidEvent.postValue(Event(Unit))
+    }
+
     fun postStamp() {
         viewModelScope.launch(Dispatchers.IO) {
             if (pictureUri.value != null) {
@@ -164,7 +171,7 @@ class StampDetailViewModel @Inject constructor(
             groupMembersTokenList.value?.let { tokenList ->
                 tokenList.map { fcmToken ->
                     initRequestCount()
-                    launch{
+                    launch {
                         stampsRepository.postFcmMessage(
                             fcmToken,
                             detailInfo.copy(
