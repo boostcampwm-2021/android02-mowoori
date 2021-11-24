@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.MissionsRepository
 import com.ariari.mowoori.ui.missions.entity.MissionInfo
 import com.ariari.mowoori.ui.register.entity.User
+import com.ariari.mowoori.util.ErrorMessage
 import com.ariari.mowoori.util.Event
 import com.ariari.mowoori.util.LogUtil
 import com.ariari.mowoori.util.getCurrentDate
@@ -78,8 +79,7 @@ class MissionsAddViewModel @Inject constructor(
             missionsRepository.getUser().onSuccess { user ->
                 loadMissionIdList(getMissionInfo(user.userId, missionName), user)
             }.onFailure {
-                addRequestCount()
-                checkRequestCount()
+                checkThrowableMessage(it)
             }
         }
     }
@@ -98,8 +98,7 @@ class MissionsAddViewModel @Inject constructor(
                 _isMissionPosted.postValue(Event(Unit))
             }
             .onFailure {
-                addRequestCount()
-                checkRequestCount()
+                checkThrowableMessage(it)
             }
     }
 
@@ -132,6 +131,18 @@ class MissionsAddViewModel @Inject constructor(
 
     fun checkMissionValid() {
         _checkMissionValidEvent.postValue(Event(Unit))
+    }
+
+    private fun checkThrowableMessage(throwable: Throwable) {
+        when (throwable.message) {
+            ErrorMessage.Offline.message -> {
+                addRequestCount()
+                checkRequestCount()
+            }
+            ErrorMessage.UserInfo.message -> {
+            }
+            else -> Unit
+        }
     }
 
     private fun setNetworkDialogEvent() {

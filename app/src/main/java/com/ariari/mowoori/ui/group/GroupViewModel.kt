@@ -7,10 +7,12 @@ import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.GroupRepository
 import com.ariari.mowoori.data.repository.IntroRepository
 import com.ariari.mowoori.ui.home.entity.GroupInfo
+import com.ariari.mowoori.util.ErrorMessage
 import com.ariari.mowoori.util.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -53,8 +55,7 @@ class GroupViewModel @Inject constructor(
             introRepository.getRandomNickName()
                 .onSuccess { randomName -> groupName.postValue(randomName + "들") }
                 .onFailure {
-                    addRequestCount()
-                    checkRequestCount()
+                    checkThrowableMessage(it)
                 }
         }
     }
@@ -62,29 +63,30 @@ class GroupViewModel @Inject constructor(
     fun joinGroup() {
         viewModelScope.launch(Dispatchers.IO) {
             val name = groupName.value ?: return@launch
-            val exist = groupRepository.isExistGroupId(name)
-            if (!exist) {
-                _inValidEvent.postValue(Event(Unit))
-            } else {
-                initRequestCount()
-                groupRepository.getUser()
-                    .onSuccess {
+            groupRepository.isExistGroupId(name)
+                .onSuccess {
+                    if (it) {
                         initRequestCount()
-                        groupRepository.addUserToGroup(name, it)
-                            .onSuccess { newGroupId ->
-                                _addGroupCompleteEvent.postValue(Event(newGroupId))
+                        groupRepository.getUser()
+                            .onSuccess { user ->
+                                initRequestCount()
+                                groupRepository.addUserToGroup(name, user)
+                                    .onSuccess { newGroupId ->
+                                        _addGroupCompleteEvent.postValue(Event(newGroupId))
+                                    }
+                                    .onFailure { throwable ->
+                                        checkThrowableMessage(throwable)
+                                    }
+                            }.onFailure { throwable ->
+                                checkThrowableMessage(throwable)
                             }
-                            .onFailure {
-                                addRequestCount()
-                                checkRequestCount()
-                                _addGroupCompleteEvent.postValue(Event(""))
-                            }
-                    }.onFailure {
-                        addRequestCount()
-                        checkRequestCount()
-                        _addGroupCompleteEvent.postValue(Event(""))
+                    } else {
+                        _inValidEvent.postValue(Event(Unit))
                     }
-            }
+                }
+                .onFailure {
+                    checkThrowableMessage(it)
+                }
         }
     }
 
@@ -100,16 +102,27 @@ class GroupViewModel @Inject constructor(
                         .onSuccess { newGroupId ->
                             _addGroupCompleteEvent.postValue(Event(newGroupId))
                         }
-                        .onFailure {
-                            addRequestCount()
-                            checkRequestCount()
-                            _addGroupCompleteEvent.postValue(Event(""))
+                        .onFailure { throwable ->
+                            checkThrowableMessage(throwable)
                         }
                 }
                 .onFailure {
-                    addRequestCount()
-                    checkRequestCount()
+                    checkThrowableMessage(it)
                 }
+        }
+    }
+
+    private fun checkThrowableMessage(throwable: Throwable) {
+        when (throwable.message) {
+            ErrorMessage.Offline.message -> {
+                addRequestCount()
+                checkRequestCount()
+            }
+            ErrorMessage.GroupInfo.message -> {
+                // TODO: 잘못된 초대 코드 핸들링
+                Timber.e(throwable)
+            }
+            else -> Unit
         }
     }
 
