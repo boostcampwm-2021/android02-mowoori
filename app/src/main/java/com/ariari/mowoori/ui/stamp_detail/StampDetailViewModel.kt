@@ -152,7 +152,7 @@ class StampDetailViewModel @Inject constructor(
     }
 
     fun getGroupMembersFcmToken() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(IO) {
             stampsRepository.getGroupMembersUserId().onSuccess { idList ->
                 val deferredMembersUserIdList = idList.map { userId ->
                     async { stampsRepository.getGroupMembersFcmToken(userId) }
@@ -167,9 +167,9 @@ class StampDetailViewModel @Inject constructor(
 
     fun postFcm() {
         viewModelScope.launch {
-            initRequestCount()
             groupMembersTokenList.value?.let { tokenList ->
                 tokenList.forEach { fcmToken ->
+                    initRequestCount()
                     stampsRepository.postFcmMessage(
                         fcmToken,
                         detailInfo.copy(

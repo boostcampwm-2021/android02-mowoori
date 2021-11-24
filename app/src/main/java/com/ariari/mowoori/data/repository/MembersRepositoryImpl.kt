@@ -14,14 +14,14 @@ class MembersRepositoryImpl @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
 ) : MembersRepository {
     override suspend fun getCurrentGroupInfo(): Result<Group> = kotlin.runCatching {
-        val uid = getUserUid() ?: throw NullPointerException("userId is Null")
+        val uid = getUserUid() ?: throw NullPointerException("uid is null")
         val groupIdSnapshot = databaseReference.child("users/$uid/currentGroupId").get().await()
         val currentGroupId = groupIdSnapshot.getValue(String::class.java)
-            ?: throw NullPointerException("groupId is Null")
+            ?: throw NullPointerException("groupId is null")
 
         val groupInfoSnapshot = databaseReference.child("groups/$currentGroupId").get().await()
         val group = groupInfoSnapshot.getValue(GroupInfo::class.java) ?: throw NullPointerException(
-            "groupInfo is Null"
+            "groupInfo is null"
         )
         Group(currentGroupId, group)
     }
