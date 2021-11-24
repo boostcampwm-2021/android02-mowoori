@@ -6,7 +6,9 @@ import com.ariari.mowoori.ui.register.entity.UserInfo
 import com.ariari.mowoori.util.ErrorMessage
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.GenericTypeIndicator
 import kotlinx.coroutines.tasks.await
+import java.lang.Exception
 import javax.inject.Inject
 
 
@@ -20,17 +22,31 @@ class GroupRepositoryImpl @Inject constructor(
             ?: throw NullPointerException(ErrorMessage.GroupInfo.message)
     }
 
-    override fun putGroupInfo(groupInfo: GroupInfo, user: User): Result<String> =
+    override suspend fun getGroupNameList(): Result<List<String>> = runCatching {
+        val groupNameListSnapShot = databaseReference.child("groupNameList").get().await()
+        groupNameListSnapShot.getValue(object : GenericTypeIndicator<List<String>>() {})
+            ?: emptyList()
+    }
+
+    override fun putGroupInfo(
+        groupNameList: List<String>,
+        groupInfo: GroupInfo,
+        user: User,
+    ): Result<String> =
         kotlin.runCatching {
             val newId = databaseReference.child("groups").push().key
             newId?.let {
+                val groupNameMutableList = groupNameList.toMutableList()
+                if (groupNameMutableList.contains(groupInfo.groupName)) {
+                    throw Exception(ErrorMessage.ExistGroupName.message)
+                }
+                groupNameMutableList.add(groupInfo.groupName)
                 val tmpGroupList = user.userInfo.groupList
-                    .toMutableList().apply {
-                        add(newId)
-                    }
+                    .toMutableList().apply { add(newId) }
                 val newUserInfo =
                     user.userInfo.copy(groupList = tmpGroupList, currentGroupId = newId)
                 val childUpdates = hashMapOf(
+                    "/groupNameList/" to groupNameMutableList,
                     "/groups/$newId" to groupInfo,
                     "/users/${user.userId}" to newUserInfo
                 )
@@ -44,6 +60,9 @@ class GroupRepositoryImpl @Inject constructor(
             val snapshot = databaseReference.child("groups/$groupId").get().await()
             val tmpGroup = snapshot.getValue(GroupInfo::class.java)
                 ?: throw NullPointerException(ErrorMessage.GroupInfo.message)
+            if (tmpGroup.userList.contains(user.userId)) {
+                throw Exception(ErrorMessage.DuplicatedGroup.message)
+            }
             val tmpUserList = tmpGroup.userList.toMutableList().apply { add(user.userId) }
             val newGroupInfo = tmpGroup.copy(userList = tmpUserList)
 

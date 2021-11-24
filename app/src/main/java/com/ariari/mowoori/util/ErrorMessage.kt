@@ -11,5 +11,8 @@ enum class ErrorMessage(val message: String) {
     UserInfo("userInfo is null"),
     Path("invalid path"),
     HashKey("invalid hash key"),
-    PushKey("Couldn't get push key for posts")
+    PushKey("Couldn't get push key for posts"),
+    DuplicatedGroup("Group Duplication is not allowed"),
+    ExistGroupName("group name already exists"),
+    ExistUserName("user name already exists")
 }

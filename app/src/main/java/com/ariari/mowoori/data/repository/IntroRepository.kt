@@ -16,7 +16,9 @@ interface IntroRepository {
 
     fun getUserUid(): String?
 
-    suspend fun userRegister(userInfo: UserInfo): Result<Boolean>
+    suspend fun getUserNameList(): Result<List<String>>
+
+    suspend fun registerUser(userNameList: List<String>, userInfo: UserInfo): Result<Boolean>
 
     suspend fun putUserProfile(uri: Uri): Result<String>
 

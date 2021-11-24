@@ -7,7 +7,9 @@ import com.ariari.mowoori.ui.register.entity.User
 interface GroupRepository {
     suspend fun getGroupInfo(groupId: String): Result<GroupInfo>
 
-    fun putGroupInfo(groupInfo: GroupInfo, user: User): Result<String>
+    suspend fun getGroupNameList(): Result<List<String>>
+
+    fun putGroupInfo(groupNameList: List<String>, groupInfo: GroupInfo, user: User): Result<String>
 
     suspend fun addUserToGroup(groupId: String, user: User): Result<String>
 

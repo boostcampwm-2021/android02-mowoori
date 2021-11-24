@@ -1,17 +1,12 @@
 package com.ariari.mowoori.ui.register
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
-import android.view.inputmethod.InputMethodManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
-import androidx.navigation.fragment.findNavController
 import com.ariari.mowoori.R
-import com.ariari.mowoori.data.local.datasource.MoWooriPrefDataSource
 import com.ariari.mowoori.databinding.ActivityRegisterBinding
 import com.ariari.mowoori.ui.main.MainActivity
 import com.ariari.mowoori.util.EventObserver
@@ -23,7 +18,7 @@ import com.ariari.mowoori.widget.ConfirmDialogFragment
 import com.ariari.mowoori.widget.NetworkDialogFragment
 import com.ariari.mowoori.widget.ProgressDialogManager
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
+import kotlin.system.exitProcess
 
 @AndroidEntryPoint
 class RegisterActivity : AppCompatActivity() {
@@ -90,8 +85,8 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun setInvalidNickNameObserver() {
-        registerViewModel.invalidNicknameEvent.observe(this, EventObserver {
-            toastMessage(getString(R.string.register_nickname_error_msg))
+        registerViewModel.invalidNicknameEvent.observe(this, {
+            toastMessage(it.message)
         })
     }
 
@@ -142,6 +137,9 @@ class RegisterActivity : AppCompatActivity() {
         NetworkDialogFragment(object : NetworkDialogFragment.NetworkDialogListener {
             override fun onCancelClick(dialog: DialogFragment) {
                 dialog.dismiss()
+                finishAffinity()
+                System.runFinalization()
+                exitProcess(0)
             }
 
             override fun onRetryClick(dialog: DialogFragment) {

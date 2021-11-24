@@ -44,9 +44,26 @@ class IntroRepositoryImpl @Inject constructor(
         return firebaseAuth.currentUser?.uid
     }
 
-    override suspend fun userRegister(userInfo: UserInfo): Result<Boolean> = runCatching {
+    override suspend fun getUserNameList(): Result<List<String>> = runCatching {
+        val groupUserListSnapShot = firebaseReference.child("userNameList").get().await()
+        groupUserListSnapShot.getValue(object : GenericTypeIndicator<List<String>>() {})
+            ?: emptyList()
+    }
+
+    override suspend fun registerUser(
+        userNameList: List<String>,
+        userInfo: UserInfo,
+    ): Result<Boolean> = runCatching {
         val uid = getUserUid() ?: throw NullPointerException(ErrorMessage.Uid.message)
-        firebaseReference.child("users").child(uid).setValue(userInfo)
+        if (userNameList.contains(userInfo.nickname)) {
+            throw Exception(ErrorMessage.ExistUserName.message)
+        }
+        val userNameMutableList = userNameList.toMutableList().apply { add(userInfo.nickname) }
+        val childUpdates = hashMapOf(
+            "/userNameList/" to userNameMutableList,
+            "/users/$uid" to userInfo
+        )
+        firebaseReference.updateChildren(childUpdates)
         true
     }
 
