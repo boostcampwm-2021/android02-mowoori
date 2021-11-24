@@ -1,11 +1,7 @@
 package com.ariari.mowoori.ui.missionsadd
 
-import android.animation.Animator
-import android.animation.AnimatorInflater
-import android.app.Activity
 import android.os.Bundle
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
@@ -15,6 +11,7 @@ import com.ariari.mowoori.R
 import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentMissionsAddBinding
 import com.ariari.mowoori.util.EventObserver
+import com.ariari.mowoori.util.getVibrateAnimInstance
 import com.ariari.mowoori.util.hideKeyBoard
 import com.ariari.mowoori.util.isNetWorkAvailable
 import com.ariari.mowoori.util.toastMessage
@@ -171,7 +168,7 @@ class MissionsAddFragment :
         with(binding.tvMissionsAddWhatInvalid) {
             return@isMissionNameValid if (binding.etMissionsAddWhat.text.length !in 1..15) {
                 isVisible = true
-                getVibrateAnimInstance().run {
+                requireContext().getVibrateAnimInstance().run {
                     setTarget(binding.tvMissionsAddWhatInvalid)
                     start()
                 }
@@ -187,7 +184,7 @@ class MissionsAddFragment :
         with(binding.tvMissionsAddWhenInvalid) {
             return@isMissionDateValid if (missionsAddViewModel.missionStartDate.value!! > missionsAddViewModel.missionEndDate.value!!) {
                 isVisible = true
-                getVibrateAnimInstance().run {
+                requireContext().getVibrateAnimInstance().run {
                     setTarget(binding.tvMissionsAddWhenInvalid)
                     start()
                 }
@@ -197,10 +194,6 @@ class MissionsAddFragment :
                 true
             }
         }
-    }
-
-    private fun getVibrateAnimInstance(): Animator {
-        return AnimatorInflater.loadAnimator(requireContext(), R.animator.animator_invalid_vibrate)
     }
 
     private fun setNetworkDialogObserver() {

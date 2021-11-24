@@ -1,7 +1,10 @@
 package com.ariari.mowoori.util
 
+import android.animation.Animator
+import android.animation.AnimatorInflater
 import android.content.Context
 import android.util.TypedValue
+import com.ariari.mowoori.R
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
@@ -60,4 +63,8 @@ fun Int.px(context: Context): Int {
 
 fun Int.dp(context: Context): Int {
     return (this.toFloat() / context.resources.displayMetrics.density).toInt()
+}
+
+fun Context.getVibrateAnimInstance(): Animator {
+    return AnimatorInflater.loadAnimator(this, R.animator.animator_invalid_vibrate)
 }
