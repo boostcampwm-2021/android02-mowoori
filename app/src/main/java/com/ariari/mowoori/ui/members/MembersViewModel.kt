@@ -7,13 +7,13 @@ import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.MembersRepository
 import com.ariari.mowoori.ui.home.entity.Group
 import com.ariari.mowoori.ui.register.entity.User
+import com.ariari.mowoori.util.ErrorMessage
 import com.ariari.mowoori.util.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import timber.log.Timber
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -47,7 +47,7 @@ class MembersViewModel @Inject constructor(
     }
 
     private fun checkRequestCount() {
-        if (requestCount > 1) {
+        if (requestCount == 1) {
             setNetworkDialogEvent()
         }
     }
@@ -64,8 +64,7 @@ class MembersViewModel @Inject constructor(
                     _currentGroup.postValue(it)
                 }
                 .onFailure {
-                    addRequestCount()
-                    checkRequestCount()
+                    checkThrowableMessage(it)
                 }
         }
     }
@@ -78,24 +77,36 @@ class MembersViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val deferredMemberList =
                 requireNotNull(currentGroup.value).groupInfo.userList.map { userId ->
-                    async {
-                        membersRepository.getUserInfo(userId)
-                            .onFailure {
-
-                            }
-                    }
+                    async { membersRepository.getUserInfo(userId) }
                 }
             _membersList.postValue(
                 deferredMemberList.awaitAll().map { result ->
+                    initRequestCount()
                     if (result.isSuccess) {
                         result.getOrNull() ?: return@launch
                     } else {
                         val throwable = result.exceptionOrNull() ?: return@launch
-                        setNetworkDialogEvent()
+                        checkThrowableMessage(throwable)
                         return@launch
                     }
                 }
             )
+        }
+    }
+
+    private fun checkThrowableMessage(throwable: Throwable) {
+        when (throwable.message) {
+            ErrorMessage.Offline.message -> {
+                addRequestCount()
+                checkRequestCount()
+            }
+            ErrorMessage.Uid.message -> {
+            }
+            ErrorMessage.GroupId.message -> {
+            }
+            ErrorMessage.GroupInfo.message -> {
+            }
+            else -> Unit
         }
     }
 
