@@ -89,6 +89,7 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun registerUserInfo() {
         if (this.isNetWorkAvailable()) {
+            registerViewModel.initFcmServerKey()
             registerViewModel.registerUserInfo()
         } else {
             showNetworkDialog()

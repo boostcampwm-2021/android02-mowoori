@@ -133,6 +133,18 @@ class RegisterViewModel @Inject constructor(
         })
     }
 
+    fun initFcmServerKey() {
+        viewModelScope.launch(Dispatchers.IO) {
+            initRequestCount()
+            introRepository.getFcmServerKey().onSuccess { key ->
+                introRepository.updateFcmServerKey(key)
+            }.onFailure {
+                addRequestCount()
+                checkRequestCount()
+            }
+        }
+    }
+
     private fun checkNicknameValid(nickname: String): Boolean {
         return (nickname.length <= 11 && nickname.isNotEmpty())
     }
