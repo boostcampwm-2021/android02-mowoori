@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.IntroRepository
 import com.ariari.mowoori.ui.register.entity.UserInfo
+import com.ariari.mowoori.util.ErrorMessage
 import com.ariari.mowoori.util.Event
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
@@ -69,8 +70,7 @@ class RegisterViewModel @Inject constructor(
                     profileText.postValue(nickname)
                 }
                 .onFailure {
-                    addRequestCount()
-                    checkRequestCount()
+                    checkThrowableMessage(it)
                 }
         }
     }
@@ -103,9 +103,8 @@ class RegisterViewModel @Inject constructor(
                     .onSuccess { url ->
                         uploadUrl = url
                     }
-                    .onFailure {
-                        addRequestCount()
-                        checkRequestCount()
+                    .onFailure { throwable ->
+                        checkThrowableMessage(throwable)
                         return@launch
                     }
             }
@@ -120,8 +119,7 @@ class RegisterViewModel @Inject constructor(
                 setLoadingEvent(false)
                 _registerSuccessEvent.postValue(Event(it))
             }.onFailure {
-                addRequestCount()
-                checkRequestCount()
+                checkThrowableMessage(it)
             }
         }
     }
@@ -137,6 +135,16 @@ class RegisterViewModel @Inject constructor(
 
     private fun checkNicknameValid(nickname: String): Boolean {
         return (nickname.length <= 11 && nickname.isNotEmpty())
+    }
+
+    private fun checkThrowableMessage(throwable: Throwable) {
+        when (throwable.message) {
+            ErrorMessage.Offline.message -> {
+                addRequestCount()
+                checkRequestCount()
+            }
+            else -> setLoadingEvent(false)
+        }
     }
 
     private fun setNetworkDialogEvent() {
