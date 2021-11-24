@@ -15,9 +15,10 @@ import com.ariari.mowoori.util.Event
 import com.ariari.mowoori.util.LogUtil
 import com.ariari.mowoori.util.getCurrentDate
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -118,7 +119,7 @@ class StampDetailViewModel @Inject constructor(
     }
 
     fun postStamp() {
-        viewModelScope.launch(IO) {
+        viewModelScope.launch(Dispatchers.IO) {
             if (pictureUri.value != null) {
                 initRequestCount()
                 stampsRepository.putCertificationImage(pictureUri.value!!, detailInfo.missionId)
@@ -135,7 +136,7 @@ class StampDetailViewModel @Inject constructor(
     }
 
     fun getGroupMembersFcmToken() {
-        viewModelScope.launch(IO) {
+        viewModelScope.launch(Dispatchers.IO) {
             stampsRepository.getGroupMembersUserId()
                 .onSuccess { idList ->
                     val deferredMembersUserIdList = idList.map { userId ->
@@ -161,22 +162,24 @@ class StampDetailViewModel @Inject constructor(
     fun postFcm() {
         viewModelScope.launch {
             groupMembersTokenList.value?.let { tokenList ->
-                tokenList.forEach { fcmToken ->
+                tokenList.map { fcmToken ->
                     initRequestCount()
-                    stampsRepository.postFcmMessage(
-                        fcmToken,
-                        detailInfo.copy(
-                            detailMode = DetailMode.INQUIRY,
-                            stampInfo = stampInfo
-                        )
-                    ).onSuccess {
-                        LogUtil.log("fcm", it.success.toString())
-                        LogUtil.log("fcm", it.failure.toString())
-                    }.onFailure {
-                        checkThrowableMessage(it)
-                        LogUtil.log("fcm", it.message.toString())
+                    launch{
+                        stampsRepository.postFcmMessage(
+                            fcmToken,
+                            detailInfo.copy(
+                                detailMode = DetailMode.INQUIRY,
+                                stampInfo = stampInfo
+                            )
+                        ).onSuccess {
+                            LogUtil.log("fcm_success", it.success.toString())
+                            LogUtil.log("fcm_failure", it.failure.toString())
+                        }.onFailure {
+                            checkThrowableMessage(it)
+                            LogUtil.log("fcm_throw_message", it.message.toString())
+                        }
                     }
-                }
+                }.joinAll()
                 setLoadingEvent(false)
                 _isFcmSent.postValue(Event(Unit))
             }
