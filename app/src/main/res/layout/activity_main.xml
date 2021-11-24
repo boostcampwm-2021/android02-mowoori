@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="0dp"
             android:layout_marginEnd="0dp"
-
+            app:itemRippleColor="@color/sky_blue_DEE7FF"
             app:itemIconTint="@drawable/selector_bottom_nav_icon"
             app:labelVisibilityMode="unlabeled"
             app:layout_constraintBottom_toBottomOf="parent"
