@@ -99,7 +99,7 @@ class StampsViewModel @Inject constructor(
 
     private fun createEmptyStamps(count: Int): MutableList<Stamp> {
         val tempStampList = mutableListOf<Stamp>()
-        repeat(count) { tempStampList.add(Stamp(stampInfo = StampInfo())) }
+        repeat(count) { tempStampList.add(Stamp(stampInfo = StampInfo(pictureUrl = "empty"))) }
         return tempStampList
     }
 

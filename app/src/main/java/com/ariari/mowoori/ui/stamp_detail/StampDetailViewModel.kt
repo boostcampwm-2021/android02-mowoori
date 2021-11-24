@@ -1,7 +1,6 @@
 package com.ariari.mowoori.ui.stamp_detail
 
 import android.net.Uri
-import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -29,29 +28,28 @@ class StampDetailViewModel @Inject constructor(
     lateinit var detailInfo: DetailInfo
         private set
 
-    lateinit var stampInfo: StampInfo
-        private set
+    private var stampInfo = StampInfo()
 
     private val _loadingEvent = MutableLiveData<Event<Boolean>>()
-    val loadingEvent: LiveData<Event<Boolean>> get() = _loadingEvent
+    val loadingEvent: LiveData<Event<Boolean>> = _loadingEvent
 
     private val _closeBtnClick = MutableLiveData<Boolean>()
     val closeBtnClick: LiveData<Boolean> = _closeBtnClick
 
     private val _isCertify = MutableLiveData<Event<Boolean>>()
-    val isCertify: LiveData<Event<Boolean>> get() = _isCertify
+    val isCertify: LiveData<Event<Boolean>> = _isCertify
 
     private val _userName = MutableLiveData<String>()
-    val userName: LiveData<String> get() = _userName
+    val userName: LiveData<String> = _userName
 
     private val _missionName = MutableLiveData<String>()
-    val missionName: LiveData<String> get() = _missionName
+    val missionName: LiveData<String> = _missionName
 
-    private val _comment = MutableLiveData("미션 완료.")
-    val comment: LiveData<String> get() = _comment
+    private val _comment = MutableLiveData<String>()
+    val comment: LiveData<String> = _comment
 
-    private val _pictureUri = MutableLiveData("default".toUri())
-    val pictureUri: LiveData<Uri> get() = _pictureUri
+    private val _pictureUri = MutableLiveData<Uri>()
+    val pictureUri: LiveData<Uri> = _pictureUri
 
     private val _isStampPosted = MutableLiveData<Event<Unit>>()
     val isStampPosted: LiveData<Event<Unit>> get() = _isStampPosted
@@ -121,33 +119,19 @@ class StampDetailViewModel @Inject constructor(
 
     fun postStamp() {
         viewModelScope.launch(IO) {
-            initRequestCount()
-            stampsRepository.putCertificationImage(pictureUri.value!!, detailInfo.missionId)
-                .onSuccess { uri ->
-                    LogUtil.log("stamp", uri)
-                    initRequestCount()
-                    stampsRepository.getMissionInfo(detailInfo.missionId)
-                        .onSuccess {
-                            stampInfo = StampInfo(
-                                uri, comment.value!!, getCurrentDate()
-                            )
-                            stampsRepository.postStamp(stampInfo, Mission(detailInfo.missionId, it))
-                                .onSuccess {
-                                    _isStampPosted.postValue(Event(Unit))
-                                }.onFailure { 
-                                    addRequestCount()
-                                    checkRequestCount()
-                                }
-                        }
-                        .onFailure {
-                            addRequestCount()
-                            checkRequestCount()
-                        }
-                }
-                .onFailure {
-                    addRequestCount()
-                    checkRequestCount()
-                }
+            if (pictureUri.value != null) {
+                initRequestCount()
+                stampsRepository.putCertificationImage(pictureUri.value!!, detailInfo.missionId)
+                    .onSuccess { uri ->
+                        postStampInfo(uri)
+                    }
+                    .onFailure {
+                        addRequestCount()
+                        checkRequestCount()
+                    }
+            } else {
+                postStampInfo("")
+            }
         }
     }
 
@@ -167,9 +151,9 @@ class StampDetailViewModel @Inject constructor(
 
     fun postFcm() {
         viewModelScope.launch {
-            initRequestCount()
             groupMembersTokenList.value?.let { tokenList ->
                 tokenList.forEach { fcmToken ->
+                    initRequestCount()
                     stampsRepository.postFcmMessage(
                         fcmToken,
                         detailInfo.copy(
@@ -189,6 +173,28 @@ class StampDetailViewModel @Inject constructor(
                 _isFcmSent.postValue(Event(Unit))
             }
         }
+    }
+
+    private suspend fun postStampInfo(uriString: String) {
+        LogUtil.log("stamp", uriString)
+        initRequestCount()
+        stampsRepository.getMissionInfo(detailInfo.missionId)
+            .onSuccess {
+                val stampInfo = StampInfo(uriString, comment.value!!, getCurrentDate())
+                initRequestCount()
+                stampsRepository.postStamp(stampInfo, Mission(detailInfo.missionId, it))
+                    .onSuccess {
+                        _isStampPosted.postValue(Event(Unit))
+                        setLoadingEvent(false)
+                    }.onFailure {
+                        addRequestCount()
+                        checkRequestCount()
+                    }
+            }
+            .onFailure {
+                addRequestCount()
+                checkRequestCount()
+            }
     }
 
     private fun setNetworkDialogEvent() {
