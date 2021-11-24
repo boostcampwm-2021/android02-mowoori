@@ -68,7 +68,11 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
 
     private fun setPlusBtnClickObserver() {
         missionsViewModel.plusBtnClick.observe(viewLifecycleOwner, EventObserver {
-            this.findNavController().navigate(R.id.action_missionsFragment_to_missionsAddFragment)
+            if(missionsViewModel.isEmptyGroupList){
+                toastMessage(getString(R.string.missions_no_group))
+            }else{
+                this.findNavController().navigate(R.id.action_missionsFragment_to_missionsAddFragment)
+            }
         })
     }
 

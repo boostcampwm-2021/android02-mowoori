@@ -131,7 +131,7 @@
             android:id="@+id/tv_missions_empty"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/missions_no_missions"
+            android:text="@string/missions_no_mission"
             android:textColor="@color/gray_A3A3A3"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
