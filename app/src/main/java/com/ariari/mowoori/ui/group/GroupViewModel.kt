@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.GroupRepository
 import com.ariari.mowoori.data.repository.IntroRepository
-import com.ariari.mowoori.ui.group.entity.InvalidMode
+import com.ariari.mowoori.util.InvalidMode
 import com.ariari.mowoori.ui.home.entity.GroupInfo
 import com.ariari.mowoori.ui.register.entity.User
 import com.ariari.mowoori.util.ErrorMessage
@@ -115,7 +115,7 @@ class GroupViewModel @Inject constructor(
 
     private suspend fun checkGroupNameExist(name: String, user: User) {
         initRequestCount()
-        groupRepository.getGroupNameList(name)
+        groupRepository.getGroupNameList()
             .onSuccess { groupNameList ->
                 val groupInfo = GroupInfo(0, name, listOf(user.userId))
                 initRequestCount()

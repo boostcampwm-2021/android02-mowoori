@@ -22,7 +22,7 @@ class GroupRepositoryImpl @Inject constructor(
             ?: throw NullPointerException(ErrorMessage.GroupInfo.message)
     }
 
-    override suspend fun getGroupNameList(groupName: String): Result<List<String>> = runCatching {
+    override suspend fun getGroupNameList(): Result<List<String>> = runCatching {
         val groupNameListSnapShot = databaseReference.child("groupNameList").get().await()
         groupNameListSnapShot.getValue(object : GenericTypeIndicator<List<String>>() {})
             ?: emptyList()
