@@ -28,8 +28,9 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:onBackClick="@{viewModel::setBackBtnClick}"
             app:onPlusClick="@{viewModel::setPlusBtnClick}"
-            app:titleViewMode="@{TitleViewMode.TITLE_VIEW_PLUS_BUTTON}"
+            app:titleViewMode="@{viewModel.isMemberMission? TitleViewMode.TITLE_VIEW_BACK_BUTTON : TitleViewMode.TITLE_VIEW_PLUS_BUTTON}"
             app:titleViewText="@{viewModel.user.peekContent() == null? @string/empty : @string/missions_my_mission(viewModel.user.peekContent().userInfo.nickname)}" />
 
         <TextView
@@ -130,7 +131,7 @@
             android:id="@+id/tv_missions_empty"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/missions_no_missions"
+            android:text="@string/missions_no_mission"
             android:textColor="@color/gray_A3A3A3"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"

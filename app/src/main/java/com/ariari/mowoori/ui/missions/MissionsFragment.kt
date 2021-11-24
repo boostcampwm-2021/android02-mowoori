@@ -38,6 +38,7 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
     private fun setObserver() {
         setLoadingObserver()
         setPlusBtnClickObserver()
+        setBackBtnClickObserver()
         setMissionsTypeObserver()
         setMissionsListObserver()
         setItemClickObserver()
@@ -67,7 +68,17 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
 
     private fun setPlusBtnClickObserver() {
         missionsViewModel.plusBtnClick.observe(viewLifecycleOwner, EventObserver {
-            this.findNavController().navigate(R.id.action_missionsFragment_to_missionsAddFragment)
+            if(missionsViewModel.isEmptyGroupList){
+                toastMessage(getString(R.string.missions_no_group))
+            }else{
+                this.findNavController().navigate(R.id.action_missionsFragment_to_missionsAddFragment)
+            }
+        })
+    }
+
+    private fun setBackBtnClickObserver() {
+        missionsViewModel.backBtnClick.observe(viewLifecycleOwner, EventObserver {
+            this.findNavController().popBackStack()
         })
     }
 

@@ -1,5 +1,6 @@
 package com.ariari.mowoori.ui.missions
 
+import androidx.databinding.Observable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,8 +12,12 @@ import com.ariari.mowoori.util.ErrorMessage
 import com.ariari.mowoori.util.Event
 import com.ariari.mowoori.util.getCurrentDate
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.rxjava3.core.Observable.create
+import io.reactivex.rxjava3.core.ObservableEmitter
+import io.reactivex.rxjava3.core.ObservableOnSubscribe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,6 +29,15 @@ class MissionsViewModel @Inject constructor(
 
     private val _plusBtnClick = MutableLiveData<Event<Boolean>>()
     val plusBtnClick: LiveData<Event<Boolean>> = _plusBtnClick
+
+    private val _backBtnClick = MutableLiveData<Event<Boolean>>()
+    val backBtnClick: LiveData<Event<Boolean>> get() = _backBtnClick
+
+    private val _isMemberMission = MutableLiveData<Boolean>()
+    val isMemberMission: LiveData<Boolean> = _isMemberMission
+
+    var isEmptyGroupList = false
+        private set
 
     private val _itemClick = MutableLiveData<Event<Mission>>()
     val itemClick: LiveData<Event<Mission>> = _itemClick
@@ -68,6 +82,10 @@ class MissionsViewModel @Inject constructor(
         _plusBtnClick.value = Event(true)
     }
 
+    fun setBackBtnClick() {
+        _backBtnClick.value = Event(true)
+    }
+
     fun setItemClick(mission: Mission) {
         _itemClick.postValue(Event(mission))
     }
@@ -89,12 +107,15 @@ class MissionsViewModel @Inject constructor(
 
     fun sendUserToLoadMissions(user: User?) {
         if (user != null) {
+            _isMemberMission.value = true
+            isEmptyGroupList = user.userInfo.groupList.isEmpty()
             loadUser(user)
             loadMissionIdList(user)
         } else {
             viewModelScope.launch(Dispatchers.IO) {
                 initRequestCount()
                 missionsRepository.getUser().onSuccess { user ->
+                    isEmptyGroupList = user.userInfo.groupList.isEmpty()
                     loadUser(user)
                     loadMissionIdList(user)
                 }.onFailure {
