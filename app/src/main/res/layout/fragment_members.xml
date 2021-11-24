@@ -22,8 +22,8 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:onInviteClick="@{viewModel::clickPlusButton}"
-            app:titleViewText="@{viewModel.currentGroup.groupInfo.groupName}"
-            app:titleViewMode="@{TitleViewMode.TITLE_VIEW_INVITE_BUTTON}" />
+            app:titleViewMode="@{TitleViewMode.TITLE_VIEW_INVITE_BUTTON}"
+            app:titleViewText="@{viewModel.currentGroup.groupInfo.groupName}" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_members"
@@ -31,6 +31,7 @@
             android:layout_height="0dp"
             android:layout_marginHorizontal="18dp"
             android:orientation="vertical"
+            android:overScrollMode="never"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
