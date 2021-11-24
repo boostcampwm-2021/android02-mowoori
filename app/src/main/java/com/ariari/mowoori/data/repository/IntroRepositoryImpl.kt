@@ -3,14 +3,13 @@ package com.ariari.mowoori.data.repository
 import android.net.Uri
 import com.ariari.mowoori.data.local.datasource.MoWooriPrefDataSource
 import com.ariari.mowoori.ui.register.entity.UserInfo
+import com.ariari.mowoori.util.ErrorMessage
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.GenericTypeIndicator
 import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.tasks.await
-import java.lang.NullPointerException
 import javax.inject.Inject
 
 class IntroRepositoryImpl @Inject constructor(
@@ -34,9 +33,9 @@ class IntroRepositoryImpl @Inject constructor(
         val namesRef = firebaseReference.child("names").get().await()
         val map =
             namesRef.getValue(object : GenericTypeIndicator<HashMap<String, List<String>>>() {})
-                ?: throw NullPointerException("invalid path")
-        val prefixList = map["prefix"] ?: throw NullPointerException("invalid key")
-        val nameList = map["name"] ?: throw NullPointerException("invalid key")
+                ?: throw NullPointerException(ErrorMessage.Path.message)
+        val prefixList = map["prefix"] ?: throw NullPointerException(ErrorMessage.HashKey.message)
+        val nameList = map["name"] ?: throw NullPointerException(ErrorMessage.HashKey.message)
         "${prefixList.random()} ${nameList.random()}"
     }
 
@@ -45,7 +44,7 @@ class IntroRepositoryImpl @Inject constructor(
     }
 
     override suspend fun userRegister(userInfo: UserInfo): Result<Boolean> = runCatching {
-        val uid = getUserUid() ?: throw NullPointerException("uid is null")
+        val uid = getUserUid() ?: throw NullPointerException(ErrorMessage.Uid.message)
         firebaseReference.child("users").child(uid).setValue(userInfo)
         true
     }
@@ -67,7 +66,7 @@ class IntroRepositoryImpl @Inject constructor(
         credential: AuthCredential,
     ): Result<String> = kotlin.runCatching {
         val authResult = auth.signInWithCredential(credential).await()
-        authResult.user?.uid ?: throw NullPointerException("uid is null")
+        authResult.user?.uid ?: throw NullPointerException(ErrorMessage.Uid.message)
     }
 
     override suspend fun signInWithEmailAndPassword(
