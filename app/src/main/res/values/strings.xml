@@ -126,4 +126,6 @@
     <!-- NetworkDialogFragment -->
     <string name="dialog_network_retry">재시도</string>
     <string name="dialog_network_content">데이터 요청에 실패하였습니다.\n사용중인 네트워크 상태를 확인해주세요.\n다시 요청 하시겠습니까?</string>
+    <string name="stamp_detail_comment_invalid">5~100자 사이로 입력해주세요.</string>
+    <string name="desc_iv_stamp_detail_highlight_circle">강조표시 점</string>
 </resources>
