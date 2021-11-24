@@ -134,7 +134,7 @@ class IntroActivity : AppCompatActivity() {
     private fun requestPermissions(permissions: List<String>) {
         if (!hasPermissions(permissions)) {
             Timber.d("hasPermission false")
-            toastMessage("앱 사용 중에 이미지 저장을 위해 반드시 외부저장소 권한이 필요합니다!!!!!!!")
+            toastMessage("앱 사용 중 이미지 저장을 위해 반드시 외부저장소 권한이 필요합니다.")
             activityPermissionLauncher.launch(permissions.toTypedArray())
         }
     }
