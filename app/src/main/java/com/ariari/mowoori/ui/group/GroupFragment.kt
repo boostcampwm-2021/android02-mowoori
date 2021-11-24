@@ -101,26 +101,18 @@ class GroupFragment : Fragment() {
     }
 
     private fun joinOrAddGroup() {
-        when (args.groupMode) {
-            GroupMode.INVITE -> {
-                viewModel.joinGroup()
+        if (requireContext().isNetWorkAvailable()) {
+            when (args.groupMode) {
+                GroupMode.INVITE -> {
+                    viewModel.joinGroup()
+                }
+                GroupMode.NEW -> {
+                    viewModel.addNewGroup()
+                }
             }
-            GroupMode.NEW -> {
-                viewModel.addNewGroup()
-            }
+        } else {
+            showNetworkDialog()
         }
-//        if (requireContext().isNetWorkAvailable()) {
-//            when (args.groupMode) {
-//                GroupMode.INVITE -> {
-//                    viewModel.joinGroup()
-//                }
-//                GroupMode.NEW -> {
-//                    viewModel.addNewGroup()
-//                }
-//            }
-//        } else {
-//            showNetworkDialog()
-//        }
     }
 
     private fun setNetworkDialogObserver() {
