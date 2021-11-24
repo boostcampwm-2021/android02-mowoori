@@ -15,6 +15,7 @@ import com.ariari.mowoori.data.local.datasource.MoWooriPrefDataSource
 import com.ariari.mowoori.databinding.ActivityRegisterBinding
 import com.ariari.mowoori.ui.main.MainActivity
 import com.ariari.mowoori.util.EventObserver
+import com.ariari.mowoori.util.hideKeyBoard
 import com.ariari.mowoori.util.isNetWorkAvailable
 import com.ariari.mowoori.util.toastMessage
 import com.ariari.mowoori.widget.BaseDialogFragment
@@ -59,17 +60,9 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun setRootClick() {
         binding.root.setOnClickListener {
-            hideKeyboard(it)
+            this.hideKeyBoard(it)
             currentFocus?.clearFocus()
         }
-    }
-
-    private fun hideKeyboard(v: View) {
-        // InputMethodManager 를 통해 가상 키보드를 숨길 수 있다.
-        // 현재 focus 되어있는 뷰의 windowToken 을 hideSoftInputFromWindow 메서드의 매개변수로 넘겨준다.
-        val inputMethodManager =
-            this.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(v.windowToken, 0)
     }
 
     private fun setCompleteClick() {

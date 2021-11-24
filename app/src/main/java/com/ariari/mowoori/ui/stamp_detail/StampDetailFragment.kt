@@ -26,6 +26,7 @@ import com.ariari.mowoori.ui.stamp_detail.entity.PictureType
 import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.util.LogUtil
 import com.ariari.mowoori.util.getCurrentDateTime
+import com.ariari.mowoori.util.hideKeyBoard
 import com.ariari.mowoori.util.isNetWorkAvailable
 import com.ariari.mowoori.util.toastMessage
 import com.ariari.mowoori.widget.NetworkDialogFragment
@@ -288,15 +289,9 @@ class StampDetailFragment :
 
     private fun setRootClick() {
         binding.container.setOnClickListener {
-            hideKeyboard(it)
+            requireContext().hideKeyBoard(it)
             requireActivity().currentFocus?.clearFocus()
         }
-    }
-
-    private fun hideKeyboard(v: View) {
-        val inputMethodManager =
-            requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(v.windowToken, 0)
     }
 
     private fun setCloseBtnClickObserver() {

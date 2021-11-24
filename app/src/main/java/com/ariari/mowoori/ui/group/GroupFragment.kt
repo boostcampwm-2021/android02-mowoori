@@ -17,6 +17,7 @@ import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.FragmentGroupBinding
 import com.ariari.mowoori.ui.group.entity.GroupMode
 import com.ariari.mowoori.util.EventObserver
+import com.ariari.mowoori.util.hideKeyBoard
 import com.ariari.mowoori.util.isNetWorkAvailable
 import com.ariari.mowoori.widget.NetworkDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,6 +54,7 @@ class GroupFragment : Fragment() {
         setOnCompleteClickListener()
         setGroupNameChangeListener()
         setNetworkDialogObserver()
+        setRootClick()
         when (args.groupMode) {
             GroupMode.INVITE -> {
                 setTitle(R.string.group_invite_title)
@@ -136,5 +138,12 @@ class GroupFragment : Fragment() {
                 joinOrAddGroup()
             }
         }).show(requireActivity().supportFragmentManager, "NetworkDialogFragment")
+    }
+
+    private fun setRootClick() {
+        binding.constraintLayout.setOnClickListener {
+            requireContext().hideKeyBoard(it)
+            requireActivity().currentFocus?.clearFocus()
+        }
     }
 }
