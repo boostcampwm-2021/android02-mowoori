@@ -12,7 +12,6 @@ import com.ariari.mowoori.util.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -61,16 +60,20 @@ class GroupViewModel @Inject constructor(
     }
 
     fun joinGroup() {
+        val code = groupName.value ?: ""
+        if (!checkInviteCodeValidation(code)) {
+            _inValidEvent.postValue(Event(Unit))
+            return
+        }
         viewModelScope.launch(Dispatchers.IO) {
-            val name = groupName.value ?: return@launch
-            groupRepository.isExistGroupId(name)
+            groupRepository.isExistGroupId(code)
                 .onSuccess {
                     if (it) {
                         initRequestCount()
                         groupRepository.getUser()
                             .onSuccess { user ->
                                 initRequestCount()
-                                groupRepository.addUserToGroup(name, user)
+                                groupRepository.addUserToGroup(code, user)
                                     .onSuccess { newGroupId ->
                                         _addGroupCompleteEvent.postValue(Event(newGroupId))
                                     }
@@ -91,11 +94,15 @@ class GroupViewModel @Inject constructor(
     }
 
     fun addNewGroup() {
+        val name = groupName.value ?: ""
+        if (!checkGroupNameValidation(name)) {
+            _inValidEvent.postValue(Event(Unit))
+            return
+        }
         viewModelScope.launch(Dispatchers.IO) {
             initRequestCount()
             groupRepository.getUser()
                 .onSuccess {
-                    val name = groupName.value ?: return@launch
                     val groupInfo = GroupInfo(0, name, listOf(it.userId))
                     initRequestCount()
                     groupRepository.putGroupInfo(groupInfo, it)
@@ -112,6 +119,14 @@ class GroupViewModel @Inject constructor(
         }
     }
 
+    private fun checkGroupNameValidation(groupName: String): Boolean {
+        return groupName.length <= 11 && groupName.isNotEmpty()
+    }
+
+    private fun checkInviteCodeValidation(code: String): Boolean {
+        return code.isNotEmpty()
+    }
+
     private fun checkThrowableMessage(throwable: Throwable) {
         when (throwable.message) {
             ErrorMessage.Offline.message -> {
@@ -119,8 +134,7 @@ class GroupViewModel @Inject constructor(
                 checkRequestCount()
             }
             ErrorMessage.GroupInfo.message -> {
-                // TODO: 잘못된 초대 코드 핸들링
-                Timber.e(throwable)
+                _inValidEvent.postValue(Event(Unit))
             }
             else -> Unit
         }
