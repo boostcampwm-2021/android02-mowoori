@@ -73,8 +73,11 @@ class GroupFragment : Fragment() {
     }
 
     private fun setValidationObserver() {
-        viewModel.inValidEvent.observe(viewLifecycleOwner, {
-            binding.tvGroupInvalid.isVisible = true
+        viewModel.inValidEvent.observe(viewLifecycleOwner, EventObserver {
+            when (args.groupMode) {
+                GroupMode.INVITE -> binding.tvInviteCodeInvalid.isVisible = true
+                GroupMode.NEW -> binding.tvGroupNameInvalid.isVisible = true
+            }
             objectAnimator.start()
         })
     }
@@ -86,7 +89,10 @@ class GroupFragment : Fragment() {
     }
 
     private fun setGroupNameChangeListener() {
-        binding.etGroup.doOnTextChanged { _, _, _, _ -> binding.tvGroupInvalid.isVisible = false }
+        binding.etGroup.doOnTextChanged { _, _, _, _ ->
+            binding.tvGroupNameInvalid.isVisible = false
+            binding.tvInviteCodeInvalid.isVisible = false
+        }
     }
 
     private fun setOnCompleteClickListener() {
