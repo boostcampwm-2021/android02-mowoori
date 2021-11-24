@@ -126,9 +126,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     private fun setMenuListener() {
         binding.tbHome.setOnMenuItemClickListener { item ->
             when (item.itemId) {
-                R.id.alarmFragment -> {
-                    findNavController().navigate(R.id.action_homeFragment_to_notificationFragment)
-                }
                 R.id.menu_tb_home_sun -> {
                     LogUtil.log("lottie", "sun")
                     binding.lottieHomeSun.apply {
@@ -142,6 +139,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
                         playAnimation()
                     }
                 }
+//                R.id.alarmFragment -> {
+//                    findNavController().navigate(R.id.action_homeFragment_to_notificationFragment)
+//                }
             }
             false
         }
