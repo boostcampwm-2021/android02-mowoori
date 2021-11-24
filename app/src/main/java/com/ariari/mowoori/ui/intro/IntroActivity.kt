@@ -73,6 +73,7 @@ class IntroActivity : AppCompatActivity() {
     private fun setObservers() {
         introViewModel.isUserRegistered.observe(this, EventObserver {
             if (it) {
+                introViewModel.updateFcmServerKey()
                 introViewModel.updateFcmToken()
                 introViewModel.setUserRegistered(true)
                 moveToMain()
