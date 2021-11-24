@@ -16,8 +16,8 @@ import androidx.navigation.fragment.navArgs
 import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.FragmentGroupBinding
 import com.ariari.mowoori.ui.group.entity.GroupMode
+import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.util.isNetWorkAvailable
-import com.ariari.mowoori.util.toastMessage
 import com.ariari.mowoori.widget.NetworkDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -80,13 +80,8 @@ class GroupFragment : Fragment() {
     }
 
     private fun setAddGroupCompleteObserver() {
-        viewModel.addGroupCompleteEvent.observe(viewLifecycleOwner, {
-            val newGroupId = it.peekContent()
-            if (newGroupId.isNotEmpty()) {
-                findNavController().navigate(R.id.action_groupNameFragment_to_homeFragment)
-            } else {
-                toastMessage("그룹 생성에 실패하였습니다.")
-            }
+        viewModel.addGroupCompleteEvent.observe(viewLifecycleOwner, EventObserver {
+            findNavController().navigate(R.id.action_groupNameFragment_to_homeFragment)
         })
     }
 

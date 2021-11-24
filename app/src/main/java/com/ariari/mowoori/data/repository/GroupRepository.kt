@@ -2,7 +2,6 @@ package com.ariari.mowoori.data.repository
 
 import com.ariari.mowoori.ui.home.entity.GroupInfo
 import com.ariari.mowoori.ui.register.entity.User
-import com.ariari.mowoori.ui.register.entity.UserInfo
 
 
 interface GroupRepository {
@@ -14,5 +13,5 @@ interface GroupRepository {
 
     suspend fun getUser(): Result<User>
 
-    suspend fun isExistGroupId(groupId: String): Boolean
+    suspend fun isExistGroupId(groupId: String): Result<Boolean>
 }
