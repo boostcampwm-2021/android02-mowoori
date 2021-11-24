@@ -9,6 +9,7 @@ import com.ariari.mowoori.data.repository.IntroRepository
 import com.ariari.mowoori.ui.register.entity.UserInfo
 import com.ariari.mowoori.util.ErrorMessage
 import com.ariari.mowoori.util.Event
+import com.ariari.mowoori.util.InvalidMode
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,8 +22,8 @@ class RegisterViewModel @Inject constructor(
     private val introRepository: IntroRepository,
 ) : ViewModel() {
     val profileText = MutableLiveData("")
-    private val _invalidNicknameEvent = MutableLiveData<Event<Unit>>()
-    val invalidNicknameEvent: LiveData<Event<Unit>> = _invalidNicknameEvent
+    private val _invalidNicknameEvent = MutableLiveData<InvalidMode>()
+    val invalidNicknameEvent: LiveData<InvalidMode> = _invalidNicknameEvent
 
     private val _registerSuccessEvent = MutableLiveData<Event<Boolean>>()
     val registerSuccessEvent: LiveData<Event<Boolean>> = _registerSuccessEvent
@@ -92,7 +93,7 @@ class RegisterViewModel @Inject constructor(
         val nickname = profileText.value ?: ""
         if (!checkNicknameValid(nickname)) {
             setLoadingEvent(false)
-            _invalidNicknameEvent.value = Event(Unit)
+            _invalidNicknameEvent.value = InvalidMode.InvalidNickname
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
@@ -109,19 +110,26 @@ class RegisterViewModel @Inject constructor(
                     }
             }
             initRequestCount()
-            introRepository.userRegister(
-                UserInfo(
-                    nickname = nickname,
-                    profileImage = uploadUrl,
-                    fcmToken = fcmToken
-                )
-            ).onSuccess {
+            introRepository.getUserNameList()
+                .onSuccess { userNameList ->
+                    registerUser(userNameList, UserInfo(nickname, uploadUrl, fcmToken))
+                }
+                .onFailure {
+                    checkThrowableMessage(it)
+                }
+        }
+    }
+
+    private suspend fun registerUser(userNameList: List<String>, userInfo: UserInfo) {
+        initRequestCount()
+        introRepository.registerUser(userNameList, userInfo)
+            .onSuccess {
                 setLoadingEvent(false)
                 _registerSuccessEvent.postValue(Event(it))
-            }.onFailure {
+            }
+            .onFailure {
                 checkThrowableMessage(it)
             }
-        }
     }
 
     fun initFcmToken() {
@@ -154,6 +162,10 @@ class RegisterViewModel @Inject constructor(
             ErrorMessage.Offline.message -> {
                 addRequestCount()
                 checkRequestCount()
+            }
+            ErrorMessage.ExistUserName.message -> {
+                setLoadingEvent(false)
+                _invalidNicknameEvent.postValue(InvalidMode.AlreadyExistNickname)
             }
             else -> setLoadingEvent(false)
         }

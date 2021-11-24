@@ -85,8 +85,8 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun setInvalidNickNameObserver() {
-        registerViewModel.invalidNicknameEvent.observe(this, EventObserver {
-            toastMessage(getString(R.string.register_nickname_error_msg))
+        registerViewModel.invalidNicknameEvent.observe(this, {
+            toastMessage(it.message)
         })
     }
 
