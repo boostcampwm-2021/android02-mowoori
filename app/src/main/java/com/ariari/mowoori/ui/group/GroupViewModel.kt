@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.GroupRepository
 import com.ariari.mowoori.data.repository.IntroRepository
 import com.ariari.mowoori.ui.home.entity.GroupInfo
+import com.ariari.mowoori.ui.register.entity.User
 import com.ariari.mowoori.util.ErrorMessage
 import com.ariari.mowoori.util.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -102,21 +103,36 @@ class GroupViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             initRequestCount()
             groupRepository.getUser()
-                .onSuccess {
-                    val groupInfo = GroupInfo(0, name, listOf(it.userId))
+                .onSuccess { user ->
+                    checkGroupNameExist(name, user)
+                }
+                .onFailure {
+                    checkThrowableMessage(it)
+                }
+        }
+    }
+
+    private suspend fun checkGroupNameExist(name: String, user: User) {
+        initRequestCount()
+        groupRepository.isGroupNameExist(name)
+            .onSuccess {
+                if (!it) {
+                    val groupInfo = GroupInfo(0, name, listOf(user.userId))
                     initRequestCount()
-                    groupRepository.putGroupInfo(groupInfo, it)
+                    groupRepository.putGroupInfo(groupInfo, user)
                         .onSuccess { newGroupId ->
                             _addGroupCompleteEvent.postValue(Event(newGroupId))
                         }
                         .onFailure { throwable ->
                             checkThrowableMessage(throwable)
                         }
+                } else {
+                    _inValidEvent.postValue(Event(Unit))
                 }
-                .onFailure {
-                    checkThrowableMessage(it)
-                }
-        }
+            }
+            .onFailure {
+                checkThrowableMessage(it)
+            }
     }
 
     private fun checkGroupNameValidation(groupName: String): Boolean {
@@ -134,6 +150,9 @@ class GroupViewModel @Inject constructor(
                 checkRequestCount()
             }
             ErrorMessage.GroupInfo.message -> {
+                _inValidEvent.postValue(Event(Unit))
+            }
+            ErrorMessage.DuplicatedGroup.message -> {
                 _inValidEvent.postValue(Event(Unit))
             }
             else -> Unit

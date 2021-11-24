@@ -6,7 +6,9 @@ import com.ariari.mowoori.ui.register.entity.UserInfo
 import com.ariari.mowoori.util.ErrorMessage
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.GenericTypeIndicator
 import kotlinx.coroutines.tasks.await
+import java.lang.Exception
 import javax.inject.Inject
 
 
@@ -20,6 +22,14 @@ class GroupRepositoryImpl @Inject constructor(
             ?: throw NullPointerException(ErrorMessage.GroupInfo.message)
     }
 
+    override suspend fun isGroupNameExist(groupName: String): Result<Boolean> = runCatching {
+        val groupNameListSnapShot = databaseReference.child("groupNameList").get().await()
+        val groupNameList =
+            groupNameListSnapShot.getValue(object : GenericTypeIndicator<List<String>>() {})
+                ?: emptyList()
+        groupNameList.contains(groupName)
+    }
+
     override fun putGroupInfo(groupInfo: GroupInfo, user: User): Result<String> =
         kotlin.runCatching {
             val newId = databaseReference.child("groups").push().key
@@ -31,6 +41,7 @@ class GroupRepositoryImpl @Inject constructor(
                 val newUserInfo =
                     user.userInfo.copy(groupList = tmpGroupList, currentGroupId = newId)
                 val childUpdates = hashMapOf(
+                    "/groupNameList/${groupInfo.groupName}" to String,
                     "/groups/$newId" to groupInfo,
                     "/users/${user.userId}" to newUserInfo
                 )
@@ -44,6 +55,9 @@ class GroupRepositoryImpl @Inject constructor(
             val snapshot = databaseReference.child("groups/$groupId").get().await()
             val tmpGroup = snapshot.getValue(GroupInfo::class.java)
                 ?: throw NullPointerException(ErrorMessage.GroupInfo.message)
+            if (tmpGroup.userList.contains(user.userId)) {
+                throw Exception(ErrorMessage.DuplicatedGroup.message)
+            }
             val tmpUserList = tmpGroup.userList.toMutableList().apply { add(user.userId) }
             val newGroupInfo = tmpGroup.copy(userList = tmpUserList)
 
