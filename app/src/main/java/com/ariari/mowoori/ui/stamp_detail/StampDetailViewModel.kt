@@ -185,7 +185,6 @@ class StampDetailViewModel @Inject constructor(
                 stampsRepository.postStamp(stampInfo, Mission(detailInfo.missionId, it))
                     .onSuccess {
                         _isStampPosted.postValue(Event(Unit))
-                        setLoadingEvent(false)
                     }.onFailure {
                         addRequestCount()
                         checkRequestCount()
