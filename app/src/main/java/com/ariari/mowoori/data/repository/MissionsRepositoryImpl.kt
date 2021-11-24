@@ -4,6 +4,7 @@ import com.ariari.mowoori.ui.missions.entity.Mission
 import com.ariari.mowoori.ui.missions.entity.MissionInfo
 import com.ariari.mowoori.ui.register.entity.User
 import com.ariari.mowoori.ui.register.entity.UserInfo
+import com.ariari.mowoori.util.ErrorMessage
 import com.ariari.mowoori.util.LogUtil
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
@@ -59,7 +60,7 @@ class MissionsRepositoryImpl @Inject constructor(
             val snapshot = firebaseReference.child("missions/$missionId").get().await()
             LogUtil.log("getMission Impl", snapshot.getValue(MissionInfo::class.java).toString())
             val missionInfo = snapshot.getValue(MissionInfo::class.java)
-                ?: throw NullPointerException("mission is null")
+                ?: throw NullPointerException(ErrorMessage.MissionInfo.message)
             missionInfo
         }
 

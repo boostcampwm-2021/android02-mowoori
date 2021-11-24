@@ -11,10 +11,12 @@ import com.ariari.mowoori.ui.missions.entity.Mission
 import com.ariari.mowoori.ui.missions.entity.MissionInfo
 import com.ariari.mowoori.ui.stamp.entity.Stamp
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
+import com.ariari.mowoori.util.ErrorMessage
 import com.ariari.mowoori.util.Event
-import com.ariari.mowoori.util.LogUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -78,19 +80,22 @@ class StampsViewModel @Inject constructor(
     private fun getAllStamps(missionInfo: MissionInfo): LiveData<Event<MutableList<Stamp>>> {
         val tempMutableLiveData = MutableLiveData<Event<MutableList<Stamp>>>()
         viewModelScope.launch(Dispatchers.IO) {
-            val tempStampList = mutableListOf<Stamp>()
-            missionInfo.stampList.forEach { stampId ->
-                initRequestCount()
-                stampsRepository.getStampInfo(stampId)
-                    .onSuccess { stampInfo ->
-                        tempStampList.add(Stamp(stampId, stampInfo))
-                    }
-                    .onFailure {
-                        addRequestCount()
-                        checkRequestCount()
-                        Timber.e("stampInfo Error: $it")
-                    }
+            val tempStampIdList = mutableListOf<String>()
+            val deferredStampList = missionInfo.stampList.map { stampId ->
+                tempStampIdList.add(stampId)
+                async { stampsRepository.getStampInfo(stampId) }
             }
+            val tempStampList = deferredStampList.awaitAll().mapIndexed { index, result ->
+                initRequestCount()
+                if (result.isSuccess) {
+                    val stampInfo = result.getOrNull() ?: return@launch
+                    Stamp(tempStampIdList[index], stampInfo)
+                } else {
+                    val throwable = result.exceptionOrNull() ?: return@launch
+                    checkThrowableMessage(throwable)
+                    return@launch
+                }
+            }.toMutableList()
             tempStampList.addAll(createEmptyStamps(missionInfo.totalStamp - tempStampList.size))
             tempMutableLiveData.postValue(Event(tempStampList))
         }
@@ -120,10 +125,26 @@ class StampsViewModel @Inject constructor(
                 .onSuccess {
                     _mission.postValue(Mission(missionId, it))
                 }.onFailure {
-                    addRequestCount()
-                    checkRequestCount()
-                    Timber.e("$it")
+                    checkThrowableMessage(it)
                 }
+        }
+    }
+
+    private fun checkThrowableMessage(throwable: Throwable) {
+        when (throwable.message) {
+            ErrorMessage.Offline.message -> {
+                addRequestCount()
+                checkRequestCount()
+            }
+            ErrorMessage.MissionInfo.message -> {
+            }
+            ErrorMessage.Uid.message -> {
+            }
+            ErrorMessage.GroupId.message -> {
+            }
+            ErrorMessage.GroupInfo.message -> {
+            }
+            else -> Unit
         }
     }
 
