@@ -25,6 +25,12 @@ class MissionsViewModel @Inject constructor(
     private val _plusBtnClick = MutableLiveData<Event<Boolean>>()
     val plusBtnClick: LiveData<Event<Boolean>> = _plusBtnClick
 
+    private val _backBtnClick = MutableLiveData<Event<Boolean>>()
+    val backBtnClick: LiveData<Event<Boolean>> get() = _backBtnClick
+
+    private val _isMemberMission = MutableLiveData<Boolean>()
+    val isMemberMission: LiveData<Boolean> = _isMemberMission
+
     private val _itemClick = MutableLiveData<Event<Mission>>()
     val itemClick: LiveData<Event<Mission>> = _itemClick
 
@@ -68,6 +74,10 @@ class MissionsViewModel @Inject constructor(
         _plusBtnClick.value = Event(true)
     }
 
+    fun setBackBtnClick() {
+        _backBtnClick.value = Event(true)
+    }
+
     fun setItemClick(mission: Mission) {
         _itemClick.postValue(Event(mission))
     }
@@ -89,6 +99,7 @@ class MissionsViewModel @Inject constructor(
 
     fun sendUserToLoadMissions(user: User?) {
         if (user != null) {
+            _isMemberMission.value = true
             loadUser(user)
             loadMissionIdList(user)
         } else {
