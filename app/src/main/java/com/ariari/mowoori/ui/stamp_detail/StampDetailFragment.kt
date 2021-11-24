@@ -35,9 +35,13 @@ import com.ariari.mowoori.widget.ProgressDialogManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.jakewharton.rxbinding4.view.clicks
 import dagger.hilt.android.AndroidEntryPoint
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.Disposable
 import timber.log.Timber
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class StampDetailFragment :
@@ -46,6 +50,7 @@ class StampDetailFragment :
     private val safeArgs: StampDetailFragmentArgs by navArgs()
     private var currentPhotoPath: String? = null
     private var providerUri: Uri? = null
+    private var completeBtnDisposable: Disposable? = null
 
     private val activityGalleryLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) {
@@ -185,15 +190,17 @@ class StampDetailFragment :
     }
 
     private fun setBtnCertifyListener() {
-        binding.btnStampDetailCertify.setOnClickListener {
-            stampDetailViewModel.setComment(binding.etStampDetailComment.text.toString())
-            if (requireContext().isNetWorkAvailable()) {
-                stampDetailViewModel.setLoadingEvent(true)
-                stampDetailViewModel.postStamp()
-            } else {
-                showNetworkDialog()
+        completeBtnDisposable = binding.btnStampDetailCertify.clicks()
+            .throttleFirst(5, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                stampDetailViewModel.setComment(binding.etStampDetailComment.text.toString())
+                if (requireContext().isNetWorkAvailable()) {
+                    stampDetailViewModel.setLoadingEvent(true)
+                } else {
+                    showNetworkDialog()
+                }
             }
-        }
     }
 
     private val onClick: (pictureType: PictureType) -> Unit = {
@@ -260,19 +267,15 @@ class StampDetailFragment :
         stampDetailViewModel.setPictureUri(uri)
 
         if (uri == null) {
-            Glide.with(requireContext())
-                .load(R.drawable.ic_stamp)
-                .override(300, 300)
-                .transform(CenterCrop(), RoundedCorners(16))
-                .into(binding.ivStampDetail)
+            binding.tvStampDetailIcon.isVisible = true
         } else {
             Glide.with(requireContext())
                 .load(uri)
                 .override(300, 300)
                 .transform(CenterCrop(), RoundedCorners(16))
                 .into(binding.ivStampDetail)
+            binding.tvStampDetailIcon.isVisible = false
         }
-        binding.tvStampDetailIcon.isVisible = false
     }
 
     private fun hasPermission(permission: String): Boolean {
@@ -334,8 +337,10 @@ class StampDetailFragment :
 
     private fun setLoadingObserver() {
         stampDetailViewModel.loadingEvent.observe(viewLifecycleOwner, EventObserver { isLoading ->
-            if (isLoading) ProgressDialogManager.instance.show(requireContext())
-            else ProgressDialogManager.instance.clear()
+            if (isLoading) {
+                ProgressDialogManager.instance.show(requireContext())
+                stampDetailViewModel.postStamp()
+            } else ProgressDialogManager.instance.clear()
         })
     }
 
@@ -359,5 +364,10 @@ class StampDetailFragment :
                 stampDetailViewModel.postStamp()
             }
         }).show(requireActivity().supportFragmentManager, "NetworkDialogFragment")
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        completeBtnDisposable?.dispose()
     }
 }
