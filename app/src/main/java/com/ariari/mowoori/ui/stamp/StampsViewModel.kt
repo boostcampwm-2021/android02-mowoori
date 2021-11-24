@@ -136,17 +136,12 @@ class StampsViewModel @Inject constructor(
                 addRequestCount()
                 checkRequestCount()
             }
-            ErrorMessage.MissionInfo.message -> {
-            }
-            ErrorMessage.StampInfo.message -> {
-            }
-            else -> Unit
+            else -> setLoadingEvent(false)
         }
     }
 
     private fun setNetworkDialogEvent() {
         setLoadingEvent(false)
-
         _networkDialogEvent.postValue(Event(true))
     }
 
