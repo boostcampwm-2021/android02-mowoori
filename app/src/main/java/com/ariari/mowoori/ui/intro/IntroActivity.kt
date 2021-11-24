@@ -22,6 +22,7 @@ import com.ariari.mowoori.util.toastMessage
 import com.ariari.mowoori.widget.NetworkDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
+import kotlin.system.exitProcess
 
 @AndroidEntryPoint
 class IntroActivity : AppCompatActivity() {
@@ -156,9 +157,9 @@ class IntroActivity : AppCompatActivity() {
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions: Map<String, Boolean>? ->
             Timber.d("register까지 잘 들어왔음")
             permissions?.let {
-                it.entries.forEach { it ->
-                    val permissionName = it.key
-                    val isGranted = it.value
+                it.entries.forEach { map ->
+                    val permissionName = map.key
+                    val isGranted = map.value
                     if (isGranted) {
                         LogUtil.log("permissionName", permissionName)
 //                    when (permissionName) {
@@ -185,6 +186,9 @@ class IntroActivity : AppCompatActivity() {
         NetworkDialogFragment(object : NetworkDialogFragment.NetworkDialogListener {
             override fun onCancelClick(dialog: DialogFragment) {
                 dialog.dismiss()
+                finishAffinity()
+                System.runFinalization()
+                exitProcess(0)
             }
 
             override fun onRetryClick(dialog: DialogFragment) {
