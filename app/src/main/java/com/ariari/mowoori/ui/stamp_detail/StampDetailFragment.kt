@@ -260,19 +260,15 @@ class StampDetailFragment :
         stampDetailViewModel.setPictureUri(uri)
 
         if (uri == null) {
-            Glide.with(requireContext())
-                .load(R.drawable.ic_stamp)
-                .override(300, 300)
-                .transform(CenterCrop(), RoundedCorners(16))
-                .into(binding.ivStampDetail)
+            binding.tvStampDetailIcon.isVisible = true
         } else {
             Glide.with(requireContext())
                 .load(uri)
                 .override(300, 300)
                 .transform(CenterCrop(), RoundedCorners(16))
                 .into(binding.ivStampDetail)
+            binding.tvStampDetailIcon.isVisible = false
         }
-        binding.tvStampDetailIcon.isVisible = false
     }
 
     private fun hasPermission(permission: String): Boolean {
