@@ -12,5 +12,6 @@ enum class ErrorMessage(val message: String) {
     Path("invalid path"),
     HashKey("invalid hash key"),
     PushKey("Couldn't get push key for posts"),
-    DuplicatedGroup("Group Duplication is not allowed")
+    DuplicatedGroup("Group Duplication is not allowed"),
+    ExistGroupName("group name already exists")
 }

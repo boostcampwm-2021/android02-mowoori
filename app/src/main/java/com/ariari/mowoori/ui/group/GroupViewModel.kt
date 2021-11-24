@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.GroupRepository
 import com.ariari.mowoori.data.repository.IntroRepository
+import com.ariari.mowoori.ui.group.entity.InvalidMode
 import com.ariari.mowoori.ui.home.entity.GroupInfo
 import com.ariari.mowoori.ui.register.entity.User
 import com.ariari.mowoori.util.ErrorMessage
@@ -26,8 +27,8 @@ class GroupViewModel @Inject constructor(
     private val _addGroupCompleteEvent = MutableLiveData<Event<String>>()
     val addGroupCompleteEvent: LiveData<Event<String>> = _addGroupCompleteEvent
 
-    private val _inValidEvent = MutableLiveData<Event<Unit>>()
-    val inValidEvent: LiveData<Event<Unit>> = _inValidEvent
+    private val _inValidMode = MutableLiveData<InvalidMode>()
+    val inValidMode: LiveData<InvalidMode> = _inValidMode
 
     private val _networkDialogEvent = MutableLiveData<Boolean>()
     val networkDialogEvent: LiveData<Boolean> get() = _networkDialogEvent
@@ -63,7 +64,7 @@ class GroupViewModel @Inject constructor(
     fun joinGroup() {
         val code = groupName.value ?: ""
         if (!checkInviteCodeValidation(code)) {
-            _inValidEvent.postValue(Event(Unit))
+            _inValidMode.postValue(InvalidMode.InValidCode)
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
@@ -85,7 +86,7 @@ class GroupViewModel @Inject constructor(
                                 checkThrowableMessage(throwable)
                             }
                     } else {
-                        _inValidEvent.postValue(Event(Unit))
+                        _inValidMode.postValue(InvalidMode.InValidCode)
                     }
                 }
                 .onFailure {
@@ -97,7 +98,7 @@ class GroupViewModel @Inject constructor(
     fun addNewGroup() {
         val name = groupName.value ?: ""
         if (!checkGroupNameValidation(name)) {
-            _inValidEvent.postValue(Event(Unit))
+            _inValidMode.postValue(InvalidMode.InValidGroupName)
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
@@ -114,21 +115,17 @@ class GroupViewModel @Inject constructor(
 
     private suspend fun checkGroupNameExist(name: String, user: User) {
         initRequestCount()
-        groupRepository.isGroupNameExist(name)
-            .onSuccess {
-                if (!it) {
-                    val groupInfo = GroupInfo(0, name, listOf(user.userId))
-                    initRequestCount()
-                    groupRepository.putGroupInfo(groupInfo, user)
-                        .onSuccess { newGroupId ->
-                            _addGroupCompleteEvent.postValue(Event(newGroupId))
-                        }
-                        .onFailure { throwable ->
-                            checkThrowableMessage(throwable)
-                        }
-                } else {
-                    _inValidEvent.postValue(Event(Unit))
-                }
+        groupRepository.getGroupNameList(name)
+            .onSuccess { groupNameList ->
+                val groupInfo = GroupInfo(0, name, listOf(user.userId))
+                initRequestCount()
+                groupRepository.putGroupInfo(groupNameList, groupInfo, user)
+                    .onSuccess { newGroupId ->
+                        _addGroupCompleteEvent.postValue(Event(newGroupId))
+                    }
+                    .onFailure { throwable ->
+                        checkThrowableMessage(throwable)
+                    }
             }
             .onFailure {
                 checkThrowableMessage(it)
@@ -150,10 +147,13 @@ class GroupViewModel @Inject constructor(
                 checkRequestCount()
             }
             ErrorMessage.GroupInfo.message -> {
-                _inValidEvent.postValue(Event(Unit))
+                _inValidMode.postValue(InvalidMode.InValidCode)
             }
             ErrorMessage.DuplicatedGroup.message -> {
-                _inValidEvent.postValue(Event(Unit))
+                _inValidMode.postValue(InvalidMode.AlreadyJoin)
+            }
+            ErrorMessage.ExistGroupName.message -> {
+                _inValidMode.postValue(InvalidMode.AlreadyExistGroupName)
             }
             else -> Unit
         }

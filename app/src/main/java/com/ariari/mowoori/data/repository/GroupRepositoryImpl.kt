@@ -22,26 +22,31 @@ class GroupRepositoryImpl @Inject constructor(
             ?: throw NullPointerException(ErrorMessage.GroupInfo.message)
     }
 
-    override suspend fun isGroupNameExist(groupName: String): Result<Boolean> = runCatching {
+    override suspend fun getGroupNameList(groupName: String): Result<List<String>> = runCatching {
         val groupNameListSnapShot = databaseReference.child("groupNameList").get().await()
-        val groupNameList =
-            groupNameListSnapShot.getValue(object : GenericTypeIndicator<List<String>>() {})
-                ?: emptyList()
-        groupNameList.contains(groupName)
+        groupNameListSnapShot.getValue(object : GenericTypeIndicator<List<String>>() {})
+            ?: emptyList()
     }
 
-    override fun putGroupInfo(groupInfo: GroupInfo, user: User): Result<String> =
+    override fun putGroupInfo(
+        groupNameList: List<String>,
+        groupInfo: GroupInfo,
+        user: User,
+    ): Result<String> =
         kotlin.runCatching {
             val newId = databaseReference.child("groups").push().key
             newId?.let {
+                val groupNameMutableList = groupNameList.toMutableList()
+                if (groupNameMutableList.contains(groupInfo.groupName)) {
+                    throw Exception(ErrorMessage.ExistGroupName.message)
+                }
+                groupNameMutableList.add(groupInfo.groupName)
                 val tmpGroupList = user.userInfo.groupList
-                    .toMutableList().apply {
-                        add(newId)
-                    }
+                    .toMutableList().apply { add(newId) }
                 val newUserInfo =
                     user.userInfo.copy(groupList = tmpGroupList, currentGroupId = newId)
                 val childUpdates = hashMapOf(
-                    "/groupNameList/${groupInfo.groupName}" to String,
+                    "/groupNameList/" to groupNameMutableList,
                     "/groups/$newId" to groupInfo,
                     "/users/${user.userId}" to newUserInfo
                 )
