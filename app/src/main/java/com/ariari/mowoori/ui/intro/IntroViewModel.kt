@@ -89,6 +89,18 @@ class IntroViewModel @Inject constructor(
         }
     }
 
+    fun updateFcmServerKey() {
+        viewModelScope.launch(Dispatchers.IO) {
+            initRequestCount()
+            introRepository.getFcmServerKey().onSuccess { key ->
+                introRepository.updateFcmServerKey(key)
+            }.onFailure {
+                addRequestCount()
+                checkRequestCount()
+            }
+        }
+    }
+
     fun firebaseAuthWithGoogle(idToken: String?, testId: String = "", testPassword: String = "") {
         if (idToken != null) {
             val credential = GoogleAuthProvider.getCredential(idToken, null)

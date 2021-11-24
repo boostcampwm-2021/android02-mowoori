@@ -5,9 +5,9 @@ import com.ariari.mowoori.data.local.datasource.MoWooriPrefDataSource
 import com.ariari.mowoori.ui.register.entity.UserInfo
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.GenericTypeIndicator
+import com.google.firebase.database.ktx.getValue
 import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.tasks.await
 import java.lang.NullPointerException
@@ -60,6 +60,18 @@ class IntroRepositoryImpl @Inject constructor(
 
     override suspend fun updateFcmToken(token: String) {
         firebaseReference.child("users/${getUserUid()}/fcmToken").setValue(token)
+    }
+
+    override suspend fun getFcmServerKey(): Result<String> =
+        kotlin.runCatching {
+            val snapshot = firebaseReference.child("fcmServerKey").get().await()
+            val fcmServerKey =
+                snapshot.getValue<String>() ?: throw NullPointerException("fcmServerKey is null")
+            fcmServerKey
+        }
+
+    override suspend fun updateFcmServerKey(key: String) {
+        preference.updateFcmServerKey(key)
     }
 
     override suspend fun signInWithCredential(

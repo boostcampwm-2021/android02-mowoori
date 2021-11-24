@@ -22,6 +22,10 @@ interface IntroRepository {
 
     suspend fun updateFcmToken(token: String)
 
+    suspend fun getFcmServerKey(): Result<String>
+
+    suspend fun updateFcmServerKey(key: String)
+
     suspend fun signInWithCredential(auth: FirebaseAuth, credential: AuthCredential): Result<String>
 
     suspend fun signInWithEmailAndPassword(
