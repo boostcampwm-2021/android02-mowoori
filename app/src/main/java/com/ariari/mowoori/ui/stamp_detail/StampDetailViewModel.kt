@@ -196,7 +196,7 @@ class StampDetailViewModel @Inject constructor(
             initRequestCount()
             stampsRepository.getMissionInfo(detailInfo.missionId)
                 .onSuccess { missionInfo ->
-                    val stampInfo = StampInfo(uriString, comment.value!!, getCurrentDate())
+                    stampInfo = StampInfo(uriString, comment.value!!, getCurrentDate())
                     initRequestCount()
                     stampsRepository.postStamp(
                         stampInfo,
