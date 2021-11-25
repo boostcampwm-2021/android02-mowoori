@@ -118,7 +118,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
                 binding.tvHomeEmpty.isVisible = false
                 binding.tvHomeEmptyDrawer.isVisible = false
                 adapter.submitList(groupList)
-                homeViewModel.updateIsSnowing()
             }
         })
     }
