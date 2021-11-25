@@ -119,4 +119,18 @@ class StampsRepositoryImpl @Inject constructor(
             snapshot.getValue<String>() ?: ""
         }
 
+    override suspend fun putGroupDoneMission(): Result<Int> = runCatching {
+        val uid =
+            getUserId().getOrNull() ?: throw NullPointerException(ErrorMessage.Uid.message)
+        val groupIdSnapshot = databaseReference.child("users/$uid/currentGroupId").get().await()
+        val groupId = groupIdSnapshot.getValue<String>()
+            ?: throw NullPointerException(ErrorMessage.CurrentGroupId.message)
+        val doneMissionSnapshot =
+            databaseReference.child("groups/$groupId/doneMission").get().await()
+        val doneMission = doneMissionSnapshot.getValue<Int>()
+            ?: throw NullPointerException(ErrorMessage.DoneMission.message)
+
+        databaseReference.child("groups/$groupId/doneMission").setValue(doneMission + 1)
+        doneMission + 1
+    }
 }

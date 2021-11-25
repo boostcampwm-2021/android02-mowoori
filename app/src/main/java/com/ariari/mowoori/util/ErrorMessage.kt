@@ -14,5 +14,6 @@ enum class ErrorMessage(val message: String) {
     PushKey("Couldn't get push key for posts"),
     DuplicatedGroup("Group Duplication is not allowed"),
     ExistGroupName("group name already exists"),
-    ExistUserName("user name already exists")
+    ExistUserName("user name already exists"),
+    DoneMission("DoneMission is null")
 }

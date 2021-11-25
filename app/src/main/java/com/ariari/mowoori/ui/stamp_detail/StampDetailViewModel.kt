@@ -52,9 +52,6 @@ class StampDetailViewModel @Inject constructor(
     private val _pictureUri = MutableLiveData<Uri>()
     val pictureUri: LiveData<Uri> = _pictureUri
 
-    private val _isStampPosted = MutableLiveData<Event<Unit>>()
-    val isStampPosted: LiveData<Event<Unit>> get() = _isStampPosted
-
     private val _networkDialogEvent = MutableLiveData<Boolean>()
     val networkDialogEvent: LiveData<Boolean> get() = _networkDialogEvent
 
@@ -142,7 +139,7 @@ class StampDetailViewModel @Inject constructor(
         }
     }
 
-    fun getGroupMembersFcmToken() {
+    private fun getGroupMembersFcmToken() {
         viewModelScope.launch(Dispatchers.IO) {
             stampsRepository.getGroupMembersUserId()
                 .onSuccess { idList ->
@@ -193,23 +190,36 @@ class StampDetailViewModel @Inject constructor(
         }
     }
 
-    private suspend fun postStampInfo(uriString: String) {
-        LogUtil.log("stamp", uriString)
-        initRequestCount()
-        stampsRepository.getMissionInfo(detailInfo.missionId)
-            .onSuccess {
-                val stampInfo = StampInfo(uriString, comment.value!!, getCurrentDate())
-                initRequestCount()
-                stampsRepository.postStamp(stampInfo, Mission(detailInfo.missionId, it))
-                    .onSuccess {
-                        _isStampPosted.postValue(Event(Unit))
-                    }.onFailure { throwable ->
-                        checkThrowableMessage(throwable)
-                    }
-            }
-            .onFailure {
-                checkThrowableMessage(it)
-            }
+    private fun postStampInfo(uriString: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            LogUtil.log("stamp", uriString)
+            initRequestCount()
+            stampsRepository.getMissionInfo(detailInfo.missionId)
+                .onSuccess { missionInfo ->
+                    val stampInfo = StampInfo(uriString, comment.value!!, getCurrentDate())
+                    initRequestCount()
+                    stampsRepository.postStamp(
+                        stampInfo,
+                        Mission(detailInfo.missionId, missionInfo)
+                    )
+                        .onSuccess {
+                            val doneMissionJob = launch {
+                                if (missionInfo.totalStamp - missionInfo.curStamp == 1) {
+                                    stampsRepository.putGroupDoneMission()
+                                }
+                            }
+                            val stampPostedJob = launch {
+                                getGroupMembersFcmToken()
+                            }
+                            joinAll(doneMissionJob, stampPostedJob)
+                        }.onFailure { throwable ->
+                            checkThrowableMessage(throwable)
+                        }
+                }
+                .onFailure {
+                    checkThrowableMessage(it)
+                }
+        }
     }
 
     private fun checkThrowableMessage(throwable: Throwable) {

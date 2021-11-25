@@ -1,6 +1,5 @@
 package com.ariari.mowoori.ui.stamp_detail
 
-import android.content.ContentResolver
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -105,28 +104,12 @@ class StampDetailFragment :
 
     private fun setObserver() {
         setLoadingObserver()
-        setIsMissionPostedObserver()
         setCloseBtnClickObserver()
         setIsCertifyObserver()
         setNetworkDialogObserver()
         setGroupMembersFcmTokenListObserver()
         setIsFcmSentObserver()
         setValidationObserver()
-    }
-
-    private fun setDefaultImageUri() {
-        val pictureUrl = Uri.Builder()
-            .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
-            .authority(resources.getResourcePackageName(R.drawable.ic_stamp))
-            .appendPath(resources.getResourceTypeName(R.drawable.ic_stamp))
-            .appendPath(resources.getResourceEntryName(R.drawable.ic_stamp))
-            .build()
-
-        Glide.with(requireContext())
-            .load(pictureUrl)
-            .override(300, 300)
-            .transform(CenterCrop(), RoundedCorners(16))
-            .into(binding.ivStampDetail)
     }
 
     private fun setBtnVisible() {
@@ -318,14 +301,6 @@ class StampDetailFragment :
                     ivStampDetailHighlightCircle.isVisible = false
                 }
             }
-        })
-    }
-
-    private fun setIsMissionPostedObserver() {
-        stampDetailViewModel.isStampPosted.observe(viewLifecycleOwner, EventObserver {
-            // TODO: 알림 발생
-            stampDetailViewModel.getGroupMembersFcmToken()
-            //this.findNavController().popBackStack()
         })
     }
 
