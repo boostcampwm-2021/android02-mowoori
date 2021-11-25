@@ -19,4 +19,6 @@ interface StampsRepository {
     suspend fun postFcmMessage(fcmToken: String, detailInfo: DetailInfo): Result<FcmResponse>
     suspend fun getGroupMembersUserId(): Result<List<String>>
     suspend fun getGroupMembersFcmToken(userId: String): Result<String>
+
+    suspend fun putGroupDoneMission(): Result<Int>
 }
