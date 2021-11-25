@@ -33,7 +33,7 @@ class SnowAnimator(
         container.addView(snow)
 
         // snow 좌표 설정
-        val snowStartHeight = snow.scaleY + 50f
+        val snowStartHeight = snow.scaleY + 70f
         val startX = Random.nextFloat() * container.width
         val endX = Random.nextFloat() * container.width
 
