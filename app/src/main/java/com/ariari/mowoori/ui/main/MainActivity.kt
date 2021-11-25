@@ -29,7 +29,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setNavController()
         setBottomNavVisibility()
-        isOpenFromFcm()
     }
 
     private fun isOpenFromFcm() {
@@ -39,6 +38,7 @@ class MainActivity : AppCompatActivity() {
                         HomeFragmentDirections.actionHomeFragmentToStampDetailFragment(detailInfo)
                     )
             }
+            intent.removeExtra(FROM_FCM)
         }
     }
 
@@ -53,7 +53,11 @@ class MainActivity : AppCompatActivity() {
     private fun setBottomNavVisibility() {
         navController.addOnDestinationChangedListener { _, destination, arguments ->
             when (destination.id) {
-                R.id.homeFragment, R.id.membersFragment -> showBottomNav()
+                R.id.homeFragment->{
+                    isOpenFromFcm()
+                    showBottomNav()
+                }
+                R.id.membersFragment -> showBottomNav()
                 R.id.missionsFragment -> {
                     if (arguments?.get("user") != null) {
                         // 구성원의 미션
