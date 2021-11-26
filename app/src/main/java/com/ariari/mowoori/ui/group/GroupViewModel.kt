@@ -33,18 +33,14 @@ class GroupViewModel @Inject constructor(
     private val _networkDialogEvent = MutableLiveData<Boolean>()
     val networkDialogEvent: LiveData<Boolean> get() = _networkDialogEvent
 
-    private var _requestCount = 0
-    private val requestCount get() = _requestCount
+    private var requestCount = 0
 
     private fun initRequestCount() {
-        _requestCount = 0
-    }
-
-    private fun addRequestCount() {
-        _requestCount++
+        requestCount = 0
     }
 
     private fun checkRequestCount() {
+        requestCount++
         if (requestCount == 1) {
             setNetworkDialogEvent()
         }
@@ -54,8 +50,10 @@ class GroupViewModel @Inject constructor(
         try {
             val nickname = getNickName()
             groupName.postValue(nickname + "들")
-        } catch (throwable: Throwable) {
-            checkThrowableMessage(throwable)
+        } catch (e: Exception) {
+            checkRequestCount()
+        } catch (e: NullPointerException) {
+            // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
         }
     }
 
@@ -73,8 +71,10 @@ class GroupViewModel @Inject constructor(
                 val user = getUser()
                 val isSuccess = addUserToGroup(code, user)
                 _successAddGroup.postValue(isSuccess)
-            } catch (throwable: Throwable) {
-                checkThrowableMessage(throwable)
+            } catch (e: Exception) {
+                checkRequestCount()
+            } catch (e: NullPointerException) {
+                // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
             }
         }
     }
@@ -108,8 +108,10 @@ class GroupViewModel @Inject constructor(
                 val groupInfo = GroupInfo(0, name, listOf(user.userId))
                 val isSuccess = putGroupInfo(groupNameList, groupInfo, user)
                 _successAddGroup.postValue(isSuccess)
-            } catch (throwable: Throwable) {
-                checkThrowableMessage(throwable)
+            } catch (e: Exception) {
+                checkRequestCount()
+            } catch (e: NullPointerException) {
+                // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
             }
         }
     }
@@ -140,25 +142,6 @@ class GroupViewModel @Inject constructor(
     ): Boolean {
         initRequestCount()
         return groupRepository.putGroupInfo(groupNameList, groupInfo, user).getOrThrow()
-    }
-
-    private fun checkThrowableMessage(throwable: Throwable) {
-        when (throwable.message) {
-            ErrorMessage.Offline.message -> {
-                addRequestCount()
-                checkRequestCount()
-            }
-            ErrorMessage.GroupInfo.message -> {
-                _inValidMode.postValue(InvalidMode.InValidCode)
-            }
-            ErrorMessage.DuplicatedGroup.message -> {
-                _inValidMode.postValue(InvalidMode.AlreadyJoin)
-            }
-            ErrorMessage.ExistGroupName.message -> {
-                _inValidMode.postValue(InvalidMode.AlreadyExistGroupName)
-            }
-            else -> Unit
-        }
     }
 
     private fun setNetworkDialogEvent() {
