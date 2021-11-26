@@ -15,9 +15,7 @@ import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.ActivityIntroBinding
 import com.ariari.mowoori.ui.main.MainActivity
 import com.ariari.mowoori.ui.register.RegisterActivity
-import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.util.LogUtil
-import com.ariari.mowoori.util.isNetWorkAvailable
 import com.ariari.mowoori.util.toastMessage
 import com.ariari.mowoori.widget.NetworkDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,10 +44,10 @@ class IntroActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        introViewModel.setFirebaseAuth()
-        autoLogin()
         binding.viewModel = introViewModel
+        introViewModel.setFirebaseAuth()
         introViewModel.initFcmToken()
+        autoLogin()
         setListeners()
         setObservers()
         requestPermissions(permissionList)
@@ -72,14 +70,18 @@ class IntroActivity : AppCompatActivity() {
     }
 
     private fun setObservers() {
-        introViewModel.isUserRegistered.observe(this, EventObserver {
+        introViewModel.isUserRegistered.observe(this, {
             if (it) {
-                introViewModel.updateFcmServerKey()
-                introViewModel.updateFcmToken()
-                introViewModel.setUserRegistered(true)
-                moveToMain()
+                introViewModel.updateFcmServerKeyAndFcmToken()
             } else {
                 moveToRegister()
+            }
+        })
+
+        introViewModel.isFcmUpdated.observe(this, {
+            if (it) {
+                introViewModel.setUserRegistered(true)
+                moveToMain()
             }
         })
 
@@ -94,11 +96,12 @@ class IntroActivity : AppCompatActivity() {
     }
 
     private fun signIn() {
-        if (this.isNetWorkAvailable()) {
-            signLauncher.launch(getString(R.string.default_web_client_id))
-        } else {
-            showNetworkDialog()
-        }
+        signLauncher.launch(getString(R.string.default_web_client_id))
+
+//        if (this.isNetWorkAvailable()) {
+//        } else {
+//            showNetworkDialog()
+//        }
     }
 
     private fun signInTester(num: Int) {
@@ -176,9 +179,7 @@ class IntroActivity : AppCompatActivity() {
 
     private fun setNetworkDialogObserver() {
         introViewModel.networkDialogEvent.observe(this, {
-            if (it) {
-                showNetworkDialog()
-            }
+            if (it) showNetworkDialog()
         })
     }
 

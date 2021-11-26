@@ -5,14 +5,16 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.IntroRepository
-import com.ariari.mowoori.util.ErrorMessage
-import com.ariari.mowoori.util.Event
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.FirebaseNetworkException
+import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,8 +25,11 @@ class IntroViewModel @Inject constructor(
     lateinit var auth: FirebaseAuth
         private set
 
-    private val _isUserRegistered = MutableLiveData<Event<Boolean>>()
-    val isUserRegistered: LiveData<Event<Boolean>> = _isUserRegistered
+    private val _isUserRegistered = MutableLiveData<Boolean>()
+    val isUserRegistered: LiveData<Boolean> = _isUserRegistered
+
+    private val _isFcmUpdated = MutableLiveData<Boolean>()
+    val isFcmUpdated: LiveData<Boolean> = _isFcmUpdated
 
     private val _isTestLoginSuccess = MutableLiveData<Boolean>()
     val isTestLoginSuccess: LiveData<Boolean> = _isTestLoginSuccess
@@ -34,21 +39,15 @@ class IntroViewModel @Inject constructor(
     private val _networkDialogEvent = MutableLiveData<Boolean>()
     val networkDialogEvent: LiveData<Boolean> get() = _networkDialogEvent
 
-    private var _requestCount = 0
-    private val requestCount get() = _requestCount
+    private var requestCount = 0
 
     private fun initRequestCount() {
-        _requestCount = 0
-    }
-
-    private fun addRequestCount() {
-        _requestCount++
+        requestCount = 0
     }
 
     private fun checkRequestCount() {
-        if (requestCount == 1) {
-            setNetworkDialogEvent()
-        }
+        requestCount++
+        if (requestCount == 1) setNetworkDialogEvent()
     }
 
     fun setFirebaseAuth() {
@@ -61,19 +60,6 @@ class IntroViewModel @Inject constructor(
 
     fun getUserRegistered() = introRepository.getUserRegistered()
 
-    private fun checkUserRegistered(userUid: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            initRequestCount()
-            introRepository.checkUserRegistered(userUid)
-                .onSuccess {
-                    _isUserRegistered.postValue(Event(it))
-                }
-                .onFailure {
-                    checkThrowableMessage(it)
-                }
-        }
-    }
-
     fun initFcmToken() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
@@ -83,59 +69,81 @@ class IntroViewModel @Inject constructor(
         })
     }
 
-    fun updateFcmToken() {
+    fun updateFcmServerKeyAndFcmToken() {
         viewModelScope.launch(Dispatchers.IO) {
-            introRepository.updateFcmToken(fcmToken)
+            try {
+                val updateFcmServerKeyJob = updateFcmServerKey()
+                val updateFcmTokenJob = updateFcmToken()
+                joinAll(updateFcmServerKeyJob, updateFcmTokenJob)
+                _isFcmUpdated.postValue(true)
+            } catch (e: NullPointerException) {
+                // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
+            } catch (e: CancellationException) {
+                // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
+            }
         }
     }
 
-    fun updateFcmServerKey() {
-        viewModelScope.launch(Dispatchers.IO) {
+    private suspend fun updateFcmServerKey() = viewModelScope.launch(Dispatchers.IO) {
+        try {
+            val key = getFcmServerKey()
+            // preference
+            introRepository.updateFcmServerKey(key)
+        } catch (e: Exception) {
+            checkRequestCount()
+        } catch (e: NullPointerException) {
+            // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
+        }
+    }
+
+    private suspend fun updateFcmToken() = viewModelScope.launch(Dispatchers.IO) {
+        try {
             initRequestCount()
-            introRepository.getFcmServerKey().onSuccess { key ->
-                introRepository.updateFcmServerKey(key)
-            }.onFailure {
-                addRequestCount()
-                checkRequestCount()
-            }
+            // setValue
+            introRepository.updateFcmToken(fcmToken)
+        } catch (e: Exception) {
+            checkRequestCount()
         }
     }
 
-    fun firebaseAuthWithGoogle(idToken: String?, testId: String = "", testPassword: String = "") {
-        if (idToken != null) {
-            val credential = GoogleAuthProvider.getCredential(idToken, null)
-            viewModelScope.launch(Dispatchers.IO) {
-                initRequestCount()
-                introRepository.signInWithCredential(auth, credential)
-                    .onSuccess { uid ->
-                        checkUserRegistered(uid)
-                    }
-                    .onFailure {
-                        checkThrowableMessage(it)
-                    }
-            }
-        } else {
-            viewModelScope.launch(Dispatchers.IO) {
-                introRepository.signInWithEmailAndPassword(auth, testId, testPassword)
-                    .onSuccess {
-                        _isTestLoginSuccess.postValue(it)
-                    }
-                    .onFailure {
-                        // 테스트 로그인은 네트워크 처리 x
-                        _isTestLoginSuccess.postValue(false)
-                    }
-            }
-        }
+    private suspend fun getFcmServerKey(): String {
+        initRequestCount()
+        return introRepository.getFcmServerKey().getOrThrow()
     }
 
-    private fun checkThrowableMessage(throwable: Throwable) {
-        when (throwable.message) {
-            ErrorMessage.Offline.message -> {
-                addRequestCount()
+    fun firebaseAuthWithGoogle(idToken: String?, testId: String = "", testPassword: String = "") =
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                if (idToken != null) {
+                    val credential = GoogleAuthProvider.getCredential(idToken, null)
+                    val uid = signInWithCredential(credential)
+                    val isRegistered = checkUserRegistered(uid)
+                    _isUserRegistered.postValue(isRegistered)
+                } else {
+                    // 테스트 아이디 로그인
+                    val isSuccess = signInWithEmailAndPassword(testId, testPassword)
+                    _isTestLoginSuccess.postValue(isSuccess)
+                }
+            } catch (e: FirebaseNetworkException) {
                 checkRequestCount()
+            } catch (e: NullPointerException) {
+                // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
             }
-            else -> Unit
         }
+
+    private suspend fun signInWithCredential(credential: AuthCredential): String {
+        initRequestCount()
+        return introRepository.signInWithCredential(auth, credential).getOrThrow()
+    }
+
+    private suspend fun signInWithEmailAndPassword(testId: String, testPassword: String): Boolean {
+        initRequestCount()
+        return introRepository.signInWithEmailAndPassword(auth, testId, testPassword).getOrThrow()
+    }
+
+    private suspend fun checkUserRegistered(userUid: String): Boolean {
+        initRequestCount()
+        return introRepository.checkUserRegistered(userUid).getOrThrow()
     }
 
     private fun setNetworkDialogEvent() {
