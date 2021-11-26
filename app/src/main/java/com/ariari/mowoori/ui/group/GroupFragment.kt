@@ -17,7 +17,6 @@ import androidx.navigation.fragment.navArgs
 import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.FragmentGroupBinding
 import com.ariari.mowoori.ui.group.entity.GroupMode
-import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.util.hideKeyBoard
 import com.ariari.mowoori.util.isNetWorkAvailable
 import com.ariari.mowoori.widget.NetworkDialogFragment
@@ -84,8 +83,8 @@ class GroupFragment : Fragment() {
     }
 
     private fun setAddGroupCompleteObserver() {
-        viewModel.addGroupCompleteEvent.observe(viewLifecycleOwner, EventObserver {
-            findNavController().navigate(R.id.action_groupNameFragment_to_homeFragment)
+        viewModel.successAddGroup.observe(viewLifecycleOwner, {
+            if (it) findNavController().navigate(R.id.action_groupNameFragment_to_homeFragment)
         })
     }
 
@@ -104,12 +103,8 @@ class GroupFragment : Fragment() {
     private fun joinOrAddGroup() {
         if (requireContext().isNetWorkAvailable()) {
             when (args.groupMode) {
-                GroupMode.INVITE -> {
-                    viewModel.joinGroup()
-                }
-                GroupMode.NEW -> {
-                    viewModel.addNewGroup()
-                }
+                GroupMode.INVITE -> viewModel.joinGroup()
+                GroupMode.NEW -> viewModel.addNewGroup()
             }
         } else {
             showNetworkDialog()

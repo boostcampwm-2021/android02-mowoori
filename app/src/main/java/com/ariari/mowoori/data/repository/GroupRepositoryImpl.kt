@@ -8,7 +8,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.GenericTypeIndicator
 import kotlinx.coroutines.tasks.await
-import java.lang.Exception
 import javax.inject.Inject
 
 
@@ -28,11 +27,11 @@ class GroupRepositoryImpl @Inject constructor(
             ?: emptyList()
     }
 
-    override fun putGroupInfo(
+    override suspend fun putGroupInfo(
         groupNameList: List<String>,
         groupInfo: GroupInfo,
         user: User,
-    ): Result<String> =
+    ): Result<Boolean> =
         kotlin.runCatching {
             val newId = databaseReference.child("groups").push().key
             newId?.let {
@@ -51,11 +50,11 @@ class GroupRepositoryImpl @Inject constructor(
                     "/users/${user.userId}" to newUserInfo
                 )
                 databaseReference.updateChildren(childUpdates)
-                newId
+                true
             } ?: throw NullPointerException(ErrorMessage.PushKey.message)
         }
 
-    override suspend fun addUserToGroup(groupId: String, user: User): Result<String> =
+    override suspend fun addUserToGroup(groupId: String, user: User): Result<Boolean> =
         kotlin.runCatching {
             val snapshot = databaseReference.child("groups/$groupId").get().await()
             val tmpGroup = snapshot.getValue(GroupInfo::class.java)
@@ -73,7 +72,7 @@ class GroupRepositoryImpl @Inject constructor(
                 "/users/${user.userId}" to newUserInfo
             )
             databaseReference.updateChildren(childUpdates)
-            groupId
+            true
         }
 
     override suspend fun getUser(): Result<User> = kotlin.runCatching {
@@ -85,8 +84,10 @@ class GroupRepositoryImpl @Inject constructor(
         User(uid, userInfo)
     }
 
-    override suspend fun isExistGroupId(groupId: String): Result<Boolean> = runCatching {
+    override suspend fun hasExistGroupId(groupId: String): Result<Boolean> = runCatching {
         val snapshot = databaseReference.child("groups/$groupId").get().await()
-        snapshot.exists()
+        snapshot.getValue(GroupInfo::class.java) ?: throw java.lang.NullPointerException(
+            ErrorMessage.GroupInfo.message)
+        true
     }
 }
