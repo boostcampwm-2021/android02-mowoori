@@ -3,6 +3,7 @@ package com.ariari.mowoori.data.repository
 import android.net.Uri
 import com.ariari.mowoori.data.local.datasource.MoWooriPrefDataSource
 import com.ariari.mowoori.ui.register.entity.UserInfo
+import com.ariari.mowoori.util.DuplicatedException
 import com.ariari.mowoori.util.ErrorMessage
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
@@ -56,7 +57,7 @@ class IntroRepositoryImpl @Inject constructor(
     ): Result<Boolean> = runCatching {
         val uid = getUserUid() ?: throw NullPointerException(ErrorMessage.Uid.message)
         if (userNameList.contains(userInfo.nickname)) {
-            throw Exception(ErrorMessage.ExistUserName.message)
+            throw DuplicatedException(ErrorMessage.ExistUserName.message)
         }
         val userNameMutableList = userNameList.toMutableList().apply { add(userInfo.nickname) }
         val childUpdates = hashMapOf(

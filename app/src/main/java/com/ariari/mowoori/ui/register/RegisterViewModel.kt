@@ -7,8 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.IntroRepository
 import com.ariari.mowoori.ui.register.entity.UserInfo
-import com.ariari.mowoori.util.ErrorMessage
-import com.ariari.mowoori.util.Event
+import com.ariari.mowoori.util.DuplicatedException
 import com.ariari.mowoori.util.InvalidMode
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
@@ -25,59 +24,46 @@ class RegisterViewModel @Inject constructor(
     private val _invalidNicknameEvent = MutableLiveData<InvalidMode>()
     val invalidNicknameEvent: LiveData<InvalidMode> = _invalidNicknameEvent
 
-    private val _registerSuccessEvent = MutableLiveData<Event<Boolean>>()
-    val registerSuccessEvent: LiveData<Event<Boolean>> = _registerSuccessEvent
+    private val _isRegisterSuccess = MutableLiveData<Boolean>()
+    val isRegisterSuccess: LiveData<Boolean> = _isRegisterSuccess
 
-    private val _profileImageClickEvent = MutableLiveData<Event<Unit>>()
-    val profileImageClickEvent: LiveData<Event<Unit>> = _profileImageClickEvent
+    private val _profileImageClickEvent = MutableLiveData<Unit>()
+    val profileImageClickEvent: LiveData<Unit> = _profileImageClickEvent
 
     private val _profileImageUri = MutableLiveData<Uri>()
     val profileImageUri: LiveData<Uri> = _profileImageUri
 
     private var fcmToken = ""
 
-    private val _loadingEvent = MutableLiveData<Event<Boolean>>()
-    val loadingEvent: LiveData<Event<Boolean>> = _loadingEvent
+    private val _loadingEvent = MutableLiveData<Boolean>()
+    val loadingEvent: LiveData<Boolean> = _loadingEvent
 
-    private val _networkDialogEvent = MutableLiveData<Boolean>()
-    val networkDialogEvent: LiveData<Boolean> get() = _networkDialogEvent
+    private val _isNetworkDialogShowed = MutableLiveData(false)
+    val isNetworkDialogShowed: LiveData<Boolean> get() = _isNetworkDialogShowed
 
-    private var _requestCount = 0
-    private val requestCount get() = _requestCount
-
-    private fun initRequestCount() {
-        _requestCount = 0
+    fun setLoadingEvent(flag: Boolean) {
+        _loadingEvent.postValue(flag)
     }
 
-    private fun addRequestCount() {
-        _requestCount++
-    }
-
-    private fun checkRequestCount() {
-        if (requestCount == 1) {
-            setNetworkDialogEvent()
-        }
-    }
-
-    private fun setLoadingEvent(flag: Boolean) {
-        _loadingEvent.postValue(Event(flag))
+    fun resetNetworkDialog() {
+        _isNetworkDialogShowed.value = false
     }
 
     fun createNickName() {
         viewModelScope.launch(Dispatchers.IO) {
-            initRequestCount()
-            introRepository.getRandomNickName()
-                .onSuccess { nickname ->
-                    profileText.postValue(nickname)
-                }
-                .onFailure {
-                    checkThrowableMessage(it)
-                }
+            try {
+                val nickname = introRepository.getRandomNickName().getOrThrow()
+                profileText.postValue(nickname)
+            } catch (e: Exception) {
+                checkNetworkDialog()
+            } catch (e: NullPointerException) {
+                // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
+            }
         }
     }
 
     fun clickProfile() {
-        _profileImageClickEvent.value = Event(Unit)
+        _profileImageClickEvent.value = Unit
     }
 
     fun setProfileImage(uri: Uri) {
@@ -88,91 +74,64 @@ class RegisterViewModel @Inject constructor(
         introRepository.setUserRegistered(isRegistered)
     }
 
-    fun registerUserInfo() {
-        setLoadingEvent(true)
-        val nickname = profileText.value ?: ""
-        if (!checkNicknameValid(nickname)) {
-            setLoadingEvent(false)
-            _invalidNicknameEvent.value = InvalidMode.InvalidNickname
-            return
-        }
-        viewModelScope.launch(Dispatchers.IO) {
-            initRequestCount()
-            var uploadUrl = ""
-            profileImageUri.value?.let {
-                introRepository.putUserProfile(it)
-                    .onSuccess { url ->
-                        uploadUrl = url
-                    }
-                    .onFailure { throwable ->
-                        checkThrowableMessage(throwable)
-                        return@launch
-                    }
-            }
-            initRequestCount()
-            introRepository.getUserNameList()
-                .onSuccess { userNameList ->
-                    registerUser(userNameList, UserInfo(nickname, uploadUrl, fcmToken))
-                }
-                .onFailure {
-                    checkThrowableMessage(it)
-                }
-        }
-    }
-
-    private suspend fun registerUser(userNameList: List<String>, userInfo: UserInfo) {
-        initRequestCount()
-        introRepository.registerUser(userNameList, userInfo)
-            .onSuccess {
-                setLoadingEvent(false)
-                _registerSuccessEvent.postValue(Event(it))
-            }
-            .onFailure {
-                checkThrowableMessage(it)
-            }
-    }
-
     fun initFcmToken() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                return@OnCompleteListener
-            }
+            if (!task.isSuccessful) return@OnCompleteListener
             fcmToken = task.result.toString()
         })
     }
 
-    fun initFcmServerKey() {
-        viewModelScope.launch(Dispatchers.IO) {
-            initRequestCount()
-            introRepository.getFcmServerKey().onSuccess { key ->
-                introRepository.updateFcmServerKey(key)
-            }.onFailure {
-                addRequestCount()
-                checkRequestCount()
-            }
+    fun initFcmServerKey() = viewModelScope.launch(Dispatchers.IO) {
+        try {
+            val key = introRepository.getFcmServerKey().getOrThrow()
+            introRepository.updateFcmServerKey(key)
+        } catch (e: Exception) {
+            checkNetworkDialog()
+        } catch (e: NullPointerException) {
+            // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
+        }
+    }
+
+    fun registerUserInfo() = viewModelScope.launch(Dispatchers.IO) {
+        val nickname = profileText.value ?: ""
+        if (!checkNicknameValid(nickname)) return@launch
+        try {
+            val uploadUrl = putUserProfile(profileImageUri.value)
+            val userNameList = introRepository.getUserNameList().getOrThrow()
+            val isSuccess =
+                introRepository.registerUser(userNameList, UserInfo(nickname, uploadUrl, fcmToken))
+                    .getOrThrow()
+            _isRegisterSuccess.postValue(isSuccess)
+        } catch (e: NullPointerException) {
+            // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
+        } catch (e: DuplicatedException) {
+            // 이름 중복 예외처리
+            _invalidNicknameEvent.postValue(InvalidMode.AlreadyExistNickname)
+            setLoadingEvent(false)
+        } catch (e: Exception) {
+            checkNetworkDialog()
         }
     }
 
     private fun checkNicknameValid(nickname: String): Boolean {
-        return (nickname.length <= 11 && nickname.isNotEmpty())
-    }
-
-    private fun checkThrowableMessage(throwable: Throwable) {
-        when (throwable.message) {
-            ErrorMessage.Offline.message -> {
-                addRequestCount()
-                checkRequestCount()
-            }
-            ErrorMessage.ExistUserName.message -> {
-                setLoadingEvent(false)
-                _invalidNicknameEvent.postValue(InvalidMode.AlreadyExistNickname)
-            }
-            else -> setLoadingEvent(false)
+        return if (nickname.length <= 11 && nickname.isNotEmpty()) {
+            true
+        } else {
+            setLoadingEvent(false)
+            _invalidNicknameEvent.value = InvalidMode.InvalidNickname
+            false
         }
     }
 
-    private fun setNetworkDialogEvent() {
+    private suspend fun putUserProfile(imageUri: Uri?): String {
+        imageUri ?: return ""
+        return introRepository.putUserProfile(imageUri).getOrThrow()
+    }
+
+    private fun checkNetworkDialog() {
         setLoadingEvent(false)
-        _networkDialogEvent.postValue(true)
+        _isNetworkDialogShowed.value?.let {
+            if (!it) _isNetworkDialogShowed.postValue(true)
+        }
     }
 }
