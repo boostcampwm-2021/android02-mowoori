@@ -19,6 +19,7 @@ import com.ariari.mowoori.util.LogUtil
 import com.ariari.mowoori.util.toastMessage
 import com.ariari.mowoori.widget.NetworkDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.joinAll
 import timber.log.Timber
 import kotlin.system.exitProcess
 
@@ -73,6 +74,8 @@ class IntroActivity : AppCompatActivity() {
         introViewModel.isUserRegistered.observe(this, {
             if (it) {
                 introViewModel.updateFcmServerKeyAndFcmToken()
+//                introViewModel.updateFcmServerKey()
+//                introViewModel.updateFcmToken()
             } else {
                 moveToRegister()
             }
@@ -86,11 +89,8 @@ class IntroActivity : AppCompatActivity() {
         })
 
         introViewModel.isTestLoginSuccess.observe(this, {
-            if (it) {
-                moveToMain()
-            } else {
-                binding.llTest.isVisible = true
-            }
+            if (it) moveToMain()
+            else binding.llTest.isVisible = true
         })
         setNetworkDialogObserver()
     }
@@ -178,7 +178,7 @@ class IntroActivity : AppCompatActivity() {
         }
 
     private fun setNetworkDialogObserver() {
-        introViewModel.networkDialogEvent.observe(this, {
+        introViewModel.isNetworkDialogShowed.observe(this, {
             if (it) showNetworkDialog()
         })
     }
@@ -195,6 +195,7 @@ class IntroActivity : AppCompatActivity() {
             override fun onRetryClick(dialog: DialogFragment) {
                 dialog.dismiss()
                 signIn()
+                introViewModel.resetNetworkDialog()
             }
         }).show(supportFragmentManager, "NetworkDialogFragment")
     }

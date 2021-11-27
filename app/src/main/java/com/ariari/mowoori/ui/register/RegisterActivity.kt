@@ -132,7 +132,6 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun showNetworkDialog() {
-        println("RegisterActivity - dialog")
         NetworkDialogFragment(object : NetworkDialogFragment.NetworkDialogListener {
             override fun onCancelClick(dialog: DialogFragment) {
                 dialog.dismiss()

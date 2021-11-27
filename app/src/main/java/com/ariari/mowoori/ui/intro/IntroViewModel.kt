@@ -7,13 +7,12 @@ import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.IntroRepository
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.FirebaseNetworkException
-import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -36,19 +35,8 @@ class IntroViewModel @Inject constructor(
 
     private var fcmToken = ""
 
-    private val _networkDialogEvent = MutableLiveData<Boolean>()
-    val networkDialogEvent: LiveData<Boolean> get() = _networkDialogEvent
-
-    private var requestCount = 0
-
-    private fun initRequestCount() {
-        requestCount = 0
-    }
-
-    private fun checkRequestCount() {
-        requestCount++
-        if (requestCount == 1) setNetworkDialogEvent()
-    }
+    private val _isNetworkDialogShowed = MutableLiveData(false)
+    val isNetworkDialogShowed: LiveData<Boolean> get() = _isNetworkDialogShowed
 
     fun setFirebaseAuth() {
         auth = FirebaseAuth.getInstance()
@@ -59,6 +47,10 @@ class IntroViewModel @Inject constructor(
     }
 
     fun getUserRegistered() = introRepository.getUserRegistered()
+
+    fun resetNetworkDialog() {
+        _isNetworkDialogShowed.value = false
+    }
 
     fun initFcmToken() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
@@ -71,44 +63,36 @@ class IntroViewModel @Inject constructor(
 
     fun updateFcmServerKeyAndFcmToken() {
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val updateFcmServerKeyJob = updateFcmServerKey()
-                val updateFcmTokenJob = updateFcmToken()
-                joinAll(updateFcmServerKeyJob, updateFcmTokenJob)
+            val updateFcmServerKeyJob = updateFcmServerKey()
+            val updateFcmTokenJob = updateFcmToken()
+            joinAll(updateFcmServerKeyJob, updateFcmTokenJob)
+            if (!updateFcmServerKeyJob.isCancelled && !updateFcmTokenJob.isCancelled) {
                 _isFcmUpdated.postValue(true)
-            } catch (e: NullPointerException) {
-                // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
-            } catch (e: CancellationException) {
-                // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
             }
         }
     }
 
-    private suspend fun updateFcmServerKey() = viewModelScope.launch(Dispatchers.IO) {
+    private fun updateFcmServerKey() = viewModelScope.launch(Dispatchers.IO) {
         try {
-            val key = getFcmServerKey()
+            val key = introRepository.getFcmServerKey().getOrThrow()
             // preference
             introRepository.updateFcmServerKey(key)
         } catch (e: Exception) {
-            checkRequestCount()
+            checkNetworkDialog()
+            this.cancel()
         } catch (e: NullPointerException) {
             // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
         }
     }
 
-    private suspend fun updateFcmToken() = viewModelScope.launch(Dispatchers.IO) {
+    private fun updateFcmToken() = viewModelScope.launch(Dispatchers.IO) {
         try {
-            initRequestCount()
             // setValue
             introRepository.updateFcmToken(fcmToken)
         } catch (e: Exception) {
-            checkRequestCount()
+            checkNetworkDialog()
+            this.cancel()
         }
-    }
-
-    private suspend fun getFcmServerKey(): String {
-        initRequestCount()
-        return introRepository.getFcmServerKey().getOrThrow()
     }
 
     fun firebaseAuthWithGoogle(idToken: String?, testId: String = "", testPassword: String = "") =
@@ -116,37 +100,28 @@ class IntroViewModel @Inject constructor(
             try {
                 if (idToken != null) {
                     val credential = GoogleAuthProvider.getCredential(idToken, null)
-                    val uid = signInWithCredential(credential)
-                    val isRegistered = checkUserRegistered(uid)
+                    val uid = introRepository.signInWithCredential(auth, credential).getOrThrow()
+                    val isRegistered = introRepository.checkUserRegistered(uid).getOrThrow()
                     _isUserRegistered.postValue(isRegistered)
                 } else {
                     // 테스트 아이디 로그인
-                    val isSuccess = signInWithEmailAndPassword(testId, testPassword)
+                    val isSuccess =
+                        introRepository.signInWithEmailAndPassword(auth, testId, testPassword)
+                            .getOrThrow()
                     _isTestLoginSuccess.postValue(isSuccess)
                 }
             } catch (e: FirebaseNetworkException) {
-                checkRequestCount()
+                checkNetworkDialog()
             } catch (e: NullPointerException) {
                 // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
+            } catch (e: Exception) {
+                checkNetworkDialog()
             }
         }
 
-    private suspend fun signInWithCredential(credential: AuthCredential): String {
-        initRequestCount()
-        return introRepository.signInWithCredential(auth, credential).getOrThrow()
-    }
-
-    private suspend fun signInWithEmailAndPassword(testId: String, testPassword: String): Boolean {
-        initRequestCount()
-        return introRepository.signInWithEmailAndPassword(auth, testId, testPassword).getOrThrow()
-    }
-
-    private suspend fun checkUserRegistered(userUid: String): Boolean {
-        initRequestCount()
-        return introRepository.checkUserRegistered(userUid).getOrThrow()
-    }
-
-    private fun setNetworkDialogEvent() {
-        _networkDialogEvent.postValue(true)
+    private fun checkNetworkDialog() {
+        _isNetworkDialogShowed.value?.let {
+            if (!it) _isNetworkDialogShowed.postValue(true)
+        }
     }
 }
