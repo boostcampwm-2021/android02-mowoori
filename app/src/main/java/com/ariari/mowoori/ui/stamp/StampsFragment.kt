@@ -2,7 +2,8 @@ package com.ariari.mowoori.ui.stamp
 
 import android.os.Bundle
 import android.view.View
-import android.view.ViewTreeObserver.OnGlobalLayoutListener
+import android.view.ViewTreeObserver
+import android.view.ViewTreeObserver.OnPreDrawListener
 import android.widget.ImageView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
@@ -97,16 +98,16 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
 
     private fun setSpanCount() {
         // 뷰 사이즈 측정 시점을 관찰하는 옵저버
-        binding.rvStamps.viewTreeObserver.addOnGlobalLayoutListener(object :
-            OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
+        binding.rvStamps.viewTreeObserver.addOnPreDrawListener(object : OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
                 // 뷰의 측정이 자주 일어날 경우 중첩된 리스너 등록을 방지하기 위해 콜백 함수가 호출되면 해당 리스너를 제거한다.
-                binding.rvStamps.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                binding.rvStamps.viewTreeObserver.removeOnPreDrawListener(this)
                 val resources = requireActivity().resources
                 val recyclerViewWidth = binding.rvStamps.width
                 val itemWidth =
                     resources.getDimension(R.dimen.stamp_width) + resources.getDimension(R.dimen.stamp_padding)
                 viewModel.setSpanCount(recyclerViewWidth / itemWidth)
+                return true
             }
         })
     }
