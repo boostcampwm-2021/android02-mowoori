@@ -32,6 +32,10 @@ class GroupViewModel @Inject constructor(
     private val _isNetworkDialogShowed = MutableLiveData(false)
     val isNetworkDialogShowed: LiveData<Boolean> get() = _isNetworkDialogShowed
 
+    fun resetNetworkDialog() {
+        _isNetworkDialogShowed.value = false
+    }
+
     fun setGroupName() = viewModelScope.launch(Dispatchers.IO) {
         try {
             val nickname = introRepository.getRandomNickName().getOrThrow()

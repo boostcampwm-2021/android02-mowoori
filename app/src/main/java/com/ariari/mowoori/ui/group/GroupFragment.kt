@@ -127,6 +127,7 @@ class GroupFragment : Fragment() {
             override fun onRetryClick(dialog: DialogFragment) {
                 dialog.dismiss()
                 joinOrAddGroup()
+                viewModel.resetNetworkDialog()
             }
         }).show(requireActivity().supportFragmentManager, "NetworkDialogFragment")
     }
