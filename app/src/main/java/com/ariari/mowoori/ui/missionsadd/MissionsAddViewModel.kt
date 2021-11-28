@@ -6,8 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.MissionsRepository
 import com.ariari.mowoori.ui.missions.entity.MissionInfo
-import com.ariari.mowoori.ui.register.entity.User
-import com.ariari.mowoori.util.ErrorMessage
 import com.ariari.mowoori.util.Event
 import com.ariari.mowoori.util.LogUtil
 import com.ariari.mowoori.util.getCurrentDate
@@ -40,27 +38,14 @@ class MissionsAddViewModel @Inject constructor(
     private val _checkMissionValidEvent = MutableLiveData<Event<Unit>>()
     val checkMissionValidEvent: LiveData<Event<Unit>> = _checkMissionValidEvent
 
-    private val _isMissionPosted = MutableLiveData<Event<Unit>>()
-    val isMissionPosted: LiveData<Event<Unit>> = _isMissionPosted
+    private val _isMissionPosted = MutableLiveData<Boolean>()
+    val isMissionPosted: LiveData<Boolean> = _isMissionPosted
 
-    private val _networkDialogEvent = MutableLiveData<Event<Boolean>>()
-    val networkDialogEvent: LiveData<Event<Boolean>> get() = _networkDialogEvent
+    private val _isNetworkDialogShowed = MutableLiveData(Event(false))
+    val isNetworkDialogShowed: LiveData<Event<Boolean>> get() = _isNetworkDialogShowed
 
-    private var _requestCount = 0
-    private val requestCount get() = _requestCount
-
-    private fun initRequestCount() {
-        _requestCount = 0
-    }
-
-    private fun addRequestCount() {
-        _requestCount++
-    }
-
-    private fun checkRequestCount() {
-        if (requestCount == 1) {
-            setNetworkDialogEvent()
-        }
+    fun resetNetworkDialog() {
+        _isNetworkDialogShowed.value = Event(false)
     }
 
     init {
@@ -73,33 +58,21 @@ class MissionsAddViewModel @Inject constructor(
         _backBtnClick.value = Event(true)
     }
 
-    fun postMission(missionName: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            initRequestCount()
-            missionsRepository.getUser().onSuccess { user ->
-                loadMissionIdList(getMissionInfo(user.userId, missionName), user)
-            }.onFailure {
-                checkThrowableMessage(it)
-            }
+    fun postMission(missionName: String) = viewModelScope.launch(Dispatchers.IO) {
+        try {
+            val user = missionsRepository.getUser().getOrThrow()
+            val missionInfo = getMissionInfo(user.userId, missionName)
+            val missionIdList =
+                missionsRepository.getMissionIdList(user.userInfo.currentGroupId).getOrThrow()
+            val isSuccess = missionsRepository.postMission(missionInfo,
+                user.userInfo.currentGroupId,
+                missionIdList).getOrThrow()
+            _isMissionPosted.postValue(isSuccess)
+        } catch (e: Exception) {
+            checkNetworkDialog()
+        } catch (e: NullPointerException) {
+            // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
         }
-    }
-
-    private suspend fun loadMissionIdList(missionInfo: MissionInfo, user: User) {
-        initRequestCount()
-        missionsRepository.getMissionIdList(user.userInfo.currentGroupId)
-            .onSuccess { missionIdList ->
-                // missions에 missionInfo 추가, currentGroup의 missionList에 missionInfo 추가
-                missionsRepository.postMission(
-                    missionInfo,
-                    user.userInfo.currentGroupId,
-                    missionIdList
-                )
-                // 화면 종료 Event 실행
-                _isMissionPosted.postValue(Event(Unit))
-            }
-            .onFailure {
-                checkThrowableMessage(it)
-            }
     }
 
     private fun getMissionInfo(userId: String, missionName: String): MissionInfo {
@@ -133,19 +106,11 @@ class MissionsAddViewModel @Inject constructor(
         _checkMissionValidEvent.postValue(Event(Unit))
     }
 
-    private fun checkThrowableMessage(throwable: Throwable) {
-        when (throwable.message) {
-            ErrorMessage.Offline.message -> {
-                addRequestCount()
-                checkRequestCount()
+    private fun checkNetworkDialog() {
+        _isNetworkDialogShowed.value?.let {
+            if (!it.peekContent()) {
+                _isNetworkDialogShowed.postValue(Event(true))
             }
-            ErrorMessage.UserInfo.message -> {
-            }
-            else -> Unit
         }
-    }
-
-    private fun setNetworkDialogEvent() {
-        _networkDialogEvent.postValue(Event(true))
     }
 }
