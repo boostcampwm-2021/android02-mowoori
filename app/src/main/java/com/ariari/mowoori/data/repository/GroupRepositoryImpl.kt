@@ -3,6 +3,7 @@ package com.ariari.mowoori.data.repository
 import com.ariari.mowoori.ui.home.entity.GroupInfo
 import com.ariari.mowoori.ui.register.entity.User
 import com.ariari.mowoori.ui.register.entity.UserInfo
+import com.ariari.mowoori.util.DuplicatedException
 import com.ariari.mowoori.util.ErrorMessage
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
@@ -37,7 +38,7 @@ class GroupRepositoryImpl @Inject constructor(
             newId?.let {
                 val groupNameMutableList = groupNameList.toMutableList()
                 if (groupNameMutableList.contains(groupInfo.groupName)) {
-                    throw Exception(ErrorMessage.ExistGroupName.message)
+                    throw DuplicatedException(ErrorMessage.ExistGroupName.message)
                 }
                 groupNameMutableList.add(groupInfo.groupName)
                 val tmpGroupList = user.userInfo.groupList

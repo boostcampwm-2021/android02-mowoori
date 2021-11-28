@@ -112,10 +112,8 @@ class GroupFragment : Fragment() {
     }
 
     private fun setNetworkDialogObserver() {
-        viewModel.networkDialogEvent.observe(viewLifecycleOwner, {
-            if (it) {
-                showNetworkDialog()
-            }
+        viewModel.isNetworkDialogShowed.observe(viewLifecycleOwner, {
+            if (it) showNetworkDialog()
         })
     }
 

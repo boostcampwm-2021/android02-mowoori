@@ -7,8 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.GroupRepository
 import com.ariari.mowoori.data.repository.IntroRepository
 import com.ariari.mowoori.ui.home.entity.GroupInfo
-import com.ariari.mowoori.ui.register.entity.User
-import com.ariari.mowoori.util.ErrorMessage
+import com.ariari.mowoori.util.DuplicatedException
 import com.ariari.mowoori.util.InvalidMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -30,52 +29,32 @@ class GroupViewModel @Inject constructor(
     private val _inValidMode = MutableLiveData<InvalidMode>()
     val inValidMode: LiveData<InvalidMode> = _inValidMode
 
-    private val _networkDialogEvent = MutableLiveData<Boolean>()
-    val networkDialogEvent: LiveData<Boolean> get() = _networkDialogEvent
-
-    private var requestCount = 0
-
-    private fun initRequestCount() {
-        requestCount = 0
-    }
-
-    private fun checkRequestCount() {
-        requestCount++
-        if (requestCount == 1) {
-            setNetworkDialogEvent()
-        }
-    }
+    private val _isNetworkDialogShowed = MutableLiveData(false)
+    val isNetworkDialogShowed: LiveData<Boolean> get() = _isNetworkDialogShowed
 
     fun setGroupName() = viewModelScope.launch(Dispatchers.IO) {
         try {
-            val nickname = getNickName()
+            val nickname = introRepository.getRandomNickName().getOrThrow()
             groupName.postValue(nickname + "들")
         } catch (e: Exception) {
-            checkRequestCount()
+            checkNetworkDialog()
         } catch (e: NullPointerException) {
             // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
         }
     }
 
-    private suspend fun getNickName(): String {
-        initRequestCount()
-        return introRepository.getRandomNickName().getOrThrow()
-    }
-
-    fun joinGroup() {
-        val code = groupName.value ?: ""
-        if (!checkInviteCodeValidation(code)) return
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                checkGroupId(code) // 실패시 throw
-                val user = getUser()
-                val isSuccess = addUserToGroup(code, user)
-                _successAddGroup.postValue(isSuccess)
-            } catch (e: Exception) {
-                checkRequestCount()
-            } catch (e: NullPointerException) {
-                // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
-            }
+    fun joinGroup() = viewModelScope.launch(Dispatchers.IO) {
+        try {
+            val code = groupName.value ?: ""
+            if (!checkInviteCodeValidation(code)) return@launch
+            groupRepository.hasExistGroupId(code).getOrThrow()
+            val user = groupRepository.getUser().getOrThrow()
+            val isSuccess = groupRepository.addUserToGroup(code, user).getOrThrow()
+            _successAddGroup.postValue(isSuccess)
+        } catch (e: Exception) {
+            checkNetworkDialog()
+        } catch (e: NullPointerException) {
+            // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
         }
     }
 
@@ -88,31 +67,22 @@ class GroupViewModel @Inject constructor(
         }
     }
 
-    private suspend fun checkGroupId(code: String): Boolean {
-        initRequestCount()
-        return groupRepository.hasExistGroupId(code).getOrThrow()
-    }
-
-    private suspend fun addUserToGroup(code: String, user: User): Boolean {
-        initRequestCount()
-        return groupRepository.addUserToGroup(code, user).getOrThrow()
-    }
-
-    fun addNewGroup() {
-        val name = groupName.value ?: ""
-        if (!checkGroupNameValidation(name)) return
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val user = getUser()
-                val groupNameList = getGroupNameList()
-                val groupInfo = GroupInfo(0, name, listOf(user.userId))
-                val isSuccess = putGroupInfo(groupNameList, groupInfo, user)
-                _successAddGroup.postValue(isSuccess)
-            } catch (e: Exception) {
-                checkRequestCount()
-            } catch (e: NullPointerException) {
-                // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
-            }
+    fun addNewGroup() = viewModelScope.launch(Dispatchers.IO) {
+        try {
+            val name = groupName.value ?: ""
+            if (!checkGroupNameValidation(name)) return@launch
+            val user = groupRepository.getUser().getOrThrow()
+            val groupNameList = groupRepository.getGroupNameList().getOrThrow()
+            val groupInfo = GroupInfo(0, name, listOf(user.userId))
+            val isSuccess =
+                groupRepository.putGroupInfo(groupNameList, groupInfo, user).getOrThrow()
+            _successAddGroup.postValue(isSuccess)
+        } catch (e: Exception) {
+            checkNetworkDialog()
+        } catch (e: NullPointerException) {
+            // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
+        } catch (e: DuplicatedException) {
+            _inValidMode.postValue(InvalidMode.AlreadyExistGroupName)
         }
     }
 
@@ -125,26 +95,9 @@ class GroupViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getUser(): User {
-        initRequestCount()
-        return groupRepository.getUser().getOrThrow()
-    }
-
-    private suspend fun getGroupNameList(): List<String> {
-        initRequestCount()
-        return groupRepository.getGroupNameList().getOrThrow()
-    }
-
-    private suspend fun putGroupInfo(
-        groupNameList: List<String>,
-        groupInfo: GroupInfo,
-        user: User,
-    ): Boolean {
-        initRequestCount()
-        return groupRepository.putGroupInfo(groupNameList, groupInfo, user).getOrThrow()
-    }
-
-    private fun setNetworkDialogEvent() {
-        _networkDialogEvent.postValue(true)
+    private fun checkNetworkDialog() {
+        _isNetworkDialogShowed.value?.let {
+            if (!it) _isNetworkDialogShowed.postValue(true)
+        }
     }
 }
