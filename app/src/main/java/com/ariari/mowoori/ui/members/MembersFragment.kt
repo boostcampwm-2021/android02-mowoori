@@ -42,14 +42,12 @@ class MembersFragment : BaseFragment<FragmentMembersBinding>(R.layout.fragment_m
     }
 
     private fun setGroupInfo() {
-        membersViewModel.setLoadingEvent(true)
-        membersViewModel.fetchGroupInfo()
-//        if (requireContext().isNetWorkAvailable()) {
-//            membersViewModel.setLoadingEvent(true)
-//            membersViewModel.fetchGroupInfo()
-//        } else {
-//            showNetworkDialog()
-//        }
+        if (requireContext().isNetWorkAvailable()) {
+            membersViewModel.setLoadingEvent(true)
+            membersViewModel.fetchGroupInfo()
+        } else {
+            showNetworkDialog()
+        }
     }
 
     private fun setLoadingObserver() {
