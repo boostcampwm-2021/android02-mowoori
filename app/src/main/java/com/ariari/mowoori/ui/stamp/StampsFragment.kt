@@ -145,7 +145,7 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
     }
 
     private fun setMissionObserver() {
-        viewModel.mission.observe(viewLifecycleOwner, {
+        viewModel.mission.observe(viewLifecycleOwner, EventObserver {
             mission = it
         })
     }
@@ -165,16 +165,13 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
 
     private fun setStampListObserver() {
         viewModel.stampList.observe(viewLifecycleOwner, EventObserver { stampList ->
-            viewModel.setLoadingEvent(false)
             adapter.submitList(stampList)
         })
     }
 
     private fun setNetworkDialogObserver() {
-        viewModel.networkDialogEvent.observe(viewLifecycleOwner, EventObserver {
-            if (it) {
-                showNetworkDialog()
-            }
+        viewModel.isNetworkDialogShowed.observe(viewLifecycleOwner, EventObserver {
+            if (it) showNetworkDialog()
         })
     }
 
@@ -188,6 +185,7 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
             override fun onRetryClick(dialog: DialogFragment) {
                 dialog.dismiss()
                 loadMissionInfo()
+                viewModel.resetNetworkDialog()
             }
         }).show(requireActivity().supportFragmentManager, "NetworkDialogFragment")
     }

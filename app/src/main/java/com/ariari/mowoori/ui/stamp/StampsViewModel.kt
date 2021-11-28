@@ -3,22 +3,18 @@ package com.ariari.mowoori.ui.stamp
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.MissionsRepository
 import com.ariari.mowoori.data.repository.StampsRepository
 import com.ariari.mowoori.ui.missions.entity.Mission
-import com.ariari.mowoori.ui.missions.entity.MissionInfo
 import com.ariari.mowoori.ui.stamp.entity.Stamp
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
-import com.ariari.mowoori.util.ErrorMessage
 import com.ariari.mowoori.util.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -36,33 +32,20 @@ class StampsViewModel @Inject constructor(
     private val _backBtnClick = MutableLiveData<Event<Boolean>>()
     val backBtnClick: LiveData<Event<Boolean>> get() = _backBtnClick
 
-    private val _mission = MutableLiveData<Mission>()
-    val mission: LiveData<Mission> get() = _mission
+    private val _mission = MutableLiveData<Event<Mission>>()
+    val mission: LiveData<Event<Mission>> get() = _mission
 
-    val stampList: LiveData<Event<MutableList<Stamp>>> =
-        mission.switchMap { getAllStamps(it.missionInfo) }
+    private val _stampList = MutableLiveData<Event<MutableList<Stamp>>>()
+    val stampList: LiveData<Event<MutableList<Stamp>>> = _stampList
 
     private val _isMyMission = MutableLiveData<Event<Boolean>>()
     val isMyMission: LiveData<Event<Boolean>> get() = _isMyMission
 
-    private val _networkDialogEvent = MutableLiveData<Event<Boolean>>()
-    val networkDialogEvent: LiveData<Event<Boolean>> get() = _networkDialogEvent
+    private val _isNetworkDialogShowed = MutableLiveData(Event(false))
+    val isNetworkDialogShowed: LiveData<Event<Boolean>> get() = _isNetworkDialogShowed
 
-    private var _requestCount = 0
-    private val requestCount get() = _requestCount
-
-    private fun initRequestCount() {
-        _requestCount = 0
-    }
-
-    private fun addRequestCount() {
-        _requestCount++
-    }
-
-    private fun checkRequestCount() {
-        if (requestCount == 1) {
-            setNetworkDialogEvent()
-        }
+    fun resetNetworkDialog() {
+        _isNetworkDialogShowed.value = Event(false)
     }
 
     fun setLoadingEvent(flag: Boolean) {
@@ -77,72 +60,53 @@ class StampsViewModel @Inject constructor(
         _backBtnClick.value = Event(true)
     }
 
-    private fun getAllStamps(missionInfo: MissionInfo): LiveData<Event<MutableList<Stamp>>> {
-        val tempMutableLiveData = MutableLiveData<Event<MutableList<Stamp>>>()
-        viewModelScope.launch(Dispatchers.IO) {
-            val tempStampIdList = mutableListOf<String>()
+    fun setIsMyMission(userId: String) {
+        try {
+            val uid = stampsRepository.getUserId().getOrThrow()
+            _isMyMission.value = Event(userId == uid)
+        } catch (e: NullPointerException) {
+            // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
+        }
+    }
+
+    fun loadMissionInfo(missionId: String) = viewModelScope.launch(Dispatchers.IO) {
+        try {
+            val missionInfo = missionsRepository.getMissionInfo(missionId).getOrThrow()
+            _mission.postValue(Event(Mission(missionId, missionInfo)))
             val deferredStampList = missionInfo.stampList.map { stampId ->
-                tempStampIdList.add(stampId)
                 async { stampsRepository.getStampInfo(stampId) }
             }
             val tempStampList = deferredStampList.awaitAll().mapIndexed { index, result ->
-                initRequestCount()
-                if (result.isSuccess) {
-                    val stampInfo = result.getOrNull() ?: return@launch
-                    Stamp(tempStampIdList[index], stampInfo)
-                } else {
-                    val throwable = result.exceptionOrNull() ?: return@launch
-                    checkThrowableMessage(throwable)
+                try {
+                    val stampInfo = result.getOrThrow()
+                    Stamp(missionInfo.stampList[index], stampInfo)
+                } catch (e: Exception) {
+                    checkNetworkDialog()
+                    return@launch
+                } catch (e: NullPointerException) {
                     return@launch
                 }
             }.toMutableList()
             tempStampList.addAll(createEmptyStamps(missionInfo.totalStamp - tempStampList.size))
-            tempMutableLiveData.postValue(Event(tempStampList))
+            _stampList.postValue(Event(tempStampList))
+            setLoadingEvent(false)
+        } catch (e: Exception) {
+            checkNetworkDialog()
+        } catch (e: NullPointerException) {
+            // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
         }
-        return tempMutableLiveData
     }
 
     private fun createEmptyStamps(count: Int): MutableList<Stamp> {
-        val tempStampList = mutableListOf<Stamp>()
-        repeat(count) { tempStampList.add(Stamp(stampInfo = StampInfo(pictureUrl = "empty"))) }
-        return tempStampList
+        val tempEmptyStampList = mutableListOf<Stamp>()
+        repeat(count) { tempEmptyStampList.add(Stamp(stampInfo = StampInfo(pictureUrl = "empty"))) }
+        return tempEmptyStampList
     }
 
-    fun setIsMyMission(userId: String) {
-        stampsRepository.getUserId()
-            .onSuccess { uid ->
-                _isMyMission.value = Event(uid == userId)
-            }
-            .onFailure {
-                Timber.e("$it")
-            }
-    }
-
-    fun loadMissionInfo(missionId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            initRequestCount()
-            missionsRepository.getMissionInfo(missionId)
-                .onSuccess {
-                    _mission.postValue(Mission(missionId, it))
-                }.onFailure {
-                    checkThrowableMessage(it)
-                }
-        }
-    }
-
-    private fun checkThrowableMessage(throwable: Throwable) {
-        when (throwable.message) {
-            ErrorMessage.Offline.message -> {
-                addRequestCount()
-                checkRequestCount()
-            }
-            else -> setLoadingEvent(false)
-        }
-    }
-
-    private fun setNetworkDialogEvent() {
+    private fun checkNetworkDialog() {
         setLoadingEvent(false)
-        _networkDialogEvent.postValue(Event(true))
+        _isNetworkDialogShowed.value?.let {
+            if (!it.peekContent()) _isNetworkDialogShowed.postValue(Event(true))
+        }
     }
-
 }
