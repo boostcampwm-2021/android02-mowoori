@@ -10,7 +10,6 @@ import android.view.animation.AccelerateInterpolator
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.ariari.mowoori.R
-import com.ariari.mowoori.ui.home.HomeViewModel
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 

@@ -73,6 +73,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     }
 
     private fun setAnimators() {
+        homeViewModel.cancelAnimator()
         snowAnimator = SnowAnimator(
             container = binding.containerHome,
             addAnimator = { animator -> addSnowAnimator(animator) },

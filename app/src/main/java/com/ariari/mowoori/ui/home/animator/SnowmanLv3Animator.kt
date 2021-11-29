@@ -14,7 +14,6 @@ import android.view.animation.BounceInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
 import com.ariari.mowoori.R
-import com.ariari.mowoori.ui.home.HomeViewModel
 import com.ariari.mowoori.ui.home.entity.ViewInfo
 
 class SnowmanLv3Animator(
