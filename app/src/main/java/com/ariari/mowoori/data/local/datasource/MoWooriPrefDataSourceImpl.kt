@@ -13,7 +13,7 @@ class MoWooriPrefDataSourceImpl @Inject constructor(
     override fun setUserRegistered(boolean: Boolean) =
         prefs.edit().putBoolean(USER_REGISTERED_KEY, boolean).apply()
 
-    override fun updateFcmServerKey(key: String) {
+    override suspend fun updateFcmServerKey(key: String) {
         prefs.edit().putString(FCM_SERVER_KEY, key).apply()
     }
 

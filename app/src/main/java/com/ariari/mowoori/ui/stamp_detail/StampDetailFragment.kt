@@ -107,7 +107,6 @@ class StampDetailFragment :
         setCloseBtnClickObserver()
         setIsCertifyObserver()
         setNetworkDialogObserver()
-        setGroupMembersFcmTokenListObserver()
         setIsFcmSentObserver()
         setValidationObserver()
     }
@@ -304,15 +303,9 @@ class StampDetailFragment :
         })
     }
 
-    private fun setGroupMembersFcmTokenListObserver() {
-        stampDetailViewModel.groupMembersTokenList.observe(viewLifecycleOwner) {
-            stampDetailViewModel.postFcm()
-        }
-    }
-
     private fun setIsFcmSentObserver() {
-        stampDetailViewModel.isFcmSent.observe(viewLifecycleOwner, EventObserver {
-            this.findNavController().popBackStack()
+        stampDetailViewModel.isFcmSent.observe(viewLifecycleOwner, {
+            if (it) this.findNavController().popBackStack()
         })
     }
 
@@ -326,10 +319,8 @@ class StampDetailFragment :
     }
 
     private fun setNetworkDialogObserver() {
-        stampDetailViewModel.networkDialogEvent.observe(viewLifecycleOwner, {
-            if (it) {
-                showNetworkDialog()
-            }
+        stampDetailViewModel.isNetworkDialogShowed.observe(viewLifecycleOwner, {
+            if (it) showNetworkDialog()
         })
     }
 
@@ -343,6 +334,7 @@ class StampDetailFragment :
             override fun onRetryClick(dialog: DialogFragment) {
                 dialog.dismiss()
                 stampDetailViewModel.postStamp()
+                stampDetailViewModel.resetNetworkDialog()
             }
         }).show(requireActivity().supportFragmentManager, "NetworkDialogFragment")
     }

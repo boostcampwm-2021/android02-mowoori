@@ -2,8 +2,8 @@ package com.ariari.mowoori.ui.missions
 
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.DialogFragment
 import androidx.core.view.isVisible
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -13,8 +13,8 @@ import com.ariari.mowoori.databinding.FragmentMissionsBinding
 import com.ariari.mowoori.ui.missions.adapter.MissionsAdapter
 import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.util.isNetWorkAvailable
-import com.ariari.mowoori.widget.NetworkDialogFragment
 import com.ariari.mowoori.util.toastMessage
+import com.ariari.mowoori.widget.NetworkDialogFragment
 import com.ariari.mowoori.widget.ProgressDialogManager
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -31,8 +31,26 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = missionsViewModel
         setMissionsRvAdapter()
+        setPlusButtonVisible()
         loadMissions()
         setObserver()
+    }
+
+    private fun setMissionsRvAdapter() {
+        binding.rvMissions.adapter = missionsAdapter
+    }
+
+    private fun setPlusButtonVisible() {
+        missionsViewModel.setIsMemberMission(args.user)
+    }
+
+    private fun loadMissions() {
+        if (requireContext().isNetWorkAvailable()) {
+            missionsViewModel.setLoadingEvent(true)
+            missionsViewModel.loadUserThenLoadMissionList(args.user)
+        } else {
+            showNetworkDialog()
+        }
     }
 
     private fun setObserver() {
@@ -43,7 +61,6 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
         setMissionsListObserver()
         setItemClickObserver()
         setNetworkDialogObserver()
-        setErrorMessageObserver()
     }
 
     private fun setLoadingObserver() {
@@ -53,25 +70,13 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
         })
     }
 
-    private fun setMissionsRvAdapter() {
-        binding.rvMissions.adapter = missionsAdapter
-    }
-
-    private fun loadMissions() {
-        if (requireContext().isNetWorkAvailable()) {
-            missionsViewModel.setLoadingEvent(true)
-            missionsViewModel.sendUserToLoadMissions(args.user)
-        } else {
-            showNetworkDialog()
-        }
-    }
-
     private fun setPlusBtnClickObserver() {
         missionsViewModel.plusBtnClick.observe(viewLifecycleOwner, EventObserver {
-            if(missionsViewModel.isEmptyGroupList){
+            if (missionsViewModel.isEmptyGroupList) {
                 toastMessage(getString(R.string.missions_no_group))
-            }else{
-                this.findNavController().navigate(R.id.action_missionsFragment_to_missionsAddFragment)
+            } else {
+                this.findNavController()
+                    .navigate(R.id.action_missionsFragment_to_missionsAddFragment)
             }
         })
     }
@@ -84,15 +89,14 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
 
     private fun setMissionsTypeObserver() {
         missionsViewModel.missionsType.observe(viewLifecycleOwner) {
-            missionsViewModel.sendUserToLoadMissions(args.user)
+            missionsViewModel.loadUserThenLoadMissionList(args.user)
         }
     }
 
     private fun setMissionsListObserver() {
-        missionsViewModel.missionsList.observe(viewLifecycleOwner, EventObserver { missionsList ->
+        missionsViewModel.filteredMissionList.observe(viewLifecycleOwner, { missionsList ->
             missionsAdapter.submitList(missionsList)
             binding.tvMissionsEmpty.isVisible = missionsList.isEmpty()
-            missionsViewModel.setLoadingEvent(false)
         })
     }
 
@@ -107,10 +111,8 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
     }
 
     private fun setNetworkDialogObserver() {
-        missionsViewModel.networkDialogEvent.observe(viewLifecycleOwner, EventObserver {
-            if (it) {
-                showNetworkDialog()
-            }
+        missionsViewModel.isNetworkDialogShowed.observe(viewLifecycleOwner, EventObserver {
+            if (it) showNetworkDialog()
         })
     }
 
@@ -124,23 +126,8 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
             override fun onRetryClick(dialog: DialogFragment) {
                 dialog.dismiss()
                 loadMissions()
+                missionsViewModel.resetNetworkDialog()
             }
         }).show(requireActivity().supportFragmentManager, "NetworkDialogFragment")
-    }
-    
-    private fun setErrorMessageObserver() {
-        missionsViewModel.errorMessage.observe(viewLifecycleOwner, EventObserver {
-            when (it) {
-                "loadMissionList" -> {
-                    toastMessage("에러가 발생했습니다. 잠시 후 다시 시도해주세요.")
-                }
-                "getUser" -> {
-                    toastMessage("사용자 정보를 가져올 수 없습니다. 잠시 후 다시 시도해주세요.")
-                }
-                else -> {
-                    toastMessage("에러가 발생했습니다. 잠시 후 다시 시도해주세요.")
-                }
-            }
-        })
     }
 }

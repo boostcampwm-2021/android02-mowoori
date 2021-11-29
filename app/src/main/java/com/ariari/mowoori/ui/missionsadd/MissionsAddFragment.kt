@@ -62,9 +62,11 @@ class MissionsAddFragment :
     }
 
     private fun setCompleteEventObserver() {
-        missionsAddViewModel.isMissionPosted.observe(viewLifecycleOwner, EventObserver {
-            toastMessage("미션이 성공적으로 추가되었습니다.")
-            this.findNavController().popBackStack()
+        missionsAddViewModel.isMissionPosted.observe(viewLifecycleOwner, {
+            if (it) {
+                toastMessage("미션이 성공적으로 추가되었습니다.")
+                this.findNavController().popBackStack()
+            }
         })
     }
 
@@ -197,10 +199,8 @@ class MissionsAddFragment :
     }
 
     private fun setNetworkDialogObserver() {
-        missionsAddViewModel.networkDialogEvent.observe(viewLifecycleOwner, EventObserver {
-            if (it) {
-                showNetworkDialog()
-            }
+        missionsAddViewModel.isNetworkDialogShowed.observe(viewLifecycleOwner, EventObserver {
+            if (it) showNetworkDialog()
         })
     }
 
@@ -214,6 +214,7 @@ class MissionsAddFragment :
             override fun onRetryClick(dialog: DialogFragment) {
                 dialog.dismiss()
                 postMission()
+                missionsAddViewModel.resetNetworkDialog()
             }
         }).show(requireActivity().supportFragmentManager, "NetworkDialogFragment")
     }

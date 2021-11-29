@@ -17,7 +17,12 @@ interface MissionsRepository {
     suspend fun isExistGroupId(groupId: String): Boolean
 
     // mission 추가
-    suspend fun postMission(missionInfo: MissionInfo, groupId: String, missionIdList: List<String>)
+    suspend fun postMission(
+        missionInfo: MissionInfo,
+        groupId: String,
+        missionIdList: List<String>,
+    ): Result<Boolean>
+
     suspend fun getUserName(userId: String): Result<String>
 
     // get Mission
