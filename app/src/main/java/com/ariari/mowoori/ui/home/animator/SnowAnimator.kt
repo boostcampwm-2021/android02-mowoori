@@ -16,7 +16,7 @@ import kotlin.random.Random
 
 class SnowAnimator(
     private val container: ConstraintLayout,
-    private val homeViewModel: HomeViewModel,
+    private val addAnimator: (Animator) -> Unit,
     private val context: Context
 ) {
 
@@ -62,7 +62,7 @@ class SnowAnimator(
                 }
             })
         }
-        homeViewModel.addSnowAnimator(snowAnimSet)
+        addAnimator(snowAnimSet)
         snowAnimSet.start()
         delay(delayTime)
     }

@@ -16,6 +16,13 @@ import com.ariari.mowoori.ui.home.animator.SnowAnimator
 import com.ariari.mowoori.ui.home.animator.SnowmanLv2Animator
 import com.ariari.mowoori.ui.home.animator.SnowmanLv3Animator
 import com.ariari.mowoori.ui.home.animator.SnowmanLv4Animator
+import com.ariari.mowoori.ui.home.animator.SnowmanLv4Animator.Companion.ADD_SOURCES
+import com.ariari.mowoori.ui.home.animator.SnowmanLv4Animator.Companion.BODY_MEASURE
+import com.ariari.mowoori.ui.home.animator.SnowmanLv4Animator.Companion.LEFT_BLACK_DONE
+import com.ariari.mowoori.ui.home.animator.SnowmanLv4Animator.Companion.LEFT_WHITE_DONE
+import com.ariari.mowoori.ui.home.animator.SnowmanLv4Animator.Companion.RESET_ALPHA
+import com.ariari.mowoori.ui.home.animator.SnowmanLv4Animator.Companion.RIGHT_BLACK_DONE
+import com.ariari.mowoori.ui.home.animator.SnowmanLv4Animator.Companion.RIGHT_WHITE_DONE
 import com.ariari.mowoori.ui.home.entity.Lv4Component
 import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.util.LogUtil
@@ -66,28 +73,40 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     }
 
     private fun setAnimators() {
-        snowAnimator = SnowAnimator(binding.containerHome, homeViewModel, requireContext())
+        snowAnimator = SnowAnimator(
+            container = binding.containerHome,
+            addAnimator = { animator -> addSnowAnimator(animator) },
+            context = requireContext()
+        )
         snowmanLv2Animator =
-            SnowmanLv2Animator(binding.ivHomeSnowmanFaceLv2, homeViewModel, requireContext())
+            SnowmanLv2Animator(
+                face = binding.ivHomeSnowmanFaceLv2,
+                addAnimator = { animator -> addAnimator(animator) },
+                context = requireContext()
+            )
         snowmanLv3Animator =
             SnowmanLv3Animator(
-                binding.ivHomeSnowmanFaceLv3, binding.ivHomeSnowmanBody,
-                arrayOf(
+                face = binding.ivHomeSnowmanFaceLv3,
+                body = binding.ivHomeSnowmanBody,
+                buttons = arrayOf(
                     binding.ivHomeSnowmanButtonTop,
                     binding.ivHomeSnowmanButtonMiddle,
                     binding.ivHomeSnowmanButtonBottom
                 ),
-                homeViewModel, requireContext()
+                addAnimator = { animator -> addAnimator(animator) },
+                context = requireContext()
             )
         snowmanLv4Animator = SnowmanLv4Animator(
-            Lv4Component(
+            component = Lv4Component(
                 binding.layoutHomeSnowmanFaceLv4,
                 listOf(binding.ivHomeSnowmanLeftHand, binding.ivHomeSnowmanRightHand),
                 binding.ivHomeSnowmanBody,
                 listOf(binding.ivHomeFirstExclamation, binding.ivHomeSecondExclamation),
                 listOf(binding.ivHomeLeftHeart, binding.ivHomeRightHeart)
             ),
-            homeViewModel, requireContext()
+            addAnimator = { animator -> addAnimator(animator) },
+            updateAttributes = { attributes -> updateLv4Attributes(attributes) },
+            context = requireContext()
         )
     }
 
@@ -229,6 +248,26 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
             SnowmanLevel.LV4 -> {
                 snowmanLv4Animator.start()
             }
+        }
+    }
+
+    private fun addSnowAnimator(animator: Animator) {
+        homeViewModel.addSnowAnimator(animator)
+    }
+
+    private fun addAnimator(animator: Animator) {
+        homeViewModel.addAnimator(animator)
+    }
+
+    private fun updateLv4Attributes(step: Int) {
+        when (step) {
+            ADD_SOURCES -> homeViewModel.addSources()
+            RESET_ALPHA -> homeViewModel.resetAlphaForLv4()
+            BODY_MEASURE -> homeViewModel.bodyMeasured()
+            LEFT_BLACK_DONE -> homeViewModel.leftBlackViewInfoDone()
+            RIGHT_BLACK_DONE -> homeViewModel.rightBlackViewInfoDone()
+            LEFT_WHITE_DONE -> homeViewModel.leftWhiteViewInfoDone()
+            RIGHT_WHITE_DONE -> homeViewModel.rightWhiteViewInfoDone()
         }
     }
 

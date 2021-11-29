@@ -21,7 +21,7 @@ class SnowmanLv3Animator(
     private var face: ImageView,
     private var body: ImageView,
     private var buttons: Array<ImageView>,
-    private val homeViewModel: HomeViewModel,
+    private val addAnimator: (Animator) -> Unit,
     private val context: Context
 ) {
     // 3단계 눈사람 얼굴, 몸통 애니메이션
@@ -62,7 +62,7 @@ class SnowmanLv3Animator(
             animatorResId
         ).apply {
             setTarget(view)
-            homeViewModel.addAnimator(this)
+            addAnimator(this)
         }
 
     private fun getAnimatorFromProperty(
@@ -72,12 +72,12 @@ class SnowmanLv3Animator(
     ) =
         ObjectAnimator.ofPropertyValuesHolder(view, property).apply {
             this.duration = duration
-            homeViewModel.addAnimator(this)
+            addAnimator(this)
         }
 
     private fun getFaceHorizontalAnimator(goRightNext: Boolean, goUpNext: Boolean, path: Path) =
         ObjectAnimator.ofFloat(face, View.X, View.Y, path).apply {
-            homeViewModel.addAnimator(this)
+            addAnimator(this)
             if (goUpNext) {
                 duration = 2000
                 interpolator = BounceInterpolator()
