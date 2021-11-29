@@ -44,6 +44,7 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         setAdapter()
         setCompleteClick()
         setObserver()
+        hasInitialized = true
     }
 
     private fun setStartEnterTransition() {
@@ -64,7 +65,6 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
     private fun loadMissionInfo() {
         if (requireContext().isNetWorkAvailable()) {
             if (!hasInitialized) {
-                hasInitialized = true
                 setSpanCount()
                 viewModel.setLoadingEvent(true)
                 viewModel.loadMissionInfo(safeArgs.missionId)

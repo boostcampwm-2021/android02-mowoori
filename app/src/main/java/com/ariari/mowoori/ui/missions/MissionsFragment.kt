@@ -34,6 +34,7 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
         setPlusButtonVisible()
         loadMissions()
         setObserver()
+        hasInitialized = true
     }
 
     private fun setMissionsRvAdapter() {
@@ -47,7 +48,6 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
     private fun loadMissions() {
         if (requireContext().isNetWorkAvailable()) {
             if (!hasInitialized) {
-                hasInitialized = true
                 missionsViewModel.setLoadingEvent(true)
                 missionsViewModel.loadUserThenLoadMissionList(args.user)
             }
