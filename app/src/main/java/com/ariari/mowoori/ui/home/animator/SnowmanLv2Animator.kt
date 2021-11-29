@@ -12,7 +12,7 @@ import com.ariari.mowoori.ui.home.HomeViewModel
 
 class SnowmanLv2Animator(
     private var face: ImageView,
-    private val homeViewModel: HomeViewModel,
+    private val addAnimator: (Animator) -> Unit,
     private val context: Context
 ) {
     // 2단계 눈사람 얼굴 애니메이션
@@ -32,7 +32,7 @@ class SnowmanLv2Animator(
                 animatorResId
             ).apply {
                 setTarget(view)
-                homeViewModel.addAnimator(this)
+                addAnimator(this)
             }
 
     private fun initAnimator() {
