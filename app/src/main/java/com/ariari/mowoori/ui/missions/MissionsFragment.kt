@@ -46,8 +46,11 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
 
     private fun loadMissions() {
         if (requireContext().isNetWorkAvailable()) {
-            missionsViewModel.setLoadingEvent(true)
-            missionsViewModel.loadUserThenLoadMissionList(args.user)
+            if (!hasInitialized) {
+                hasInitialized = true
+                missionsViewModel.setLoadingEvent(true)
+                missionsViewModel.loadUserThenLoadMissionList(args.user)
+            }
         } else {
             showNetworkDialog()
         }
@@ -102,9 +105,10 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
 
     private fun setItemClickObserver() {
         missionsViewModel.itemClick.observe(viewLifecycleOwner, EventObserver {
+            val user = missionsViewModel.user.value!!.peekContent()
             findNavController().navigate(
                 MissionsFragmentDirections.actionMissionsFragmentToStampsFragment(
-                    missionsViewModel.user.value!!.peekContent(), it.missionId
+                    it.missionId, user.userId, user.userInfo.nickname
                 )
             )
         })
