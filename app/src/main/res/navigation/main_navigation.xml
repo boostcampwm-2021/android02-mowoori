@@ -95,6 +95,11 @@
             app:destination="@id/homeFragment"
             app:popUpTo="@id/homeFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_missionsAddFragment_to_missionsFragment"
+            app:destination="@id/missionsFragment"
+            app:popUpTo="@id/missionsFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/stampsFragment"
@@ -102,19 +107,21 @@
         android:label="StampsFragment"
         tools:layout="@layout/fragment_stamps">
         <argument
-            android:name="user"
-            app:argType="com.ariari.mowoori.ui.register.entity.User" />
-        <argument
             android:name="missionId"
             app:argType="string" />
         <action
             android:id="@+id/action_stampsFragment_to_stampDetailFragment"
-            app:destination="@id/stampDetailFragment" />
+            app:destination="@id/stampDetailFragment"
+            app:popUpToInclusive="false" />
         <action
             android:id="@+id/action_stampsFragment_to_homeFragment"
             app:destination="@id/homeFragment"
             app:popUpTo="@id/homeFragment"
             app:popUpToInclusive="true" />
+        <argument
+            android:name="userId"
+            app:argType="string" />
+        <argument android:name="userNickname" />
     </fragment>
     <fragment
         android:id="@+id/stampDetailFragment"
@@ -128,6 +135,11 @@
             android:id="@+id/action_stampDetailFragment_to_homeFragment"
             app:destination="@id/homeFragment"
             app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_stampDetailFragment_to_stampsFragment"
+            app:destination="@id/stampsFragment"
+            app:popUpTo="@id/stampsFragment"
             app:popUpToInclusive="true" />
     </fragment>
 

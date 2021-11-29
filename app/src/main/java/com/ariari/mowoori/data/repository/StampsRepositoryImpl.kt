@@ -90,10 +90,11 @@ class StampsRepositoryImpl @Inject constructor(
                     data = FcmData(
                         title = "그룹원의 미션인증",
                         body = "${detailInfo.userName}님이 [${detailInfo.missionName}]에 스탬프를 찍었어요!",
+                        userId = detailInfo.userId,
                         userName = detailInfo.userName,
                         missionName = detailInfo.missionName,
-                        pictureUrl = detailInfo.stampInfo.pictureUrl,
-                        comment = detailInfo.stampInfo.comment
+                        pictureUrl = detailInfo.stamp.stampInfo.pictureUrl,
+                        comment = detailInfo.stamp.stampInfo.comment
                     )
                 )
             )
