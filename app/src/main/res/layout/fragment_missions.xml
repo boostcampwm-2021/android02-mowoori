@@ -28,9 +28,10 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:onBackClick="@{viewModel::setBackBtnClick}"
             app:onPlusClick="@{viewModel::setPlusBtnClick}"
-            app:titleViewMode="@{TitleViewMode.TITLE_VIEW_PLUS_BUTTON}"
-            app:titleViewText="@{@string/missions_my_mission(viewModel.user.peekContent().userInfo.nickname)}" />
+            app:titleViewMode="@{viewModel.isMemberMission? TitleViewMode.TITLE_VIEW_BACK_BUTTON : TitleViewMode.TITLE_VIEW_PLUS_BUTTON}"
+            app:titleViewText="@{viewModel.user.peekContent() == null? @string/empty : @string/missions_my_mission(viewModel.user.peekContent().userInfo.nickname)}" />
 
         <TextView
             android:id="@+id/tv_missions_not_done"
@@ -42,7 +43,7 @@
             android:onClick="@{()->viewModel.setNotDoneType()}"
             android:paddingVertical="6dp"
             android:text="@string/missions_not_done"
-            android:textColor="@{viewModel.missionsType.peekContent()==viewModel.NOT_DONE_TYPE ? @color/sky_blue_2094FF : @color/black}"
+            android:textColor="@{viewModel.missionsType==viewModel.NOT_DONE_TYPE ? @color/sky_blue_2094FF : @color/black}"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@id/tv_missions_done"
@@ -59,7 +60,7 @@
             android:onClick="@{()->viewModel.setDoneType()}"
             android:paddingVertical="6dp"
             android:text="@string/missions_done"
-            android:textColor="@{viewModel.missionsType.peekContent()==viewModel.DONE_TYPE ? @color/sky_blue_2094FF : @color/black}"
+            android:textColor="@{viewModel.missionsType==viewModel.DONE_TYPE ? @color/sky_blue_2094FF : @color/black}"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@id/tv_missions_fail"
@@ -76,7 +77,7 @@
             android:onClick="@{()->viewModel.setFailType()}"
             android:paddingVertical="6dp"
             android:text="@string/missions_fail"
-            android:textColor="@{viewModel.missionsType.peekContent()==viewModel.FAIL_TYPE ? @color/sky_blue_2094FF : @color/black}"
+            android:textColor="@{viewModel.missionsType==viewModel.FAIL_TYPE ? @color/sky_blue_2094FF : @color/black}"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
@@ -88,7 +89,7 @@
             android:layout_width="0dp"
             android:layout_height="4dp"
             android:background="@color/sky_blue_2094FF"
-            android:visibility="@{viewModel.missionsType.peekContent()==viewModel.NOT_DONE_TYPE ? View.VISIBLE : View.INVISIBLE}"
+            android:visibility="@{viewModel.missionsType==viewModel.NOT_DONE_TYPE ? View.VISIBLE : View.INVISIBLE}"
             app:layout_constraintEnd_toEndOf="@id/tv_missions_not_done"
             app:layout_constraintStart_toStartOf="@id/tv_missions_not_done"
             app:layout_constraintTop_toBottomOf="@id/tv_missions_not_done" />
@@ -98,7 +99,7 @@
             android:layout_width="0dp"
             android:layout_height="4dp"
             android:background="@color/sky_blue_2094FF"
-            android:visibility="@{viewModel.missionsType.peekContent()==viewModel.DONE_TYPE ? View.VISIBLE : View.INVISIBLE}"
+            android:visibility="@{viewModel.missionsType==viewModel.DONE_TYPE ? View.VISIBLE : View.INVISIBLE}"
             app:layout_constraintEnd_toEndOf="@id/tv_missions_done"
             app:layout_constraintStart_toStartOf="@id/tv_missions_done"
             app:layout_constraintTop_toBottomOf="@id/tv_missions_done" />
@@ -108,7 +109,7 @@
             android:layout_width="0dp"
             android:layout_height="4dp"
             android:background="@color/sky_blue_2094FF"
-            android:visibility="@{viewModel.missionsType.peekContent()==viewModel.FAIL_TYPE ? View.VISIBLE : View.INVISIBLE}"
+            android:visibility="@{viewModel.missionsType==viewModel.FAIL_TYPE ? View.VISIBLE : View.INVISIBLE}"
             app:layout_constraintEnd_toEndOf="@id/tv_missions_fail"
             app:layout_constraintStart_toStartOf="@id/tv_missions_fail"
             app:layout_constraintTop_toBottomOf="@id/tv_missions_fail" />
@@ -118,12 +119,25 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="16dp"
+            android:overScrollMode="never"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/view_missions_not_done"
             tools:listitem="@layout/item_missions" />
+
+        <TextView
+            android:id="@+id/tv_missions_empty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/missions_no_mission"
+            android:textColor="@color/gray_A3A3A3"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/view_missions_not_done" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

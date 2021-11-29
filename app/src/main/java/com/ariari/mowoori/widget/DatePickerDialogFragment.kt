@@ -10,7 +10,12 @@ import com.ariari.mowoori.util.getIntFormatMonth
 import com.ariari.mowoori.util.getIntFormatYear
 import java.util.*
 
-class DatePickerDialogFragment(private val now: Int, private val listener: NoticeDialogListener) :
+class DatePickerDialogFragment(
+    private val isStart: Boolean,
+    private val curDate: Int,
+    private val startDate: Int,
+    private val listener: NoticeDialogListener
+) :
     BaseDialogFragment<DialogDatePickerBinding>(R.layout.dialog_date_picker) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -21,11 +26,25 @@ class DatePickerDialogFragment(private val now: Int, private val listener: Notic
 
     private fun setDatePicker() {
         binding.datePickerMissionDate.apply {
-            minDate = Date().time
+            minDate = if (isStart) {
+                Date().time
+            } else {
+                Calendar.getInstance().apply {
+                    set(Calendar.YEAR, getIntFormatYear(startDate))
+                    set(Calendar.MONTH, (getIntFormatMonth(startDate) - 1) % 13)
+                    set(Calendar.DAY_OF_MONTH, getIntFormatDate(startDate))
+                }.time.time
+            }
         }.init(
-            getIntFormatYear(now), (getIntFormatMonth(now) - 1) % 13, getIntFormatDate(now)
+            getIntFormatYear(curDate),
+            (getIntFormatMonth(curDate) - 1) % 13,
+            getIntFormatDate(curDate)
         ) { view, year, month, date ->
-            Toast.makeText(view.context, "${year}년 ${(month+1)%13}월 ${date}일", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                view.context,
+                "${year}년 ${(month + 1) % 13}월 ${date}일",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 

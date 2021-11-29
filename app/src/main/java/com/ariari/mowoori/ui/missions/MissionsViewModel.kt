@@ -1,5 +1,6 @@
 package com.ariari.mowoori.ui.missions
 
+import androidx.databinding.Observable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -7,41 +8,82 @@ import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.MissionsRepository
 import com.ariari.mowoori.ui.missions.entity.Mission
 import com.ariari.mowoori.ui.register.entity.User
+import com.ariari.mowoori.util.ErrorMessage
 import com.ariari.mowoori.util.Event
 import com.ariari.mowoori.util.getCurrentDate
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.rxjava3.core.Observable.create
+import io.reactivex.rxjava3.core.ObservableEmitter
+import io.reactivex.rxjava3.core.ObservableOnSubscribe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
 class MissionsViewModel @Inject constructor(
-    private val missionsRepository: MissionsRepository
+    private val missionsRepository: MissionsRepository,
 ) : ViewModel() {
     private val _loadingEvent = MutableLiveData<Event<Boolean>>()
-    val loadingEvent: LiveData<Event<Boolean>> get() = _loadingEvent
+    val loadingEvent: LiveData<Event<Boolean>> = _loadingEvent
 
     private val _plusBtnClick = MutableLiveData<Event<Boolean>>()
     val plusBtnClick: LiveData<Event<Boolean>> = _plusBtnClick
 
+    private val _backBtnClick = MutableLiveData<Event<Boolean>>()
+    val backBtnClick: LiveData<Event<Boolean>> get() = _backBtnClick
+
+    private val _isMemberMission = MutableLiveData<Boolean>()
+    val isMemberMission: LiveData<Boolean> = _isMemberMission
+
+    var isEmptyGroupList = false
+        private set
+
     private val _itemClick = MutableLiveData<Event<Mission>>()
     val itemClick: LiveData<Event<Mission>> = _itemClick
 
-    private val _missionsType = MutableLiveData(Event(NOT_DONE_TYPE))
-    val missionsType: LiveData<Event<Int>> = _missionsType
+    private val _missionsType = MutableLiveData(NOT_DONE_TYPE)
+    val missionsType: LiveData<Int> = _missionsType
 
-    private val _missionsList = MutableLiveData<List<Mission>>()
-    val missionsList: LiveData<List<Mission>> = _missionsList
+    private val _missionsList = MutableLiveData<Event<List<Mission>>>()
+    val missionsList: LiveData<Event<List<Mission>>> = _missionsList
 
     private val _user = MutableLiveData<Event<User>>()
-    val user: LiveData<Event<User>> get() = _user
+    val user: LiveData<Event<User>> = _user
+
+    private val _errorMessage = MutableLiveData<Event<String>>()
+    val errorMessage: LiveData<Event<String>> = _errorMessage
+
+    private val _networkDialogEvent = MutableLiveData<Event<Boolean>>()
+    val networkDialogEvent: LiveData<Event<Boolean>> get() = _networkDialogEvent
+
+    private var _requestCount = 0
+    private val requestCount get() = _requestCount
+
+    private fun initRequestCount() {
+        _requestCount = 0
+    }
+
+    private fun addRequestCount() {
+        _requestCount++
+    }
+
+    private fun checkRequestCount() {
+        if (requestCount == 1) {
+            setNetworkDialogEvent()
+        }
+    }
 
     fun setLoadingEvent(isLoading: Boolean) {
-        _loadingEvent.value = Event(isLoading)
+        _loadingEvent.postValue(Event(isLoading))
     }
 
     fun setPlusBtnClick() {
         _plusBtnClick.value = Event(true)
+    }
+
+    fun setBackBtnClick() {
+        _backBtnClick.value = Event(true)
     }
 
     fun setItemClick(mission: Mission) {
@@ -49,68 +91,104 @@ class MissionsViewModel @Inject constructor(
     }
 
     fun setNotDoneType() {
-        _missionsType.value = Event(NOT_DONE_TYPE)
+        _missionsType.value = NOT_DONE_TYPE
         setLoadingEvent(true)
     }
 
     fun setDoneType() {
-        _missionsType.value = Event(DONE_TYPE)
+        _missionsType.value = DONE_TYPE
         setLoadingEvent(true)
     }
 
     fun setFailType() {
-        _missionsType.value = Event(FAIL_TYPE)
+        _missionsType.value = FAIL_TYPE
         setLoadingEvent(true)
     }
 
     fun sendUserToLoadMissions(user: User?) {
         if (user != null) {
+            _isMemberMission.value = true
+            isEmptyGroupList = user.userInfo.groupList.isEmpty()
             loadUser(user)
-            loadMissionsList(user)
+            loadMissionIdList(user)
         } else {
             viewModelScope.launch(Dispatchers.IO) {
+                initRequestCount()
                 missionsRepository.getUser().onSuccess { user ->
+                    isEmptyGroupList = user.userInfo.groupList.isEmpty()
                     loadUser(user)
-                    loadMissionsList(user)
-                }.onFailure { throw Exception("get User Exception!!") }
+                    loadMissionIdList(user)
+                }.onFailure {
+                    checkThrowableMessage(it)
+                }
             }
         }
     }
 
-    private fun loadMissionsList(user: User) {
+    private fun loadMissionIdList(user: User) {
         viewModelScope.launch(Dispatchers.IO) {
-            val missionIdList =
-                missionsRepository.getMissionIdList(user.userInfo.currentGroupId)
-            val missions = missionsRepository.getMissions(user.userId)
-            _missionsList.postValue(
-                when (requireNotNull(missionsType.value).peekContent()) {
-                    NOT_DONE_TYPE -> {
-                        missions.filter {
-                            (missionIdList.contains(it.missionId)) &&
-                                    (getCurrentDate() <= it.missionInfo.dueDate) &&
-                                    (it.missionInfo.curStamp < it.missionInfo.totalStamp)
-                        }
-                    }
-                    DONE_TYPE -> {
-                        missions.filter {
-                            (missionIdList.contains(it.missionId)) &&
-                                    (it.missionInfo.curStamp == it.missionInfo.totalStamp)
-                        }
-                    }
-                    FAIL_TYPE -> {
-                        missions.filter {
-                            (missionIdList.contains(it.missionId)) &&
-                                    (getCurrentDate() > it.missionInfo.dueDate) &&
-                                    (it.missionInfo.curStamp < it.missionInfo.totalStamp)
-                        }
-                    }
-                    else -> throw IllegalStateException()
-                })
+            initRequestCount()
+            missionsRepository.getMissionIdList(user.userInfo.currentGroupId)
+                .onSuccess { missionIdList ->
+                    loadMissionList(user.userId, missionIdList)
+                }
+                .onFailure {
+                    checkThrowableMessage(it)
+                }
         }
+    }
+
+    private suspend fun loadMissionList(userId: String, missionIdList: List<String>) {
+        initRequestCount()
+        missionsRepository.getMissions(userId)
+            .onSuccess { missionList ->
+                _missionsList.postValue(Event(
+                    when (requireNotNull(missionsType.value)) {
+                        NOT_DONE_TYPE -> {
+                            missionList.filter {
+                                (missionIdList.contains(it.missionId)) &&
+                                        (getCurrentDate() <= it.missionInfo.dueDate) &&
+                                        (it.missionInfo.curStamp < it.missionInfo.totalStamp)
+                            }
+                        }
+                        DONE_TYPE -> {
+                            missionList.filter {
+                                (missionIdList.contains(it.missionId)) &&
+                                        (it.missionInfo.curStamp == it.missionInfo.totalStamp)
+                            }
+                        }
+                        FAIL_TYPE -> {
+                            missionList.filter {
+                                (missionIdList.contains(it.missionId)) &&
+                                        (getCurrentDate() > it.missionInfo.dueDate) &&
+                                        (it.missionInfo.curStamp < it.missionInfo.totalStamp)
+                            }
+                        }
+                        else -> emptyList()
+                    }))
+            }
+            .onFailure {
+                checkThrowableMessage(it)
+            }
     }
 
     private fun loadUser(user: User) {
         _user.postValue(Event(user))
+    }
+
+    private fun checkThrowableMessage(throwable: Throwable) {
+        when (throwable.message) {
+            ErrorMessage.Offline.message -> {
+                addRequestCount()
+                checkRequestCount()
+            }
+            else -> setLoadingEvent(false)
+        }
+    }
+
+    private fun setNetworkDialogEvent() {
+        setLoadingEvent(false)
+        _networkDialogEvent.postValue(Event(true))
     }
 
     companion object {

@@ -1,11 +1,7 @@
 package com.ariari.mowoori.ui.missionsadd
 
-import android.animation.Animator
-import android.animation.AnimatorInflater
-import android.app.Activity
 import android.os.Bundle
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
@@ -15,9 +11,13 @@ import com.ariari.mowoori.R
 import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentMissionsAddBinding
 import com.ariari.mowoori.util.EventObserver
+import com.ariari.mowoori.util.getVibrateAnimInstance
+import com.ariari.mowoori.util.hideKeyBoard
+import com.ariari.mowoori.util.isNetWorkAvailable
 import com.ariari.mowoori.util.toastMessage
 import com.ariari.mowoori.widget.BaseDialogFragment
 import com.ariari.mowoori.widget.DatePickerDialogFragment
+import com.ariari.mowoori.widget.NetworkDialogFragment
 import com.ariari.mowoori.widget.NumberPickerDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
@@ -40,6 +40,7 @@ class MissionsAddFragment :
         setCompleteEventObserver()
         setCountEventObserver()
         setValidationObserver()
+        setNetworkDialogObserver()
     }
 
     private fun setClickListener() {
@@ -49,27 +50,21 @@ class MissionsAddFragment :
 
     private fun setRootClick() {
         binding.root.setOnClickListener {
-            hideKeyboard(it)
+            requireContext().hideKeyBoard(it)
             requireActivity().currentFocus?.clearFocus()
         }
     }
 
-    private fun hideKeyboard(v: View) {
-        val inputMethodManager =
-            requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(v.windowToken, 0)
-    }
-
     private fun setBackBtnClickObserver() {
         missionsAddViewModel.backBtnClick.observe(viewLifecycleOwner, EventObserver {
-            this.findNavController().navigateUp()
+            this.findNavController().popBackStack()
         })
     }
 
     private fun setCompleteEventObserver() {
         missionsAddViewModel.isMissionPosted.observe(viewLifecycleOwner, EventObserver {
             toastMessage("미션이 성공적으로 추가되었습니다.")
-            this.findNavController().navigateUp()
+            this.findNavController().popBackStack()
         })
     }
 
@@ -106,16 +101,27 @@ class MissionsAddFragment :
         missionsAddViewModel.checkMissionValidEvent.observe(viewLifecycleOwner, {
             if (isMissionNameValid() && isMissionDateValid()) {
                 Timber.d("success")
-                missionsAddViewModel.postMission(binding.etMissionsAddWhat.text.toString())
+                postMission()
             } else {
                 Timber.d("fail")
             }
         })
     }
 
+    private fun postMission() {
+        if (requireContext().isNetWorkAvailable()) {
+            missionsAddViewModel.postMission(binding.etMissionsAddWhat.text.toString())
+        } else {
+            showNetworkDialog()
+        }
+    }
+
     private fun setButtonListener() {
         binding.tvMissionsAddWhenStart.setOnClickListener {
-            DatePickerDialogFragment(missionsAddViewModel.missionStartDate.value!!,
+            DatePickerDialogFragment(
+                isStart = true,
+                curDate = missionsAddViewModel.missionStartDate.value!!,
+                startDate = missionsAddViewModel.missionStartDate.value!!,
                 object : BaseDialogFragment.NoticeDialogListener {
                     override fun onDialogPositiveClick(dialog: DialogFragment) {
                         val dp = (dialog as DatePickerDialogFragment).binding.datePickerMissionDate
@@ -138,7 +144,9 @@ class MissionsAddFragment :
         }
         binding.tvMissionsAddWhenEnd.setOnClickListener {
             DatePickerDialogFragment(
-                missionsAddViewModel.missionEndDate.value!!,
+                isStart = false,
+                curDate = missionsAddViewModel.missionEndDate.value!!,
+                startDate = missionsAddViewModel.missionStartDate.value!!,
                 object : BaseDialogFragment.NoticeDialogListener {
                     override fun onDialogPositiveClick(dialog: DialogFragment) {
                         val dp = (dialog as DatePickerDialogFragment).binding.datePickerMissionDate
@@ -160,7 +168,7 @@ class MissionsAddFragment :
         with(binding.tvMissionsAddWhatInvalid) {
             return@isMissionNameValid if (binding.etMissionsAddWhat.text.length !in 1..15) {
                 isVisible = true
-                getVibrateAnimInstance().run {
+                requireContext().getVibrateAnimInstance().run {
                     setTarget(binding.tvMissionsAddWhatInvalid)
                     start()
                 }
@@ -176,7 +184,7 @@ class MissionsAddFragment :
         with(binding.tvMissionsAddWhenInvalid) {
             return@isMissionDateValid if (missionsAddViewModel.missionStartDate.value!! > missionsAddViewModel.missionEndDate.value!!) {
                 isVisible = true
-                getVibrateAnimInstance().run {
+                requireContext().getVibrateAnimInstance().run {
                     setTarget(binding.tvMissionsAddWhenInvalid)
                     start()
                 }
@@ -188,8 +196,26 @@ class MissionsAddFragment :
         }
     }
 
-    private fun getVibrateAnimInstance(): Animator {
-        return AnimatorInflater.loadAnimator(requireContext(), R.animator.animator_invalid_vibrate)
+    private fun setNetworkDialogObserver() {
+        missionsAddViewModel.networkDialogEvent.observe(viewLifecycleOwner, EventObserver {
+            if (it) {
+                showNetworkDialog()
+            }
+        })
+    }
+
+    private fun showNetworkDialog() {
+        NetworkDialogFragment(object : NetworkDialogFragment.NetworkDialogListener {
+            override fun onCancelClick(dialog: DialogFragment) {
+                dialog.dismiss()
+                findNavController().navigate(R.id.action_missionsAddFragment_to_homeFragment)
+            }
+
+            override fun onRetryClick(dialog: DialogFragment) {
+                dialog.dismiss()
+                postMission()
+            }
+        }).show(requireActivity().supportFragmentManager, "NetworkDialogFragment")
     }
 }
 

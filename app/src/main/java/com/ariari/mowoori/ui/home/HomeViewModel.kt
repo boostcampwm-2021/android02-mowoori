@@ -84,7 +84,7 @@ class HomeViewModel @Inject constructor(
 
     fun setCurrentGroupInfo(groupId: String) {
         val currGroupList = groupList.value ?: return
-        val tempGroupList = currGroupList.toMutableList().map {
+        val tempGroupList = currGroupList.map {
             val copyGroup = it.copy()
             copyGroup.selected = copyGroup.groupId == groupId
             if (copyGroup.selected) _currentGroupInfo.value = it
@@ -104,9 +104,9 @@ class HomeViewModel @Inject constructor(
 
     private fun setSnowmanLevel(doneMission: Int): SnowmanLevel {
         return when {
-            doneMission <= 1 -> SnowmanLevel.LV1
-            doneMission == 2 -> SnowmanLevel.LV2
-            doneMission == 3 -> SnowmanLevel.LV3
+            doneMission <= 0 -> SnowmanLevel.LV1
+            doneMission == 1 -> SnowmanLevel.LV2
+            doneMission == 2 -> SnowmanLevel.LV3
             else -> SnowmanLevel.LV4
         }
     }

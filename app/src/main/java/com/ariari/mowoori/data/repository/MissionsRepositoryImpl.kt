@@ -4,6 +4,7 @@ import com.ariari.mowoori.ui.missions.entity.Mission
 import com.ariari.mowoori.ui.missions.entity.MissionInfo
 import com.ariari.mowoori.ui.register.entity.User
 import com.ariari.mowoori.ui.register.entity.UserInfo
+import com.ariari.mowoori.util.ErrorMessage
 import com.ariari.mowoori.util.LogUtil
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
@@ -14,23 +15,23 @@ import javax.inject.Inject
 
 class MissionsRepositoryImpl @Inject constructor(
     private val firebaseReference: DatabaseReference,
-    private val firebaseAuth: FirebaseAuth
+    private val firebaseAuth: FirebaseAuth,
 ) : MissionsRepository {
-    override suspend fun getMissionIdList(groupId: String): List<String> {
+
+    override suspend fun getMissionIdList(groupId: String): Result<List<String>> = runCatching {
         val groupsRef = firebaseReference.child("groups")
             .child(groupId)
             .child("missionList")
             .get().await()
 
         val missionIdList = groupsRef.getValue(object : GenericTypeIndicator<List<String>>() {})
-        return missionIdList ?: emptyList()
+        missionIdList ?: emptyList()
     }
 
-    override suspend fun getMissions(userId: String): List<Mission> {
+    override suspend fun getMissions(userId: String): Result<List<Mission>> = runCatching {
         val missionList = mutableListOf<Mission>()
         val missionsRef = firebaseReference.child("missions")
             .get().await()
-        // TODO:실패할 경우 처리 필요
 
         missionsRef.children.forEach { dataSnapshot ->
             if (dataSnapshot.key != null) {
@@ -43,14 +44,14 @@ class MissionsRepositoryImpl @Inject constructor(
                 }
             }
         }
-        return missionList
+        missionList
     }
 
     override suspend fun getUser(): Result<User> = kotlin.runCatching {
         val uid = firebaseAuth.currentUser?.uid ?: throw NullPointerException("uid is null")
         val snapshot = firebaseReference.child("users/$uid").get().await()
         val userInfo = snapshot.getValue(UserInfo::class.java)
-            ?: throw NullPointerException("userInfo is null")
+            ?: throw NullPointerException(ErrorMessage.UserInfo.message)
         User(uid, userInfo)
     }
 
@@ -59,7 +60,7 @@ class MissionsRepositoryImpl @Inject constructor(
             val snapshot = firebaseReference.child("missions/$missionId").get().await()
             LogUtil.log("getMission Impl", snapshot.getValue(MissionInfo::class.java).toString())
             val missionInfo = snapshot.getValue(MissionInfo::class.java)
-                ?: throw NullPointerException("mission is null")
+                ?: throw NullPointerException(ErrorMessage.MissionInfo.message)
             missionInfo
         }
 
@@ -71,7 +72,7 @@ class MissionsRepositoryImpl @Inject constructor(
     override suspend fun postMission(
         missionInfo: MissionInfo,
         groupId: String,
-        missionIdList: List<String>
+        missionIdList: List<String>,
     ) {
         val missionId = firebaseReference.child("missions").push().key
         missionId?.let {
@@ -91,6 +92,6 @@ class MissionsRepositoryImpl @Inject constructor(
     override suspend fun getUserName(userId: String): Result<String> = kotlin.runCatching {
         val snapshot = firebaseReference.child("users").child(userId).get().await()
         val userInfo = snapshot.getValue(UserInfo::class.java)
-        userInfo?.nickname ?: throw NullPointerException("getUserName is null")
+        userInfo?.nickname ?: throw NullPointerException(ErrorMessage.UserInfo.message)
     }
 }

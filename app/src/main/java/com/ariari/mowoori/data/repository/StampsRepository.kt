@@ -1,8 +1,10 @@
 package com.ariari.mowoori.data.repository
 
 import android.net.Uri
+import com.ariari.mowoori.data.remote.response.FcmResponse
 import com.ariari.mowoori.ui.missions.entity.Mission
 import com.ariari.mowoori.ui.missions.entity.MissionInfo
+import com.ariari.mowoori.ui.stamp.entity.DetailInfo
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
 
 interface StampsRepository {
@@ -13,4 +15,10 @@ interface StampsRepository {
 
     suspend fun putCertificationImage(uri: Uri, missionId: String): Result<String>
     suspend fun getStampImageUrl(uriString: String): Result<String>
+
+    suspend fun postFcmMessage(fcmToken: String, detailInfo: DetailInfo): Result<FcmResponse>
+    suspend fun getGroupMembersUserId(): Result<List<String>>
+    suspend fun getGroupMembersFcmToken(userId: String): Result<String>
+
+    suspend fun putGroupDoneMission(): Result<Int>
 }

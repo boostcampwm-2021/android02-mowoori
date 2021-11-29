@@ -4,6 +4,7 @@
     <string name="nothing">아무것도 없어요</string>
     <string name="desc_app_logo">앱 로고</string>
     <string name="cancel">취소</string>
+    <string name="empty" />
 
     <string name="bottom_nav_home">Home</string>
     <string name="bottom_nav_missions">Missions</string>
@@ -38,7 +39,8 @@
     <string name="group_name">정직한 코박쥐들</string>
     <string name="group_name_hint">`우리`의 이름을 입력해주세요</string>
     <string name="group_invite_title">초대코드를\n입력해주세요</string>
-    <string name="group_invalid">올바르지 않은 형식입니다.</string>
+    <string name="group_name_invalid">그룹 이름은 1자 이상 11자 이하에요!</string>
+    <string name="group_invite_invalid">존재하지 않은 초대 코드 입니다!</string>
 
     <!-- HomeFragment -->
     <string name="desc_home_snowman_face">눈사람 얼굴</string>
@@ -55,6 +57,8 @@
     <string name="desc_home_heart">하트</string>
     <string name="desc_home_snowman_right_hand">눈사람 오른손</string>
     <string name="desc_home_big_heart">왕 하트</string>
+    <string name="home_new_group">새로운 그룹을 추가해주세요.</string>
+    <string name="home_no_group">그룹이 없어요.</string>
 
     <!-- MissionsFragment -->
     <string name="item_missions_stamp_count">%d/%d</string>
@@ -62,11 +66,13 @@
     <string name="missions_not_done">미완료</string>
     <string name="missions_done">완료</string>
     <string name="missions_fail">실패</string>
+    <string name="missions_no_mission">해당하는 미션이 없어요.</string>
+    <string name="missions_no_group">홈화면에서 그룹을 추가한 후 미션을 추가할 수 있어요!</string>
 
     <!-- StampFragment -->
     <string name="stamps_mission">매일 잔디 채우기</string>
     <string name="stamps_number">1</string>
-    <string name="stamps_complete">오늘도 완료!</string>
+    <string name="stamps_complete">미션인증</string>
     <string name="desc_item_stamps_stamp">스탬프</string>
     <string name="desc_item_stamps_icon">스탬프 아이콘</string>
 
@@ -102,6 +108,7 @@
     <string name="members_share">공유하기</string>
     <string name="members_invite_code_title">초대코드</string>
     <string name="members_invite_code_copy_complete">초대코드가 클립보드에 복사되었습니다.</string>
+    <string name="members_no_members">구성원이 없어요.</string>
 
     <!-- StampDetailFragment -->
     <string name="stamp_detail_user">%s님의</string>
@@ -109,11 +116,17 @@
     <string name="stamp_detail_comment">한줄평</string>
     <string name="stamp_detail_hint">한줄평을 작성해주세요</string>
     <string name="stamp_detail_valid">(5자 이상 100자 이하)</string>
-    <string name="stamp_detail_complete">인증하기</string>
+    <string name="stamp_detail_complete">인증완료</string>
 
     <!-- PictureDialogFragment -->
     <string name="dialog_picture_gallery">GALLERY</string>
     <string name="dialog_picture_camera">CAMERA</string>
     <string name="desc_dialog_picture_camera_icon">카메라 아이콘</string>
     <string name="desc_dialog_picture_gallery_icon">갤러리 아이콘</string>
+
+    <!-- NetworkDialogFragment -->
+    <string name="dialog_network_retry">재시도</string>
+    <string name="dialog_network_content">데이터 요청에 실패하였습니다.\n사용중인 네트워크 상태를 확인해주세요.\n다시 요청 하시겠습니까?</string>
+    <string name="stamp_detail_comment_invalid">5~100자 사이로 입력해주세요.</string>
+    <string name="desc_iv_stamp_detail_highlight_circle">강조표시 점</string>
 </resources>

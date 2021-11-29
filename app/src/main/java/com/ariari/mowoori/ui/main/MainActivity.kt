@@ -1,7 +1,6 @@
 package com.ariari.mowoori.ui.main
 
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -11,6 +10,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.ActivityMainBinding
+import com.ariari.mowoori.ui.home.HomeFragmentDirections
+import com.ariari.mowoori.ui.stamp.entity.DetailInfo
+import com.ariari.mowoori.util.MowooriMessagingService.Companion.DETAIL_INFO
+import com.ariari.mowoori.util.MowooriMessagingService.Companion.FROM_FCM
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -24,9 +27,19 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
         setNavController()
         setBottomNavVisibility()
+    }
+
+    private fun isOpenFromFcm() {
+        if (intent.getBooleanExtra(FROM_FCM, false)) {
+            intent.getParcelableExtra<DetailInfo>(DETAIL_INFO)?.let { detailInfo ->
+                navController.navigate(
+                        HomeFragmentDirections.actionHomeFragmentToStampDetailFragment(detailInfo)
+                    )
+            }
+            intent.removeExtra(FROM_FCM)
+        }
     }
 
     private fun setNavController() {
@@ -40,7 +53,11 @@ class MainActivity : AppCompatActivity() {
     private fun setBottomNavVisibility() {
         navController.addOnDestinationChangedListener { _, destination, arguments ->
             when (destination.id) {
-                R.id.homeFragment, R.id.membersFragment -> showBottomNav()
+                R.id.homeFragment->{
+                    isOpenFromFcm()
+                    showBottomNav()
+                }
+                R.id.membersFragment -> showBottomNav()
                 R.id.missionsFragment -> {
                     if (arguments?.get("user") != null) {
                         // 구성원의 미션

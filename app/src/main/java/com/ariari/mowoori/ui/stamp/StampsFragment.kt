@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.ImageView
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
@@ -13,12 +14,15 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.ariari.mowoori.R
 import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentStampsBinding
+import com.ariari.mowoori.ui.missions.entity.Mission
+import com.ariari.mowoori.ui.register.entity.User
 import com.ariari.mowoori.ui.stamp.adapter.StampsAdapter
 import com.ariari.mowoori.ui.stamp.entity.DetailInfo
 import com.ariari.mowoori.ui.stamp.entity.DetailMode
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
 import com.ariari.mowoori.util.EventObserver
-import com.ariari.mowoori.util.LogUtil
+import com.ariari.mowoori.util.isNetWorkAvailable
+import com.ariari.mowoori.widget.NetworkDialogFragment
 import com.ariari.mowoori.widget.ProgressDialogManager
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
@@ -26,6 +30,8 @@ import timber.log.Timber
 @AndroidEntryPoint
 class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_stamps) {
     private val safeArgs: StampsFragmentArgs by navArgs()
+    private val user: User by lazy { safeArgs.user }
+    private lateinit var mission: Mission
     private lateinit var adapter: StampsAdapter
     private val viewModel: StampsViewModel by viewModels()
 
@@ -34,7 +40,8 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
         setStartEnterTransition()
-        setUser()
+        setCompleteBtnVisible()
+        loadMissionInfo()
         setAdapter()
         setSpanCount()
         setCompleteClick()
@@ -50,22 +57,16 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         }
     }
 
-    private fun setUser() {
-        viewModel.setLoadingEvent(true)
-        viewModel.setUser(safeArgs.user)
+    private fun setCompleteBtnVisible() {
+        viewModel.setIsMyMission(user.userId)
     }
 
-    private fun setUserObserver() {
-        viewModel.user.observe(viewLifecycleOwner) {
-            LogUtil.log("setUserObserver", safeArgs.missionId)
+    private fun loadMissionInfo() {
+        if (requireContext().isNetWorkAvailable()) {
+            viewModel.setLoadingEvent(true)
             viewModel.loadMissionInfo(safeArgs.missionId)
-            setCompleteBtnVisible()
-        }
-    }
-
-    private fun setMissionObserver() {
-        viewModel.mission.observe(viewLifecycleOwner) {
-            viewModel.setStampList()
+        } else {
+            showNetworkDialog()
         }
     }
 
@@ -81,69 +82,17 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
                     .navigate(
                         StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
                             DetailInfo(
-                                viewModel.user.value!!.userInfo.nickname,
-                                viewModel.mission.value!!.missionId,
-                                viewModel.mission.value!!.missionInfo.missionName,
+                                user.userInfo.nickname,
+                                mission.missionId,
+                                mission.missionInfo.missionName,
                                 DetailMode.INQUIRY,
                                 stampInfo
                             )
                         ), extras
                     )
-//                viewModel.setSelectedStampInfo(position, missionInfo.curStamp)
             }
         })
         binding.rvStamps.adapter = adapter
-    }
-
-    private fun setObserver() {
-        setLoadingObserver()
-        setBackBtnObserver()
-        setSpanCountObserver()
-        setStampListObserver()
-        setSelectedStampInfoObserver()
-        setUserObserver()
-        setMissionObserver()
-    }
-
-    private fun setCompleteBtnVisible() {
-        viewModel.setIsMyMission()
-    }
-
-    private fun setCompleteClick() {
-        binding.btnStampsComplete.setOnClickListener {
-            it.findNavController()
-                .navigate(
-                    StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
-                        DetailInfo(
-                            viewModel.user.value!!.userInfo.nickname,
-                            viewModel.mission.value!!.missionId,
-                            viewModel.mission.value!!.missionInfo.missionName,
-                            DetailMode.CERTIFY,
-                            StampInfo()
-                        )
-                    )
-                )
-        }
-    }
-
-    private fun setLoadingObserver() {
-        viewModel.loadingEvent.observe(viewLifecycleOwner, EventObserver {
-            if (it) ProgressDialogManager.instance.show(requireContext())
-            else ProgressDialogManager.instance.clear()
-        })
-    }
-
-    private fun setBackBtnObserver() {
-        viewModel.backBtnClick.observe(viewLifecycleOwner, EventObserver {
-            this.findNavController().popBackStack()
-        })
-    }
-
-    private fun setSpanCountObserver() {
-        viewModel.spanCount.observe(viewLifecycleOwner, EventObserver { spanCount ->
-            val gridLayoutManager = GridLayoutManager(requireContext(), spanCount)
-            binding.rvStamps.layoutManager = gridLayoutManager
-        })
     }
 
     private fun setSpanCount() {
@@ -162,31 +111,84 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         })
     }
 
-    private fun setStampListObserver() {
-        viewModel.stampList.observe(viewLifecycleOwner, { stampList ->
-            Timber.d("submitList")
-            adapter.submitList(stampList)
-        })
-
-        viewModel.curStampList.observe(viewLifecycleOwner, { stampList ->
-            viewModel.fillEmptyStamps(viewModel.mission.value!!.missionInfo.totalStamp - stampList.size)
-        })
-    }
-
-    private fun setSelectedStampInfoObserver() {
-        viewModel.selectedStampInfo.observe(viewLifecycleOwner, EventObserver { stampInfo ->
-            this.findNavController()
+    private fun setCompleteClick() {
+        binding.btnStampsComplete.setOnClickListener {
+            it.findNavController()
                 .navigate(
                     StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
                         DetailInfo(
-                            viewModel.user.value!!.userInfo.nickname,
-                            viewModel.mission.value!!.missionId,
-                            viewModel.mission.value!!.missionInfo.missionName,
-                            DetailMode.INQUIRY,
-                            stampInfo
+                            user.userInfo.nickname,
+                            mission.missionId,
+                            mission.missionInfo.missionName,
+                            DetailMode.CERTIFY,
+                            StampInfo()
                         )
                     )
                 )
+        }
+    }
+
+    private fun setObserver() {
+        setLoadingObserver()
+        setMissionObserver()
+        setBackBtnObserver()
+        setSpanCountObserver()
+        setStampListObserver()
+        setNetworkDialogObserver()
+    }
+
+    private fun setLoadingObserver() {
+        viewModel.loadingEvent.observe(viewLifecycleOwner, EventObserver {
+            if (it) ProgressDialogManager.instance.show(requireContext())
+            else ProgressDialogManager.instance.clear()
         })
+    }
+
+    private fun setMissionObserver() {
+        viewModel.mission.observe(viewLifecycleOwner, {
+            mission = it
+        })
+    }
+
+    private fun setBackBtnObserver() {
+        viewModel.backBtnClick.observe(viewLifecycleOwner, EventObserver {
+            this.findNavController().popBackStack()
+        })
+    }
+
+    private fun setSpanCountObserver() {
+        viewModel.spanCount.observe(viewLifecycleOwner, EventObserver { spanCount ->
+            val gridLayoutManager = GridLayoutManager(requireContext(), spanCount)
+            binding.rvStamps.layoutManager = gridLayoutManager
+        })
+    }
+
+    private fun setStampListObserver() {
+        viewModel.stampList.observe(viewLifecycleOwner, EventObserver { stampList ->
+            viewModel.setLoadingEvent(false)
+            adapter.submitList(stampList)
+        })
+    }
+
+    private fun setNetworkDialogObserver() {
+        viewModel.networkDialogEvent.observe(viewLifecycleOwner, EventObserver {
+            if (it) {
+                showNetworkDialog()
+            }
+        })
+    }
+
+    private fun showNetworkDialog() {
+        NetworkDialogFragment(object : NetworkDialogFragment.NetworkDialogListener {
+            override fun onCancelClick(dialog: DialogFragment) {
+                dialog.dismiss()
+                findNavController().navigate(R.id.action_stampsFragment_to_homeFragment)
+            }
+
+            override fun onRetryClick(dialog: DialogFragment) {
+                dialog.dismiss()
+                loadMissionInfo()
+            }
+        }).show(requireActivity().supportFragmentManager, "NetworkDialogFragment")
     }
 }

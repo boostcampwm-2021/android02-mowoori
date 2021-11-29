@@ -100,6 +100,15 @@
                 app:layout_constraintStart_toStartOf="@id/tv_stamp_detail_picture"
                 app:layout_constraintTop_toBottomOf="@id/iv_stamp_detail" />
 
+            <ImageView
+                android:id="@+id/iv_stamp_detail_highlight_circle"
+                android:layout_width="5dp"
+                android:layout_height="5dp"
+                android:background="@drawable/ic_red_circle"
+                android:contentDescription="@string/desc_iv_stamp_detail_highlight_circle"
+                app:layout_constraintStart_toEndOf="@id/tv_stamp_detail_comment"
+                app:layout_constraintTop_toTopOf="@id/tv_stamp_detail_comment" />
+
             <EditText
                 android:id="@+id/et_stamp_detail_comment"
                 android:layout_width="0dp"
@@ -119,6 +128,19 @@
                 app:layout_constraintEnd_toEndOf="@id/guideline_end"
                 app:layout_constraintStart_toStartOf="@id/tv_stamp_detail_comment"
                 app:layout_constraintTop_toBottomOf="@id/tv_stamp_detail_comment" />
+
+            <TextView
+                android:id="@+id/tv_stamp_detail_comment_invalid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="2dp"
+                android:text="@string/stamp_detail_comment_invalid"
+                android:textColor="@color/red_FF0000"
+                android:textSize="16sp"
+                android:visibility="invisible"
+                app:layout_constraintStart_toStartOf="@id/et_stamp_detail_comment"
+                app:layout_constraintTop_toBottomOf="@id/et_stamp_detail_comment" />
 
             <TextView
                 android:layout_width="wrap_content"

@@ -49,11 +49,11 @@
             tools:ignore="LabelFor" />
 
         <TextView
-            android:id="@+id/tv_group_invalid"
+            android:id="@+id/tv_invalid"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="@string/group_invalid"
+            android:text="@string/group_invite_invalid"
             android:textColor="@color/red_FF0000"
             android:textSize="16sp"
             android:visibility="invisible"

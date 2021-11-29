@@ -7,12 +7,13 @@ import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.MembersRepository
 import com.ariari.mowoori.ui.home.entity.Group
 import com.ariari.mowoori.ui.register.entity.User
+import com.ariari.mowoori.util.ErrorMessage
 import com.ariari.mowoori.util.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,15 +32,40 @@ class MembersViewModel @Inject constructor(
     private val _membersList = MutableLiveData<List<User>>()
     val membersList: LiveData<List<User>> = _membersList
 
+    private val _networkDialogEvent = MutableLiveData<Event<Boolean>>()
+    val networkDialogEvent: LiveData<Event<Boolean>> get() = _networkDialogEvent
+
+    private var _requestCount = 0
+    private val requestCount get() = _requestCount
+
+    private fun initRequestCount() {
+        _requestCount = 0
+    }
+
+    private fun addRequestCount() {
+        _requestCount++
+    }
+
+    private fun checkRequestCount() {
+        if (requestCount == 1) {
+            setNetworkDialogEvent()
+        }
+    }
+
     fun setLoadingEvent(isLoading: Boolean) {
-        _loadingEvent.value = Event(isLoading)
+        _loadingEvent.postValue(Event(isLoading))
     }
 
     fun fetchGroupInfo() {
         viewModelScope.launch(Dispatchers.IO) {
-            membersRepository.getCurrentGroupInfo().onSuccess {
-                _currentGroup.postValue(it)
-            }
+            initRequestCount()
+            membersRepository.getCurrentGroupInfo()
+                .onSuccess {
+                    _currentGroup.postValue(it)
+                }
+                .onFailure {
+                    checkThrowableMessage(it)
+                }
         }
     }
 
@@ -54,7 +80,32 @@ class MembersViewModel @Inject constructor(
                     async { membersRepository.getUserInfo(userId) }
                 }
             _membersList.postValue(
-                deferredMemberList.awaitAll().map { result -> result ?: return@launch })
+                deferredMemberList.awaitAll().map { result ->
+                    initRequestCount()
+                    if (result.isSuccess) {
+                        result.getOrNull() ?: return@launch
+                    } else {
+                        val throwable = result.exceptionOrNull() ?: return@launch
+                        checkThrowableMessage(throwable)
+                        return@launch
+                    }
+                }
+            )
         }
+    }
+
+    private fun checkThrowableMessage(throwable: Throwable) {
+        when (throwable.message) {
+            ErrorMessage.Offline.message -> {
+                addRequestCount()
+                checkRequestCount()
+            }
+            else -> setLoadingEvent(false)
+        }
+    }
+
+    private fun setNetworkDialogEvent() {
+        setLoadingEvent(false)
+        _networkDialogEvent.postValue(Event(true))
     }
 }

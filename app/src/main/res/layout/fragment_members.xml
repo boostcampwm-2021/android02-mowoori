@@ -22,8 +22,8 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:onInviteClick="@{viewModel::clickPlusButton}"
-            app:text="@string/members_title"
-            app:titleViewMode="@{TitleViewMode.TITLE_VIEW_INVITE_BUTTON}" />
+            app:titleViewMode="@{TitleViewMode.TITLE_VIEW_INVITE_BUTTON}"
+            app:titleViewText="@{viewModel.currentGroup.groupInfo.groupName}" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_members"
@@ -31,6 +31,7 @@
             android:layout_height="0dp"
             android:layout_marginHorizontal="18dp"
             android:orientation="vertical"
+            android:overScrollMode="never"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -38,6 +39,18 @@
             app:layout_constraintTop_toBottomOf="@id/title_view_members"
             app:spanCount="2"
             tools:listitem="@layout/item_members" />
+
+        <TextView
+            android:id="@+id/tv_members_empty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/members_no_members"
+            android:textColor="@color/gray_A3A3A3"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title_view_members" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

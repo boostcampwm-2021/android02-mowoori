@@ -17,6 +17,9 @@
         <action
             android:id="@+id/action_homeFragment_to_notificationFragment"
             app:destination="@id/notificationFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_stampDetailFragment"
+            app:destination="@id/stampDetailFragment" />
     </fragment>
     <fragment
         android:id="@+id/membersFragment"
@@ -26,6 +29,11 @@
         <action
             android:id="@+id/action_membersFragment_to_missionsFragment"
             app:destination="@id/missionsFragment" />
+        <action
+            android:id="@+id/action_membersFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/missionsFragment"
@@ -43,6 +51,11 @@
         <action
             android:id="@+id/action_missionsFragment_to_stampsFragment"
             app:destination="@id/stampsFragment" />
+        <action
+            android:id="@+id/action_missionsFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/inviteCheckFragment"
@@ -76,7 +89,13 @@
         android:id="@+id/missionsAddFragment"
         android:name="com.ariari.mowoori.ui.missionsadd.MissionsAddFragment"
         android:label="MissionsAddFragment"
-        tools:layout="@layout/fragment_missions_add" />
+        tools:layout="@layout/fragment_missions_add" >
+        <action
+            android:id="@+id/action_missionsAddFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
     <fragment
         android:id="@+id/stampsFragment"
         android:name="com.ariari.mowoori.ui.stamp.StampsFragment"
@@ -91,6 +110,11 @@
         <action
             android:id="@+id/action_stampsFragment_to_stampDetailFragment"
             app:destination="@id/stampDetailFragment" />
+        <action
+            android:id="@+id/action_stampsFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/stampDetailFragment"
@@ -100,6 +124,11 @@
         <argument
             android:name="detailInfo"
             app:argType="com.ariari.mowoori.ui.stamp.entity.DetailInfo" />
+        <action
+            android:id="@+id/action_stampDetailFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
 </navigation>

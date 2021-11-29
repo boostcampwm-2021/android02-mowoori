@@ -1,17 +1,16 @@
 package com.ariari.mowoori.ui.stamp_detail
 
-import android.app.Activity
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -19,30 +18,37 @@ import androidx.transition.TransitionInflater
 import com.ariari.mowoori.R
 import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentStampDetailBinding
-import com.ariari.mowoori.ui.stamp.entity.DetailInfo
 import com.ariari.mowoori.ui.stamp.entity.DetailMode
 import com.ariari.mowoori.ui.stamp_detail.entity.PictureType
 import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.util.LogUtil
 import com.ariari.mowoori.util.getCurrentDateTime
+import com.ariari.mowoori.util.getVibrateAnimInstance
+import com.ariari.mowoori.util.hideKeyBoard
+import com.ariari.mowoori.util.isNetWorkAvailable
 import com.ariari.mowoori.util.toastMessage
+import com.ariari.mowoori.widget.NetworkDialogFragment
 import com.ariari.mowoori.widget.PictureDialogFragment
+import com.ariari.mowoori.widget.ProgressDialogManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.jakewharton.rxbinding4.view.clicks
 import dagger.hilt.android.AndroidEntryPoint
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.Disposable
 import timber.log.Timber
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class StampDetailFragment :
     BaseFragment<FragmentStampDetailBinding>(R.layout.fragment_stamp_detail) {
-    private val viewModel: StampDetailViewModel by viewModels()
+    private val stampDetailViewModel: StampDetailViewModel by viewModels()
     private val safeArgs: StampDetailFragmentArgs by navArgs()
-    private lateinit var detailInfo: DetailInfo
-
     private var currentPhotoPath: String? = null
     private var providerUri: Uri? = null
+    private var completeBtnDisposable: Disposable? = null
 
     private val activityGalleryLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) {
@@ -75,7 +81,8 @@ class StampDetailFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = viewModel
+        binding.viewModel = stampDetailViewModel
+        stampDetailViewModel.setDetailInfo(safeArgs.detailInfo)
         init()
         setListener()
         setObserver()
@@ -83,11 +90,8 @@ class StampDetailFragment :
     }
 
     private fun init() {
-        setDetailInfo()
-        setEditMode()
         setBtnVisible()
         setUserName()
-        setMissionId()
         setMissionName()
         setComment()
     }
@@ -99,69 +103,87 @@ class StampDetailFragment :
     }
 
     private fun setObserver() {
-        setIsMissionPostedObserver()
+        setLoadingObserver()
         setCloseBtnClickObserver()
         setIsCertifyObserver()
-        setCommentObserver()
+        setNetworkDialogObserver()
+        setGroupMembersFcmTokenListObserver()
+        setIsFcmSentObserver()
+        setValidationObserver()
     }
 
-    private fun setDetailInfo() {
-        detailInfo = safeArgs.detailInfo
+    private fun setBtnVisible() {
+        stampDetailViewModel.setIsCertify()
     }
 
-    private fun setEditMode() {
-        if (detailInfo.detailMode == DetailMode.INQUIRY) {
+    private fun setDetailTransitionName() {
+        binding.ivStampDetail.transitionName = stampDetailViewModel.detailInfo.stampInfo.pictureUrl
+    }
+
+    private fun setUserName() {
+        stampDetailViewModel.setUserName()
+    }
+
+    private fun setMissionName() {
+        stampDetailViewModel.setMissionName()
+    }
+
+    private fun setComment() {
+        if (stampDetailViewModel.detailInfo.detailMode == DetailMode.INQUIRY) {
+            stampDetailViewModel.setComment(stampDetailViewModel.detailInfo.stampInfo.comment)
+            binding.etStampDetailComment.setText(stampDetailViewModel.detailInfo.stampInfo.comment)
+            binding.etStampDetailComment.hint = "입력한 한줄평이 없어요."
             binding.etStampDetailComment.keyListener = null
         }
     }
 
-    private fun setBtnVisible() {
-        viewModel.setIsCertify(detailInfo.detailMode)
-    }
-
-    private fun setDetailTransitionName() {
-        binding.ivStampDetail.transitionName = detailInfo.stampInfo.pictureUrl
-    }
-
-    private fun setUserName() {
-        viewModel.setUserName(detailInfo.userName)
-    }
-
-    private fun setMissionId() {
-        viewModel.setMissionId(detailInfo.missionId)
-    }
-
-    private fun setMissionName() {
-        viewModel.setMissionName(detailInfo.missionName)
-    }
-
-    private fun setComment() {
-        viewModel.setComment(detailInfo.stampInfo.comment)
-    }
-
     private fun setPictureClickListener() {
-        if (detailInfo.stampInfo.pictureUrl != "") {
-            Glide.with(requireContext())
-                .load(detailInfo.stampInfo.pictureUrl)
-                .override(300, 300)
-                .transform(CenterCrop(), RoundedCorners(16))
-                .into(binding.ivStampDetail)
-            binding.tvStampDetailIcon.isInvisible = true
-        } else {
+        val pictureUrl = stampDetailViewModel.detailInfo.stampInfo.pictureUrl
+        val mode = stampDetailViewModel.detailInfo.detailMode
+
+        if (mode == DetailMode.CERTIFY) {
             binding.ivStampDetail.setOnClickListener {
                 PictureDialogFragment(onClick).show(
                     requireActivity().supportFragmentManager,
                     "PictureDialogFragment"
                 )
             }
+        } else {
+            loadPicture(pictureUrl)
+        }
+    }
+
+    private fun loadPicture(pictureUrl: String) {
+        binding.tvStampDetailIcon.isInvisible = true
+        if (pictureUrl == "") {
+            // setDefaultImageUri()
+            // 기본 이미지일 경우
+            Glide.with(requireContext())
+                .load(R.drawable.ic_stamp)
+                .override(300, 300)
+                .transform(CenterCrop(), RoundedCorners(16))
+                .into(binding.ivStampDetail)
+        } else {
+            Glide.with(requireContext())
+                .load(pictureUrl)
+                .override(300, 300)
+                .transform(CenterCrop(), RoundedCorners(16))
+                .into(binding.ivStampDetail)
         }
     }
 
     private fun setBtnCertifyListener() {
-        binding.btnStampDetailCertify.setOnClickListener {
-            viewModel.setComment(binding.etStampDetailComment.text.toString())
-            viewModel.postStamp()
-        }
+        completeBtnDisposable = binding.btnStampDetailCertify.clicks()
+            .throttleFirst(2, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                stampDetailViewModel.setComment(binding.etStampDetailComment.text.toString())
+                if (requireContext().isNetWorkAvailable()) {
+                    stampDetailViewModel.checkCommentValid()
+                } else {
+                    showNetworkDialog()
+                }
+            }
     }
 
     private val onClick: (pictureType: PictureType) -> Unit = {
@@ -188,15 +210,13 @@ class StampDetailFragment :
         val photoFile: File?
         try {
             photoFile = createImageFile()
-            if (photoFile != null) {
-                providerUri = FileProvider.getUriForFile(
-                    requireContext(),
-                    "com.ariari.mowoori.fileProvider",
-                    photoFile
-                )
-                LogUtil.log("providerUri", providerUri.toString())
-                activityPictureLauncher.launch(providerUri)
-            }
+            providerUri = FileProvider.getUriForFile(
+                requireContext(),
+                "com.ariari.mowoori.fileProvider",
+                photoFile
+            )
+            LogUtil.log("providerUri", providerUri.toString())
+            activityPictureLauncher.launch(providerUri)
         } catch (exception: Exception) {
             Timber.e("create Image File Error~~")
         }
@@ -206,7 +226,7 @@ class StampDetailFragment :
         Timber.d("createImageFile Start")
         val timeStamp = getCurrentDateTime()
         Timber.d(timeStamp)
-        val imageFileName = "${detailInfo.missionId}_$timeStamp.jpg"
+        val imageFileName = "${stampDetailViewModel.detailInfo.missionId}_$timeStamp.jpg"
         Timber.d(imageFileName)
         val storageDir = File(
             requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
@@ -227,13 +247,18 @@ class StampDetailFragment :
     }
 
     private fun saveCurrentPicture(uri: Uri?) {
-        viewModel.setPictureUri(uri)
-        Glide.with(requireContext())
-            .load(uri)
-            .override(300, 300)
-            .transform(CenterCrop(), RoundedCorners(16))
-            .into(binding.ivStampDetail)
-        binding.tvStampDetailIcon.isVisible = false
+        stampDetailViewModel.setPictureUri(uri)
+
+        if (uri == null) {
+            binding.tvStampDetailIcon.isVisible = true
+        } else {
+            Glide.with(requireContext())
+                .load(uri)
+                .override(300, 300)
+                .transform(CenterCrop(), RoundedCorners(16))
+                .into(binding.ivStampDetail)
+            binding.tvStampDetailIcon.isVisible = false
+        }
     }
 
     private fun hasPermission(permission: String): Boolean {
@@ -250,45 +275,107 @@ class StampDetailFragment :
 
     private fun setRootClick() {
         binding.container.setOnClickListener {
-            hideKeyboard(it)
+            requireContext().hideKeyBoard(it)
             requireActivity().currentFocus?.clearFocus()
         }
     }
 
-    private fun hideKeyboard(v: View) {
-        val inputMethodManager =
-            requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(v.windowToken, 0)
-    }
-
     private fun setCloseBtnClickObserver() {
-        viewModel.closeBtnClick.observe(viewLifecycleOwner, EventObserver {
+        stampDetailViewModel.closeBtnClick.observe(viewLifecycleOwner, {
             this.findNavController().popBackStack()
         })
     }
 
     private fun setIsCertifyObserver() {
-        viewModel.isCertify.observe(viewLifecycleOwner, EventObserver {
+        stampDetailViewModel.isCertify.observe(viewLifecycleOwner, EventObserver {
             if (it) {
-                binding.btnStampDetailCertify.isVisible = true
-                binding.tvStampDetailComment.isFocusable = true
+                with(binding) {
+                    btnStampDetailCertify.isVisible = true
+                    tvStampDetailComment.isFocusable = true
+                    ivStampDetailHighlightCircle.isVisible = true
+                }
             } else {
-                binding.btnStampDetailCertify.isInvisible = true
-                binding.tvStampDetailComment.isFocusable = false
+                with(binding) {
+                    btnStampDetailCertify.isInvisible = true
+                    tvStampDetailComment.isFocusable = false
+                    ivStampDetailHighlightCircle.isVisible = false
+                }
             }
         })
     }
 
-    private fun setCommentObserver() {
-        viewModel.comment.observe(viewLifecycleOwner) {
-            binding.etStampDetailComment.setText(it)
+    private fun setGroupMembersFcmTokenListObserver() {
+        stampDetailViewModel.groupMembersTokenList.observe(viewLifecycleOwner) {
+            stampDetailViewModel.postFcm()
         }
     }
 
-    private fun setIsMissionPostedObserver() {
-        viewModel.isStampPosted.observe(viewLifecycleOwner, EventObserver {
-            // TODO: 알림 발생
+    private fun setIsFcmSentObserver() {
+        stampDetailViewModel.isFcmSent.observe(viewLifecycleOwner, EventObserver {
             this.findNavController().popBackStack()
         })
+    }
+
+    private fun setLoadingObserver() {
+        stampDetailViewModel.loadingEvent.observe(viewLifecycleOwner, EventObserver { isLoading ->
+            if (isLoading) {
+                ProgressDialogManager.instance.show(requireContext())
+                stampDetailViewModel.postStamp()
+            } else ProgressDialogManager.instance.clear()
+        })
+    }
+
+    private fun setNetworkDialogObserver() {
+        stampDetailViewModel.networkDialogEvent.observe(viewLifecycleOwner, {
+            if (it) {
+                showNetworkDialog()
+            }
+        })
+    }
+
+    private fun showNetworkDialog() {
+        NetworkDialogFragment(object : NetworkDialogFragment.NetworkDialogListener {
+            override fun onCancelClick(dialog: DialogFragment) {
+                dialog.dismiss()
+                findNavController().navigate(R.id.action_stampDetailFragment_to_homeFragment)
+            }
+
+            override fun onRetryClick(dialog: DialogFragment) {
+                dialog.dismiss()
+                stampDetailViewModel.postStamp()
+            }
+        }).show(requireActivity().supportFragmentManager, "NetworkDialogFragment")
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        completeBtnDisposable?.dispose()
+    }
+
+    private fun setValidationObserver() {
+        stampDetailViewModel.checkCommentValidEvent.observe(viewLifecycleOwner, {
+            if (isCommentValid()) {
+                Timber.d("success")
+                stampDetailViewModel.setLoadingEvent(true)
+            } else {
+                Timber.d("fail")
+            }
+        })
+    }
+
+    private fun isCommentValid(): Boolean {
+        with(binding.tvStampDetailCommentInvalid) {
+            return@isCommentValid if (binding.etStampDetailComment.text.length !in 5..100) {
+                isVisible = true
+                requireContext().getVibrateAnimInstance().run {
+                    setTarget(binding.tvStampDetailCommentInvalid)
+                    start()
+                }
+                false
+            } else {
+                binding.tvStampDetailCommentInvalid.isInvisible = true
+                true
+            }
+        }
     }
 }
