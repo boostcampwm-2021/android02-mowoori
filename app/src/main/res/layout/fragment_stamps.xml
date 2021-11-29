@@ -26,7 +26,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:onBackClick="@{viewModel::setBackBtnClick}"
             app:titleViewMode="@{TitleViewMode.TITLE_VIEW_BACK_BUTTON}"
-            app:titleViewText="@{viewModel.mission.peekContent().missionInfo.missionName}" />
+            app:titleViewText="@{viewModel.mission.missionInfo.missionName}" />
 
         <View
             android:id="@+id/view_stamps"

@@ -10,6 +10,7 @@ import com.ariari.mowoori.ui.missions.entity.Mission
 import com.ariari.mowoori.ui.missions.entity.MissionInfo
 import com.ariari.mowoori.ui.stamp.entity.DetailInfo
 import com.ariari.mowoori.ui.stamp.entity.DetailMode
+import com.ariari.mowoori.ui.stamp.entity.Stamp
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
 import com.ariari.mowoori.util.Event
 import com.ariari.mowoori.util.getCurrentDate
@@ -171,7 +172,7 @@ class StampDetailViewModel @Inject constructor(
     private fun postMessage(fcmToken: String) = viewModelScope.launch {
         try {
             stampsRepository.postFcmMessage(fcmToken,
-                detailInfo.copy(detailMode = DetailMode.INQUIRY, stampInfo = stampInfo))
+                detailInfo.copy(detailMode = DetailMode.INQUIRY, stamp = Stamp("", stampInfo)))
                 .getOrThrow()
         } catch (e: HttpException) {
             // retrofit exception

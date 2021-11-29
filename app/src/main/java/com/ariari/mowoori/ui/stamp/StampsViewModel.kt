@@ -26,17 +26,17 @@ class StampsViewModel @Inject constructor(
     private val _loadingEvent = MutableLiveData<Event<Boolean>>()
     val loadingEvent: LiveData<Event<Boolean>> get() = _loadingEvent
 
-    private val _spanCount = MutableLiveData<Event<Int>>()
-    val spanCount: LiveData<Event<Int>> get() = _spanCount
+    private val _spanCount = MutableLiveData<Int>()
+    val spanCount: LiveData<Int> get() = _spanCount
 
     private val _backBtnClick = MutableLiveData<Event<Boolean>>()
     val backBtnClick: LiveData<Event<Boolean>> get() = _backBtnClick
 
-    private val _mission = MutableLiveData<Event<Mission>>()
-    val mission: LiveData<Event<Mission>> get() = _mission
+    private val _mission = MutableLiveData<Mission>()
+    val mission: LiveData<Mission> get() = _mission
 
-    private val _stampList = MutableLiveData<Event<MutableList<Stamp>>>()
-    val stampList: LiveData<Event<MutableList<Stamp>>> = _stampList
+    private val _stampList = MutableLiveData<MutableList<Stamp>>()
+    val stampList: LiveData<MutableList<Stamp>> = _stampList
 
     private val _isMyMission = MutableLiveData<Event<Boolean>>()
     val isMyMission: LiveData<Event<Boolean>> get() = _isMyMission
@@ -53,7 +53,7 @@ class StampsViewModel @Inject constructor(
     }
 
     fun setSpanCount(result: Float) {
-        _spanCount.postValue(Event(result.toInt()))
+        _spanCount.postValue(result.toInt())
     }
 
     fun setBackBtnClick() {
@@ -72,7 +72,7 @@ class StampsViewModel @Inject constructor(
     fun loadMissionInfo(missionId: String) = viewModelScope.launch(Dispatchers.IO) {
         try {
             val missionInfo = missionsRepository.getMissionInfo(missionId).getOrThrow()
-            _mission.postValue(Event(Mission(missionId, missionInfo)))
+            _mission.postValue(Mission(missionId, missionInfo))
             val deferredStampList = missionInfo.stampList.map { stampId ->
                 async { stampsRepository.getStampInfo(stampId) }
             }
@@ -88,7 +88,7 @@ class StampsViewModel @Inject constructor(
                 }
             }.toMutableList()
             tempStampList.addAll(createEmptyStamps(missionInfo.totalStamp - tempStampList.size))
-            _stampList.postValue(Event(tempStampList))
+            _stampList.postValue(tempStampList)
             setLoadingEvent(false)
         } catch (e: Exception) {
             checkNetworkDialog()
