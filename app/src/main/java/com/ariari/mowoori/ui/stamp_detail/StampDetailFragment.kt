@@ -1,6 +1,7 @@
 package com.ariari.mowoori.ui.stamp_detail
 
 import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -31,8 +32,12 @@ import com.ariari.mowoori.widget.NetworkDialogFragment
 import com.ariari.mowoori.widget.PictureDialogFragment
 import com.ariari.mowoori.widget.ProgressDialogManager
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.jakewharton.rxbinding4.view.clicks
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -74,12 +79,14 @@ class StampDetailFragment :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        sharedElementEnterTransition =
-            TransitionInflater.from(context).inflateTransition(android.R.transition.move)
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        sharedElementEnterTransition =
+            TransitionInflater.from(context).inflateTransition(android.R.transition.move)
+        postponeEnterTransition()
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = stampDetailViewModel
         stampDetailViewModel.setDetailInfo(safeArgs.detailInfo)
@@ -116,7 +123,7 @@ class StampDetailFragment :
     }
 
     private fun setDetailTransitionName() {
-        binding.ivStampDetail.transitionName = stampDetailViewModel.detailInfo.stampInfo.pictureUrl
+        binding.ivStampDetail.transitionName = stampDetailViewModel.detailInfo.stamp.stampId
     }
 
     private fun setUserName() {
@@ -129,15 +136,15 @@ class StampDetailFragment :
 
     private fun setComment() {
         if (stampDetailViewModel.detailInfo.detailMode == DetailMode.INQUIRY) {
-            stampDetailViewModel.setComment(stampDetailViewModel.detailInfo.stampInfo.comment)
-            binding.etStampDetailComment.setText(stampDetailViewModel.detailInfo.stampInfo.comment)
+            stampDetailViewModel.setComment(stampDetailViewModel.detailInfo.stamp.stampInfo.comment)
+            binding.etStampDetailComment.setText(stampDetailViewModel.detailInfo.stamp.stampInfo.comment)
             binding.etStampDetailComment.hint = "입력한 한줄평이 없어요."
             binding.etStampDetailComment.keyListener = null
         }
     }
 
     private fun setPictureClickListener() {
-        val pictureUrl = stampDetailViewModel.detailInfo.stampInfo.pictureUrl
+        val pictureUrl = stampDetailViewModel.detailInfo.stamp.stampInfo.pictureUrl
         val mode = stampDetailViewModel.detailInfo.detailMode
 
         if (mode == DetailMode.CERTIFY) {
@@ -161,12 +168,56 @@ class StampDetailFragment :
                 .load(R.drawable.ic_stamp)
                 .override(300, 300)
                 .transform(CenterCrop(), RoundedCorners(16))
+                .addListener(object: RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean,
+                    ): Boolean {
+                        startPostponedEnterTransition()
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean,
+                    ): Boolean {
+                        startPostponedEnterTransition()
+                        return false
+                    }
+                })
                 .into(binding.ivStampDetail)
         } else {
             Glide.with(requireContext())
                 .load(pictureUrl)
                 .override(300, 300)
                 .transform(CenterCrop(), RoundedCorners(16))
+                .addListener(object: RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean,
+                    ): Boolean {
+                        startPostponedEnterTransition()
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean,
+                    ): Boolean {
+                        startPostponedEnterTransition()
+                        return false
+                    }
+                })
                 .into(binding.ivStampDetail)
         }
     }
@@ -309,7 +360,14 @@ class StampDetailFragment :
 
     private fun setIsFcmSentObserver() {
         stampDetailViewModel.isFcmSent.observe(viewLifecycleOwner, {
-            if (it) this.findNavController().popBackStack()
+
+            if (it){
+                val detailInfo = stampDetailViewModel.detailInfo
+                this.findNavController()
+                    .navigate(StampDetailFragmentDirections.actionStampDetailFragmentToStampsFragment(
+                        detailInfo.missionId, detailInfo.userId, detailInfo.userName
+                    ))
+            }
         })
     }
 

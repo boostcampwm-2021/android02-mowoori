@@ -65,7 +65,7 @@ class MissionsAddFragment :
         missionsAddViewModel.isMissionPosted.observe(viewLifecycleOwner, {
             if (it) {
                 toastMessage("미션이 성공적으로 추가되었습니다.")
-                this.findNavController().popBackStack()
+                this.findNavController().navigate(R.id.action_missionsAddFragment_to_missionsFragment)
             }
         })
     }

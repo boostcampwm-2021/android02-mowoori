@@ -32,7 +32,7 @@ class StampsAdapter(private val listener: OnItemClickListener) :
     }
 
     override fun onBindViewHolder(holder: StampViewHolder, position: Int) {
-        holder.bind(getItem(position).stampInfo)
+        holder.bind(getItem(position))
     }
 
     inner class StampViewHolder(private val binding: ItemStampsBinding) :
@@ -44,11 +44,11 @@ class StampsAdapter(private val listener: OnItemClickListener) :
             }
         }
 
-        fun bind(stampInfo: StampInfo) {
-            ViewCompat.setTransitionName(binding.ivItemStamps, stampInfo.pictureUrl)
+        fun bind(stamp: Stamp) {
+            ViewCompat.setTransitionName(binding.ivItemStamps, stamp.stampId)
             Timber.d(adapterPosition.toString())
             binding.tvItemStampsIndex.text = (adapterPosition + 1).toString()
-            when (stampInfo.pictureUrl) {
+            when (stamp.stampInfo.pictureUrl) {
                 "empty" -> {
                     // 빈 스탬프
                     with(binding) {
@@ -70,12 +70,12 @@ class StampsAdapter(private val listener: OnItemClickListener) :
                 }
                 else -> {
                     // picture url이 있는 스탬프
-                    LogUtil.log("adapter url", stampInfo.pictureUrl)
+                    LogUtil.log("adapter url", stamp.stampInfo.pictureUrl)
 
                     with(binding) {
                         tvItemStampsIndex.isInvisible = true
                         containerItemStamps.isClickable = true
-                        ivItemStamps.bindImageUrl(stampInfo.pictureUrl, true)
+                        ivItemStamps.bindImageUrl(stamp.stampInfo.pictureUrl, true)
 
 //                      Glide.with(binding.ivItemStamps)
 //                        .load(stampInfo.pictureUrl)

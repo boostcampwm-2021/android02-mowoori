@@ -39,8 +39,8 @@ class MissionsViewModel @Inject constructor(
     private val _missionsType = MutableLiveData(NOT_DONE_TYPE)
     val missionsType: LiveData<Int> = _missionsType
 
-    //    private val _missionIdList = MutableLiveData<List<String>>(emptyList())
-//    private val _missionList = MutableLiveData<List<Mission>>(emptyList())
+    private val _missionIdList = MutableLiveData<List<String>>(emptyList())
+    private val _missionList = MutableLiveData<List<Mission>>(emptyList())
     private val _filteredMissionList = MutableLiveData<List<Mission>>(emptyList())
     val filteredMissionList: LiveData<List<Mission>> = _filteredMissionList
 
@@ -72,20 +72,17 @@ class MissionsViewModel @Inject constructor(
 
     fun setNotDoneType() {
         _missionsType.value = NOT_DONE_TYPE
-//        filterMissionList(requireNotNull(_missionIdList.value), requireNotNull(_missionList.value))
-        setLoadingEvent(true)
+        filterMissionList(requireNotNull(_missionIdList.value), requireNotNull(_missionList.value))
     }
 
     fun setDoneType() {
         _missionsType.value = DONE_TYPE
-//        filterMissionList(requireNotNull(_missionIdList.value), requireNotNull(_missionList.value))
-        setLoadingEvent(true)
+        filterMissionList(requireNotNull(_missionIdList.value), requireNotNull(_missionList.value))
     }
 
     fun setFailType() {
         _missionsType.value = FAIL_TYPE
-//        filterMissionList(requireNotNull(_missionIdList.value), requireNotNull(_missionList.value))
-        setLoadingEvent(true)
+        filterMissionList(requireNotNull(_missionIdList.value), requireNotNull(_missionList.value))
     }
 
     fun setIsMemberMission(user: User?) {
@@ -101,8 +98,8 @@ class MissionsViewModel @Inject constructor(
                 missionsRepository.getMissionIdList(missionUser.userInfo.currentGroupId)
                     .getOrThrow()
             val missionList = missionsRepository.getMissions(missionUser.userId).getOrThrow()
-//            _missionIdList.postValue(missionIdList)
-//            _missionList.postValue(missionList)
+            _missionIdList.postValue(missionIdList)
+            _missionList.postValue(missionList)
             filterMissionList(missionIdList, missionList)
             setLoadingEvent(false)
         } catch (e: Exception) {

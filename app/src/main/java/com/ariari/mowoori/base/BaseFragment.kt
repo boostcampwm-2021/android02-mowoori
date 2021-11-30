@@ -14,6 +14,7 @@ abstract class BaseFragment<T : ViewDataBinding>(@LayoutRes private val layoutRe
     Fragment() {
     private var _binding: T? = null
     val binding get() = _binding ?: error(getString(R.string.binding_error))
+    var hasInitialized = false
 
     override fun onCreateView(
         inflater: LayoutInflater,

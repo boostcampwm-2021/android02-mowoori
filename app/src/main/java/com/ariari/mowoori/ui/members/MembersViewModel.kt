@@ -62,18 +62,18 @@ class MembersViewModel @Inject constructor(
             requireNotNull(currentGroup.value).groupInfo.userList.map { userId ->
                 async { membersRepository.getUserInfo(userId) }
             }
-        _membersList.postValue(
-            deferredMemberList.awaitAll().map { result ->
-                try {
-                    result.getOrThrow()
-                } catch (e: Exception) {
-                    checkNetworkDialog()
-                    return@launch
-                } catch (e: NullPointerException) {
-                    return@launch
-                }
+        val tempMemberList = deferredMemberList.awaitAll().map { result ->
+            try {
+                result.getOrThrow()
+            } catch (e: Exception) {
+                checkNetworkDialog()
+                return@launch
+            } catch (e: NullPointerException) {
+                return@launch
             }
-        )
+        }.toMutableList()
+        tempMemberList.removeIf { user -> user.userId == membersRepository.getUserUid() }
+        _membersList.postValue(tempMemberList)
     }
 
     private fun checkNetworkDialog() {
