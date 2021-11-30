@@ -8,7 +8,6 @@ import android.content.Context
 import android.view.View
 import android.widget.ImageView
 import com.ariari.mowoori.R
-import com.ariari.mowoori.ui.home.HomeViewModel
 
 class SnowmanLv2Animator(
     private var face: ImageView,

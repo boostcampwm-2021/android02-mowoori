@@ -24,8 +24,10 @@ import com.ariari.mowoori.ui.home.animator.SnowmanLv4Animator.Companion.RESET_AL
 import com.ariari.mowoori.ui.home.animator.SnowmanLv4Animator.Companion.RIGHT_BLACK_DONE
 import com.ariari.mowoori.ui.home.animator.SnowmanLv4Animator.Companion.RIGHT_WHITE_DONE
 import com.ariari.mowoori.ui.home.entity.Lv4Component
+import com.ariari.mowoori.ui.stamp.entity.DetailInfo
 import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.util.LogUtil
+import com.ariari.mowoori.util.MowooriMessagingService
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
@@ -73,6 +75,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     }
 
     private fun setAnimators() {
+        LogUtil.log("lv3_body",binding.ivHomeSnowmanBody.toString())
+        LogUtil.log("lv3_face",binding.ivHomeSnowmanFaceLv3.toString())
         snowAnimator = SnowAnimator(
             container = binding.containerHome,
             addAnimator = { animator -> addSnowAnimator(animator) },

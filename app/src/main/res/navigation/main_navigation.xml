@@ -89,7 +89,7 @@
         android:id="@+id/missionsAddFragment"
         android:name="com.ariari.mowoori.ui.missionsadd.MissionsAddFragment"
         android:label="MissionsAddFragment"
-        tools:layout="@layout/fragment_missions_add" >
+        tools:layout="@layout/fragment_missions_add">
         <action
             android:id="@+id/action_missionsAddFragment_to_homeFragment"
             app:destination="@id/homeFragment"
@@ -128,6 +128,10 @@
         android:name="com.ariari.mowoori.ui.stamp_detail.StampDetailFragment"
         android:label="StampDetailFragment"
         tools:layout="@layout/fragment_stamp_detail">
+        <argument
+            android:name="openFromFcm"
+            android:defaultValue="false"
+            app:argType="boolean" />
         <argument
             android:name="detailInfo"
             app:argType="com.ariari.mowoori.ui.stamp.entity.DetailInfo" />

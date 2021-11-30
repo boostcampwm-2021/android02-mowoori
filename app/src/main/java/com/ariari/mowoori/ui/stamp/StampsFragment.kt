@@ -85,7 +85,7 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
                 this@StampsFragment.findNavController()
                     .navigate(
                         StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
-                            DetailInfo(
+                            detailInfo = DetailInfo(
                                 safeArgs.userId,
                                 safeArgs.userNickname,
                                 mission.missionId,
@@ -122,7 +122,7 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
             it.findNavController()
                 .navigate(
                     StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
-                        DetailInfo(
+                        detailInfo = DetailInfo(
                             safeArgs.userId,
                             safeArgs.userNickname,
                             mission.missionId,
