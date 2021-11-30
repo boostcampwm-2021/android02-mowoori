@@ -12,7 +12,6 @@ import android.view.View
 import android.view.ViewTreeObserver
 import androidx.core.view.isInvisible
 import com.ariari.mowoori.R
-import com.ariari.mowoori.ui.home.HomeViewModel
 import com.ariari.mowoori.ui.home.entity.Lv4Component
 import com.ariari.mowoori.ui.home.entity.ViewInfo
 

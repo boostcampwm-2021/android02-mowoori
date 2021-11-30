@@ -281,7 +281,11 @@ class StampDetailFragment :
 
     private fun setCloseBtnClickObserver() {
         stampDetailViewModel.closeBtnClick.observe(viewLifecycleOwner, {
-            this.findNavController().popBackStack()
+            if (safeArgs.openFromFcm) {
+                findNavController().navigate(R.id.action_stampDetailFragment_to_homeFragment)
+            } else {
+                findNavController().popBackStack()
+            }
         })
     }
 

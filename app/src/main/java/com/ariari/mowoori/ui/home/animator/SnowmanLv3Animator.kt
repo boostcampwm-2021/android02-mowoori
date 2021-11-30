@@ -15,6 +15,7 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
 import com.ariari.mowoori.R
 import com.ariari.mowoori.ui.home.entity.ViewInfo
+import com.ariari.mowoori.util.LogUtil
 
 class SnowmanLv3Animator(
     private var face: ImageView,
@@ -122,6 +123,11 @@ class SnowmanLv3Animator(
                 face.x = (body.x - face.width) / 2
                 face.y = body.y + (body.height - face.height)
                 faceInfo = ViewInfo(face.x, face.y, face.width.toFloat(), face.height.toFloat())
+                LogUtil.log("lv3_body",bodyInfo.toString())
+                LogUtil.log("lv3_face",faceInfo.toString())
+                LogUtil.log("lv3_body",body.toString())
+                LogUtil.log("lv3_face",face.toString())
+
                 initHorizontalAnimator()
                 startFirstAnimation()
             }

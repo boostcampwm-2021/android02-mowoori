@@ -35,8 +35,11 @@ class MainActivity : AppCompatActivity() {
         if (intent.getBooleanExtra(FROM_FCM, false)) {
             intent.getParcelableExtra<DetailInfo>(DETAIL_INFO)?.let { detailInfo ->
                 navController.navigate(
-                        HomeFragmentDirections.actionHomeFragmentToStampDetailFragment(detailInfo)
+                    HomeFragmentDirections.actionHomeFragmentToStampDetailFragment(
+                        openFromFcm = true,
+                        detailInfo = detailInfo
                     )
+                )
             }
             intent.removeExtra(FROM_FCM)
         }
@@ -53,7 +56,7 @@ class MainActivity : AppCompatActivity() {
     private fun setBottomNavVisibility() {
         navController.addOnDestinationChangedListener { _, destination, arguments ->
             when (destination.id) {
-                R.id.homeFragment->{
+                R.id.homeFragment -> {
                     isOpenFromFcm()
                     showBottomNav()
                 }
