@@ -32,22 +32,22 @@ class MembersFragment : BaseFragment<FragmentMembersBinding>(R.layout.fragment_m
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = membersViewModel
-        setGroupInfo()
+        if (!hasInitialized) {
+            setGroupInfo()
+            hasInitialized = true
+        }
         setLoadingObserver()
         setOpenDialogEventObserver()
         setCurrentGroupObserver()
         setMembersListObserver()
         setMembersRvAdapter()
         setNetworkDialogObserver()
-        hasInitialized = true
     }
 
     private fun setGroupInfo() {
         if (requireContext().isNetWorkAvailable()) {
-            if (!hasInitialized) {
-                membersViewModel.setLoadingEvent(true)
-                membersViewModel.fetchGroupInfo()
-            }
+            membersViewModel.setLoadingEvent(true)
+            membersViewModel.fetchGroupInfo()
         } else {
             showNetworkDialog()
         }

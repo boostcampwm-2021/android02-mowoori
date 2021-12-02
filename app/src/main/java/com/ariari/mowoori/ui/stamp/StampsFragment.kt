@@ -40,11 +40,14 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         postponeEnterTransition()
         setStartEnterTransition()
         setCompleteBtnVisible()
-        loadMissionInfo()
+        if (!hasInitialized) {
+            setSpanCount()
+            loadMissionInfo()
+            hasInitialized = true
+        }
         setAdapter()
         setCompleteClick()
         setObserver()
-        hasInitialized = true
     }
 
     private fun setStartEnterTransition() {
@@ -64,11 +67,8 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
 
     private fun loadMissionInfo() {
         if (requireContext().isNetWorkAvailable()) {
-            if (!hasInitialized) {
-                setSpanCount()
-                viewModel.setLoadingEvent(true)
-                viewModel.loadMissionInfo(safeArgs.missionId)
-            }
+            viewModel.setLoadingEvent(true)
+            viewModel.loadMissionInfo(safeArgs.missionId)
         } else {
             showNetworkDialog()
         }

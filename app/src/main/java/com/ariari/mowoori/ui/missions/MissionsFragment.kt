@@ -32,9 +32,11 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
         binding.viewModel = missionsViewModel
         setMissionsRvAdapter()
         setPlusButtonVisible()
-        loadMissions()
+        if (!hasInitialized) {
+            loadMissions()
+            hasInitialized = true
+        }
         setObserver()
-        hasInitialized = true
     }
 
     private fun setMissionsRvAdapter() {
@@ -47,10 +49,8 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
 
     private fun loadMissions() {
         if (requireContext().isNetWorkAvailable()) {
-            if (!hasInitialized) {
-                missionsViewModel.setLoadingEvent(true)
-                missionsViewModel.loadUserThenLoadMissionList(args.user)
-            }
+            missionsViewModel.setLoadingEvent(true)
+            missionsViewModel.loadUserThenLoadMissionList(args.user)
         } else {
             showNetworkDialog()
         }
