@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.ariari.mowoori.ui.group.GroupViewModel" />
+    </data>
+
+    <androidx.constraintlayout.motion.widget.MotionLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layoutDescription="@xml/fragment_group_xml_constraintlayout_scene">
+
+        <TextView
+            android:id="@+id/tv_group_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:text="@string/group_name_title"
+            android:textColor="@color/black"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/et_group"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:importantForAutofill="no"
+            android:lines="1"
+            android:inputType="text"
+            android:text="@={viewModel.groupName}"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/btn_group_complete"
+            app:layout_constraintEnd_toEndOf="@id/tv_group_title"
+            app:layout_constraintStart_toStartOf="@id/tv_group_title"
+            app:layout_constraintTop_toBottomOf="@id/tv_group_title"
+            tools:ignore="LabelFor" />
+
+        <TextView
+            android:id="@+id/tv_invalid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/group_invite_invalid"
+            android:textColor="@color/red_FF0000"
+            android:textSize="16sp"
+            android:visibility="invisible"
+            app:layout_constraintStart_toStartOf="@id/et_group"
+            app:layout_constraintTop_toBottomOf="@id/et_group" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_group_complete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="24dp"
+            android:background="@drawable/border_sky_blue_line_30"
+            android:paddingStart="40dp"
+            android:paddingEnd="40dp"
+            android:text="@string/group_name_complete"
+            android:textColor="@color/sky_blue_2094FF"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.motion.widget.MotionLayout>
+</layout>

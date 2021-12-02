@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/tv_dialog_network_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/dialog_network_content"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_dialog_network_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@color/transparent"
+            android:minHeight="0dp"
+            android:paddingVertical="8dp"
+            android:text="@string/cancel"
+            android:textColor="@color/gray_A3A3A3"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/btn_dialog_network_retry"
+            app:layout_constraintStart_toStartOf="@+id/tv_dialog_network_content"
+            app:layout_constraintTop_toBottomOf="@id/tv_dialog_network_content" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_dialog_network_retry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/transparent"
+            android:minHeight="0dp"
+            android:paddingVertical="8dp"
+            android:text="@string/dialog_network_retry"
+            android:textColor="@color/sky_blue_2094FF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@+id/tv_dialog_network_content"
+            app:layout_constraintStart_toEndOf="@id/btn_dialog_network_cancel"
+            app:layout_constraintTop_toTopOf="@id/btn_dialog_network_cancel" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

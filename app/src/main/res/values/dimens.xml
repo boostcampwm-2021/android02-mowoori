@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="stamp_width">90dp</dimen>
+    <dimen name="stamp_height">90dp</dimen>
+    <dimen name="stamp_padding">4dp</dimen>
+</resources>
