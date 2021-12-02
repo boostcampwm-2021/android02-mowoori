@@ -86,7 +86,9 @@ class StampDetailFragment :
         super.onViewCreated(view, savedInstanceState)
         sharedElementEnterTransition =
             TransitionInflater.from(context).inflateTransition(android.R.transition.move)
-        postponeEnterTransition()
+        if (safeArgs.detailInfo.detailMode == DetailMode.INQUIRY) {
+            postponeEnterTransition()
+        }
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = stampDetailViewModel
         stampDetailViewModel.setDetailInfo(safeArgs.detailInfo)
