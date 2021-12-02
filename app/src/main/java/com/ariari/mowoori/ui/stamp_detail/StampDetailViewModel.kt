@@ -121,10 +121,10 @@ class StampDetailViewModel @Inject constructor(
             val doneMissionJob = putGroupDoneMission(missionInfo)
             val stampPostedJob = getGroupMembersFcmToken()
             joinAll(doneMissionJob, stampPostedJob)
-        } catch (e: Exception) {
-            checkNetworkDialog()
         } catch (e: NullPointerException) {
             // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
+        } catch (e: Exception) {
+            checkNetworkDialog()
         }
     }
 
@@ -134,11 +134,11 @@ class StampDetailViewModel @Inject constructor(
                 if (missionInfo.totalStamp - missionInfo.curStamp == 1) {
                     stampsRepository.putGroupDoneMission().getOrThrow()
                 }
+            } catch (e: NullPointerException) {
+                // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
             } catch (e: Exception) {
                 // TODO: postStamp 이후 다이얼로그 처리
 //                checkNetworkDialog()
-            } catch (e: NullPointerException) {
-                // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
             }
         }
 
@@ -150,11 +150,11 @@ class StampDetailViewModel @Inject constructor(
         val fcmTokenList = deferredFcmTokenList.awaitAll().map { result ->
             try {
                 result.getOrThrow()
+            } catch (e: NullPointerException) {
+                return@launch
             } catch (e: Exception) {
                 // TODO: postStamp 이후 다이얼로그 처리
 //                checkNetworkDialog()
-                return@launch
-            } catch (e: NullPointerException) {
                 return@launch
             }
         }
@@ -177,11 +177,11 @@ class StampDetailViewModel @Inject constructor(
         } catch (e: HttpException) {
             // retrofit exception
             // TODO: retrofit url error 처리
+        } catch (e: NullPointerException) {
+            this.cancel()
         } catch (e: Exception) {
 //             TODO: postStamp 이후 다이얼로그 처리
 //            checkNetworkDialog()
-            this.cancel()
-        } catch (e: NullPointerException) {
             this.cancel()
         }
     }

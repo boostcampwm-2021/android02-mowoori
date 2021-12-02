@@ -77,11 +77,11 @@ class IntroViewModel @Inject constructor(
             val key = introRepository.getFcmServerKey().getOrThrow()
             // preference
             introRepository.updateFcmServerKey(key)
+        } catch (e: NullPointerException) {
+            // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
         } catch (e: Exception) {
             checkNetworkDialog()
             this.cancel()
-        } catch (e: NullPointerException) {
-            // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
         }
     }
 
