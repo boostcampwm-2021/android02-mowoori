@@ -102,10 +102,10 @@ class MissionsViewModel @Inject constructor(
             _missionList.postValue(missionList)
             filterMissionList(missionIdList, missionList)
             setLoadingEvent(false)
-        } catch (e: Exception) {
-            checkNetworkDialog()
         } catch (e: NullPointerException) {
             // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
+        } catch (e: Exception) {
+            checkNetworkDialog()
         }
     }
 

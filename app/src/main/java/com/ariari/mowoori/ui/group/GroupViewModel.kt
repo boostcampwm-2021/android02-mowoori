@@ -40,10 +40,10 @@ class GroupViewModel @Inject constructor(
         try {
             val nickname = introRepository.getRandomNickName().getOrThrow()
             groupName.postValue(nickname + "들")
-        } catch (e: Exception) {
-            checkNetworkDialog()
         } catch (e: NullPointerException) {
             // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
+        } catch (e: Exception) {
+            checkNetworkDialog()
         }
     }
 
@@ -55,10 +55,10 @@ class GroupViewModel @Inject constructor(
             val user = groupRepository.getUser().getOrThrow()
             val isSuccess = groupRepository.addUserToGroup(code, user).getOrThrow()
             _successAddGroup.postValue(isSuccess)
-        } catch (e: Exception) {
-            checkNetworkDialog()
         } catch (e: NullPointerException) {
             // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
+        } catch (e: Exception) {
+            checkNetworkDialog()
         }
     }
 
@@ -81,12 +81,12 @@ class GroupViewModel @Inject constructor(
             val isSuccess =
                 groupRepository.putGroupInfo(groupNameList, groupInfo, user).getOrThrow()
             _successAddGroup.postValue(isSuccess)
-        } catch (e: Exception) {
-            checkNetworkDialog()
         } catch (e: NullPointerException) {
             // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
         } catch (e: DuplicatedException) {
             _inValidMode.postValue(InvalidMode.AlreadyExistGroupName)
+        } catch (e: Exception) {
+            checkNetworkDialog()
         }
     }
 

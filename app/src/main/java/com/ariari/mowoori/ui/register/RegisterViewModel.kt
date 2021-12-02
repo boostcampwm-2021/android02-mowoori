@@ -54,10 +54,10 @@ class RegisterViewModel @Inject constructor(
             try {
                 val nickname = introRepository.getRandomNickName().getOrThrow()
                 profileText.postValue(nickname)
-            } catch (e: Exception) {
-                checkNetworkDialog()
             } catch (e: NullPointerException) {
                 // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
+            } catch (e: Exception) {
+                checkNetworkDialog()
             }
         }
     }
@@ -85,10 +85,10 @@ class RegisterViewModel @Inject constructor(
         try {
             val key = introRepository.getFcmServerKey().getOrThrow()
             introRepository.updateFcmServerKey(key)
-        } catch (e: Exception) {
-            checkNetworkDialog()
         } catch (e: NullPointerException) {
             // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
+        } catch (e: Exception) {
+            checkNetworkDialog()
         }
     }
 

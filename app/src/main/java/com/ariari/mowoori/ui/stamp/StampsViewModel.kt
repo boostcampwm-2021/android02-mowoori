@@ -80,20 +80,20 @@ class StampsViewModel @Inject constructor(
                 try {
                     val stampInfo = result.getOrThrow()
                     Stamp(missionInfo.stampList[index], stampInfo)
+                } catch (e: NullPointerException) {
+                    return@launch
                 } catch (e: Exception) {
                     checkNetworkDialog()
-                    return@launch
-                } catch (e: NullPointerException) {
                     return@launch
                 }
             }.toMutableList()
             tempStampList.addAll(createEmptyStamps(missionInfo.totalStamp - tempStampList.size))
             _stampList.postValue(tempStampList)
             setLoadingEvent(false)
-        } catch (e: Exception) {
-            checkNetworkDialog()
         } catch (e: NullPointerException) {
             // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
+        } catch (e: Exception) {
+            checkNetworkDialog()
         }
     }
 
