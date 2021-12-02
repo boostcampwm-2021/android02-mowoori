@@ -23,6 +23,7 @@ buildscript {
         rxBindingVersion = '4.0.0'
         retrofitVersion ='2.9.0'
         encryptedSharedPreferencesVersion = '1.1.0-alpha03'
+        fragmentVersion = '1.4.0'
     }
     repositories {
         google()

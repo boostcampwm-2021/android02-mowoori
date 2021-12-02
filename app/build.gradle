@@ -99,4 +99,7 @@ dependencies {
     implementation "com.jakewharton.rxbinding4:rxbinding:$rxBindingVersion"
     implementation "com.jakewharton.rxbinding4:rxbinding-core:$rxBindingVersion"
     implementation "com.jakewharton.rxbinding4:rxbinding-appcompat:$rxBindingVersion"
+
+    // Fragment
+    implementation "androidx.fragment:fragment-ktx:$fragmentVersion"
 }

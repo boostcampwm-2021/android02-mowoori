@@ -12,6 +12,7 @@ import androidx.core.content.FileProvider
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -30,6 +31,7 @@ import com.ariari.mowoori.util.isNetWorkAvailable
 import com.ariari.mowoori.util.toastMessage
 import com.ariari.mowoori.widget.NetworkDialogFragment
 import com.ariari.mowoori.widget.PictureDialogFragment
+import com.ariari.mowoori.widget.PictureDialogFragment.Companion.PICTURE_DIALOG
 import com.ariari.mowoori.widget.ProgressDialogManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -151,13 +153,27 @@ class StampDetailFragment :
 
         if (mode == DetailMode.CERTIFY) {
             binding.ivStampDetail.setOnClickListener {
-                PictureDialogFragment(onClick).show(
-                    requireActivity().supportFragmentManager,
+                PictureDialogFragment().show(
+                    parentFragmentManager,
                     "PictureDialogFragment"
                 )
             }
         } else {
             loadPicture(pictureUrl)
+        }
+        setPictureDialogEvent()
+    }
+
+    private fun setPictureDialogEvent() {
+        setFragmentResultListener(PICTURE_DIALOG) { _, result ->
+            result.get(PICTURE_DIALOG)?.let { pictureType ->
+                if(pictureType == PictureType.GALLERY){
+                    activityGalleryLauncher.launch("image/*")
+                }
+                if(pictureType == PictureType.CAMERA){
+                    takePicture(android.Manifest.permission.CAMERA)
+                }
+            }
         }
     }
 
@@ -236,17 +252,6 @@ class StampDetailFragment :
                     showNetworkDialog()
                 }
             }
-    }
-
-    private val onClick: (pictureType: PictureType) -> Unit = {
-        when (it) {
-            PictureType.CAMERA -> {
-                takePicture(android.Manifest.permission.CAMERA)
-            }
-            else -> {
-                activityGalleryLauncher.launch("image/*")
-            }
-        }
     }
 
     private fun takePicture(permission: String) {
