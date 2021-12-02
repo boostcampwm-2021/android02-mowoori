@@ -29,15 +29,15 @@
     <string name="title_view_text">View Title</string>
 
     <!-- InviteCheckFragment -->
-    <string name="invite_check_title">`우리`의\n초대를 받으셨나요?</string>
+    <string name="invite_check_title">\'우리\'의 \n초대를 받으셨나요?</string>
     <string name="invite_check_yes">네, 초대받았어요!</string>
     <string name="invite_check_no">초대가 뭐죠?\n저는 몰라요 ㅠㅠ</string>
 
     <!-- GroupFragment -->
-    <string name="group_name_title">`우리`의\n이름을 정해주세요</string>
+    <string name="group_name_title">\'우리\'의\n이름을 정해주세요</string>
     <string name="group_name_complete">완료</string>
     <string name="group_name">정직한 코박쥐들</string>
-    <string name="group_name_hint">`우리`의 이름을 입력해주세요</string>
+    <string name="group_name_hint">\'우리\'의 이름을 입력해주세요</string>
     <string name="group_invite_title">초대코드를\n입력해주세요</string>
     <string name="group_name_invalid">그룹 이름은 1자 이상 11자 이하에요!</string>
     <string name="group_invite_invalid">존재하지 않은 초대 코드 입니다!</string>

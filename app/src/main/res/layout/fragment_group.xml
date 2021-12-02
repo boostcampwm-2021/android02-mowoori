@@ -20,7 +20,7 @@
             android:id="@+id/tv_group_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_margin="20dp"
             android:text="@string/group_name_title"
             android:textColor="@color/black"
             android:textSize="36sp"
