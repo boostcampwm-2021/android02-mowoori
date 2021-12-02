@@ -60,7 +60,6 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
         setLoadingObserver()
         setPlusBtnClickObserver()
         setBackBtnClickObserver()
-        setMissionsTypeObserver()
         setMissionsListObserver()
         setItemClickObserver()
         setNetworkDialogObserver()
@@ -88,12 +87,6 @@ class MissionsFragment : BaseFragment<FragmentMissionsBinding>(R.layout.fragment
         missionsViewModel.backBtnClick.observe(viewLifecycleOwner, EventObserver {
             this.findNavController().popBackStack()
         })
-    }
-
-    private fun setMissionsTypeObserver() {
-        missionsViewModel.missionsType.observe(viewLifecycleOwner) {
-            missionsViewModel.loadUserThenLoadMissionList(args.user)
-        }
     }
 
     private fun setMissionsListObserver() {
