@@ -4,6 +4,7 @@
 # MoWoori
 - 의미 : 모으자 우리 함께😊
 - 👉 [Wiki 바로가기](https://github.com/boostcampwm-2021/android02-mowoori/wiki)
+- 👉 [Notion 바로가기](https://wind-knight-242.notion.site/10-50-Android02-b037ecc66f7740ad8d2901d9b70c9ad7)
 
 ## 팀명
 
@@ -215,3 +216,9 @@
   - 푸쉬알람을 클릭해서 앱을 열면 미션 인증 상세화면을 볼 수 있습니다.
 
   👉 [FCM 기술 소개로](https://www.notion.so/10-50-Android02-19221df3a23f4ef88afbb4a7294df4a5)
+  
+  <br>
+  
+  ## 기술스택
+  ![모우리_기술스택](https://user-images.githubusercontent.com/68374234/144480244-3481cdf5-a8a8-4afc-b986-72ae87576cd2.jpg)
+
