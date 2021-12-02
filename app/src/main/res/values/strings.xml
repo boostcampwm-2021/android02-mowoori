@@ -59,6 +59,7 @@
     <string name="desc_home_big_heart">왕 하트</string>
     <string name="home_new_group">새로운 그룹을 추가해주세요.</string>
     <string name="home_no_group">그룹이 없어요.</string>
+    <string name="home_welcome_msg">%s님,\n오늘도 아리아리!!</string>
 
     <!-- MissionsFragment -->
     <string name="item_missions_stamp_count">%d/%d</string>
