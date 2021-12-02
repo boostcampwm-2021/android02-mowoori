@@ -23,7 +23,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val homeRepository: HomeRepository,
 ) : ViewModel() {
-    private val _userInfo = MutableLiveData<Event<UserInfo>>()
+    private val _userInfo = MutableLiveData(Event(UserInfo()))
     val userInfo: LiveData<Event<UserInfo>> = _userInfo
 
     private val _currentGroupInfo = MutableLiveData<Group>()

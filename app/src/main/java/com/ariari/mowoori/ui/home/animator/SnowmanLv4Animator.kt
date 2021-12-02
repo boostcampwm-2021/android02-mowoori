@@ -12,13 +12,13 @@ import android.view.View
 import android.view.ViewTreeObserver
 import androidx.core.view.isInvisible
 import com.ariari.mowoori.R
-import com.ariari.mowoori.ui.home.HomeViewModel
 import com.ariari.mowoori.ui.home.entity.Lv4Component
 import com.ariari.mowoori.ui.home.entity.ViewInfo
 
 class SnowmanLv4Animator(
     private val component: Lv4Component,
-    private val homeViewModel: HomeViewModel,
+    private val addAnimator: (Animator) -> Unit,
+    private val updateAttributes: (Int) -> Unit,
     private val context: Context,
 ) {
     private lateinit var leftBlackEyeInfo: ViewInfo
@@ -44,11 +44,11 @@ class SnowmanLv4Animator(
     private lateinit var disappearSecondExclamationAnimator: Animator
 
     init {
-        homeViewModel.addSources()
+        updateAttributes(ADD_SOURCES)
     }
 
     fun start() {
-        homeViewModel.resetAlphaForLv4()
+        updateAttributes(RESET_ALPHA)
         setXMLAnimators()
         initViewInfo()
     }
@@ -139,7 +139,7 @@ class SnowmanLv4Animator(
             animatorResId
         ).apply {
             setTarget(view)
-            homeViewModel.addAnimator(this)
+            addAnimator(this)
         }
 
     private fun initViewInfo() {
@@ -147,7 +147,7 @@ class SnowmanLv4Animator(
             ViewTreeObserver.OnPreDrawListener {
             override fun onPreDraw(): Boolean {
                 component.body.viewTreeObserver.removeOnPreDrawListener(this)
-                homeViewModel.bodyMeasured()
+                updateAttributes(BODY_MEASURE)
                 return true
             }
         })
@@ -158,13 +158,16 @@ class SnowmanLv4Animator(
             ViewTreeObserver.OnPreDrawListener {
             override fun onPreDraw(): Boolean {
                 component.face.ivHomeSnowmanLeftEyeBlackLv4.viewTreeObserver.removeOnPreDrawListener(
-                    this)
+                    this
+                )
                 leftBlackEyeInfo =
-                    ViewInfo(component.face.ivHomeSnowmanLeftEyeBlackLv4.x,
+                    ViewInfo(
+                        component.face.ivHomeSnowmanLeftEyeBlackLv4.x,
                         component.face.ivHomeSnowmanLeftEyeBlackLv4.y,
                         component.face.ivHomeSnowmanLeftEyeBlackLv4.width.toFloat(),
-                        component.face.ivHomeSnowmanLeftEyeBlackLv4.height.toFloat())
-                homeViewModel.leftBlackViewInfoDone()
+                        component.face.ivHomeSnowmanLeftEyeBlackLv4.height.toFloat()
+                    )
+                updateAttributes(LEFT_BLACK_DONE)
                 return true
             }
         })
@@ -172,13 +175,16 @@ class SnowmanLv4Animator(
             ViewTreeObserver.OnPreDrawListener {
             override fun onPreDraw(): Boolean {
                 component.face.ivHomeSnowmanRightEyeBlackLv4.viewTreeObserver.removeOnPreDrawListener(
-                    this)
+                    this
+                )
                 rightBlackEyeInfo =
-                    ViewInfo(component.face.ivHomeSnowmanRightEyeBlackLv4.x,
+                    ViewInfo(
+                        component.face.ivHomeSnowmanRightEyeBlackLv4.x,
                         component.face.ivHomeSnowmanRightEyeBlackLv4.y,
                         component.face.ivHomeSnowmanRightEyeBlackLv4.width.toFloat(),
-                        component.face.ivHomeSnowmanRightEyeBlackLv4.height.toFloat())
-                homeViewModel.rightBlackViewInfoDone()
+                        component.face.ivHomeSnowmanRightEyeBlackLv4.height.toFloat()
+                    )
+                updateAttributes(RIGHT_BLACK_DONE)
                 return true
             }
         })
@@ -189,17 +195,20 @@ class SnowmanLv4Animator(
             ViewTreeObserver.OnPreDrawListener {
             override fun onPreDraw(): Boolean {
                 component.face.ivHomeSnowmanLeftEyeWhiteLv4.viewTreeObserver.removeOnPreDrawListener(
-                    this)
+                    this
+                )
                 component.face.ivHomeSnowmanLeftEyeWhiteLv4.x =
                     leftBlackEyeInfo.x + leftBlackEyeInfo.width - component.face.ivHomeSnowmanLeftEyeWhiteLv4.width
                 component.face.ivHomeSnowmanLeftEyeWhiteLv4.y =
                     leftBlackEyeInfo.y + (leftBlackEyeInfo.height / 2) - (component.face.ivHomeSnowmanLeftEyeWhiteLv4.height / 2)
                 leftWhiteEyeInfo =
-                    ViewInfo(component.face.ivHomeSnowmanLeftEyeWhiteLv4.x,
+                    ViewInfo(
+                        component.face.ivHomeSnowmanLeftEyeWhiteLv4.x,
                         component.face.ivHomeSnowmanLeftEyeWhiteLv4.y,
                         component.face.ivHomeSnowmanLeftEyeWhiteLv4.width.toFloat(),
-                        component.face.ivHomeSnowmanLeftEyeWhiteLv4.height.toFloat())
-                homeViewModel.leftWhiteViewInfoDone()
+                        component.face.ivHomeSnowmanLeftEyeWhiteLv4.height.toFloat()
+                    )
+                updateAttributes(LEFT_WHITE_DONE)
                 return true
             }
         })
@@ -207,17 +216,20 @@ class SnowmanLv4Animator(
             ViewTreeObserver.OnPreDrawListener {
             override fun onPreDraw(): Boolean {
                 component.face.ivHomeSnowmanRightEyeWhiteLv4.viewTreeObserver.removeOnPreDrawListener(
-                    this)
+                    this
+                )
                 component.face.ivHomeSnowmanRightEyeWhiteLv4.x =
                     rightBlackEyeInfo.x + rightBlackEyeInfo.width - component.face.ivHomeSnowmanRightEyeWhiteLv4.width
                 component.face.ivHomeSnowmanRightEyeWhiteLv4.y =
                     rightBlackEyeInfo.y + (rightBlackEyeInfo.height / 2) - (component.face.ivHomeSnowmanRightEyeWhiteLv4.height / 2)
                 rightWhiteEyeInfo =
-                    ViewInfo(component.face.ivHomeSnowmanRightEyeWhiteLv4.x,
+                    ViewInfo(
+                        component.face.ivHomeSnowmanRightEyeWhiteLv4.x,
                         component.face.ivHomeSnowmanRightEyeWhiteLv4.y,
                         component.face.ivHomeSnowmanRightEyeWhiteLv4.width.toFloat(),
-                        component.face.ivHomeSnowmanRightEyeWhiteLv4.height.toFloat())
-                homeViewModel.rightWhiteViewInfoDone()
+                        component.face.ivHomeSnowmanRightEyeWhiteLv4.height.toFloat()
+                    )
+                updateAttributes(RIGHT_WHITE_DONE)
                 return true
             }
         })
@@ -227,36 +239,50 @@ class SnowmanLv4Animator(
     fun setObjectAnimators() {
         setMoveLeftEyeToLeftAnimator()
         setMoveRightEyeToLeftAnimator()
-        moveLeftEyeToRightAnimator = getAnimatorOfFloat(component.face.ivHomeSnowmanLeftEyeWhiteLv4,
+        moveLeftEyeToRightAnimator = getAnimatorOfFloat(
+            component.face.ivHomeSnowmanLeftEyeWhiteLv4,
             View.TRANSLATION_X,
             leftWhiteEyeInfo.x - leftBlackEyeInfo.x - leftWhiteEyeInfo.width,
-            600)
+            600
+        )
         moveRightEyeToRightAnimator =
-            getAnimatorOfFloat(component.face.ivHomeSnowmanRightEyeWhiteLv4,
+            getAnimatorOfFloat(
+                component.face.ivHomeSnowmanRightEyeWhiteLv4,
                 View.TRANSLATION_X,
                 rightWhiteEyeInfo.x - rightBlackEyeInfo.x - rightWhiteEyeInfo.width,
-                600)
+                600
+            )
         setAnimationSet()
         startAnimation()
     }
 
     private fun setMoveLeftEyeToLeftAnimator() {
-        val moveLeftEyePropertyX = PropertyValuesHolder.ofFloat(View.TRANSLATION_X,
-            leftBlackEyeInfo.x - leftWhiteEyeInfo.x)
-        val moveLeftEyePropertyY = PropertyValuesHolder.ofFloat(View.TRANSLATION_Y,
-            leftBlackEyeInfo.height - leftWhiteEyeInfo.height - (leftWhiteEyeInfo.y - leftBlackEyeInfo.y))
+        val moveLeftEyePropertyX = PropertyValuesHolder.ofFloat(
+            View.TRANSLATION_X,
+            leftBlackEyeInfo.x - leftWhiteEyeInfo.x
+        )
+        val moveLeftEyePropertyY = PropertyValuesHolder.ofFloat(
+            View.TRANSLATION_Y,
+            leftBlackEyeInfo.height - leftWhiteEyeInfo.height - (leftWhiteEyeInfo.y - leftBlackEyeInfo.y)
+        )
         moveLeftEyeToLeftAnimator =
-            getAnimatorFromProperties(component.face.ivHomeSnowmanLeftEyeWhiteLv4,
+            getAnimatorFromProperties(
+                component.face.ivHomeSnowmanLeftEyeWhiteLv4,
                 moveLeftEyePropertyX,
                 moveLeftEyePropertyY,
-                600)
+                600
+            )
     }
 
     private fun setMoveRightEyeToLeftAnimator() {
-        val moveRightEyePropertyX = PropertyValuesHolder.ofFloat(View.TRANSLATION_X,
-            rightBlackEyeInfo.x - rightWhiteEyeInfo.x)
-        val moveRightEyePropertyY = PropertyValuesHolder.ofFloat(View.TRANSLATION_Y,
-            rightBlackEyeInfo.height - rightWhiteEyeInfo.height - (rightWhiteEyeInfo.y - rightBlackEyeInfo.y))
+        val moveRightEyePropertyX = PropertyValuesHolder.ofFloat(
+            View.TRANSLATION_X,
+            rightBlackEyeInfo.x - rightWhiteEyeInfo.x
+        )
+        val moveRightEyePropertyY = PropertyValuesHolder.ofFloat(
+            View.TRANSLATION_Y,
+            rightBlackEyeInfo.height - rightWhiteEyeInfo.height - (rightWhiteEyeInfo.y - rightBlackEyeInfo.y)
+        )
         moveRightEyeToLeftAnimator =
             getAnimatorFromProperties(
                 component.face.ivHomeSnowmanRightEyeWhiteLv4,
@@ -274,7 +300,7 @@ class SnowmanLv4Animator(
     ) =
         ObjectAnimator.ofPropertyValuesHolder(view, property1, property2).apply {
             this.duration = duration
-            homeViewModel.addAnimator(this)
+            addAnimator(this)
         }
 
     private fun getAnimatorOfFloat(
@@ -285,7 +311,7 @@ class SnowmanLv4Animator(
     ) =
         ObjectAnimator.ofFloat(view, property, value).apply {
             this.duration = duration
-            homeViewModel.addAnimator(this)
+            addAnimator(this)
         }
 
     private fun setAnimationSet() {
@@ -316,5 +342,15 @@ class SnowmanLv4Animator(
 
     private fun startAnimation() {
         moveEyeToLeftAnimatorSet.start()
+    }
+
+    companion object {
+        const val ADD_SOURCES = 0
+        const val RESET_ALPHA = 1
+        const val BODY_MEASURE = 2
+        const val LEFT_BLACK_DONE = 3
+        const val RIGHT_BLACK_DONE = 4
+        const val LEFT_WHITE_DONE = 5
+        const val RIGHT_WHITE_DONE = 6
     }
 }

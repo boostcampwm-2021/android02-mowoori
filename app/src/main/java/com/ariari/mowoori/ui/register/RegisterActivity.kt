@@ -9,7 +9,6 @@ import androidx.fragment.app.DialogFragment
 import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.ActivityRegisterBinding
 import com.ariari.mowoori.ui.main.MainActivity
-import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.util.hideKeyBoard
 import com.ariari.mowoori.util.isNetWorkAvailable
 import com.ariari.mowoori.util.toastMessage
@@ -77,6 +76,7 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun registerUserInfo() {
         if (this.isNetWorkAvailable()) {
+            registerViewModel.setLoadingEvent(true)
             registerViewModel.initFcmServerKey()
             registerViewModel.registerUserInfo()
         } else {
@@ -91,7 +91,7 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun setRegisterSuccessObserver() {
-        registerViewModel.registerSuccessEvent.observe(this, EventObserver {
+        registerViewModel.isRegisterSuccess.observe(this, {
             if (it) {
                 registerViewModel.setUserRegistered(true)
                 moveToMain()
@@ -102,13 +102,13 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun setProfileClickObserver() {
-        registerViewModel.profileImageClickEvent.observe(this, EventObserver {
+        registerViewModel.profileImageClickEvent.observe(this, {
             getContent.launch("image/*")
         })
     }
 
     private fun setLoadingEventObserver() {
-        registerViewModel.loadingEvent.observe(this, EventObserver {
+        registerViewModel.loadingEvent.observe(this, {
             if (it) {
                 ProgressDialogManager.instance.show(this)
             } else {
@@ -126,10 +126,8 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun setNetworkDialogObserver() {
-        registerViewModel.networkDialogEvent.observe(this, {
-            if (it) {
-                showNetworkDialog()
-            }
+        registerViewModel.isNetworkDialogShowed.observe(this, {
+            if (it) showNetworkDialog()
         })
     }
 
@@ -145,6 +143,7 @@ class RegisterActivity : AppCompatActivity() {
             override fun onRetryClick(dialog: DialogFragment) {
                 dialog.dismiss()
                 registerUserInfo()
+                registerViewModel.resetNetworkDialog()
             }
         }).show(supportFragmentManager, "NetworkDialogFragment")
     }

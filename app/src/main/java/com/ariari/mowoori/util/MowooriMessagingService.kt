@@ -11,6 +11,7 @@ import com.ariari.mowoori.R
 import com.ariari.mowoori.ui.main.MainActivity
 import com.ariari.mowoori.ui.stamp.entity.DetailInfo
 import com.ariari.mowoori.ui.stamp.entity.DetailMode
+import com.ariari.mowoori.ui.stamp.entity.Stamp
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -34,13 +35,14 @@ class MowooriMessagingService : FirebaseMessagingService() {
         intent.putExtra(FROM_FCM, true)
         intent.putExtra(
             DETAIL_INFO, DetailInfo(
+                userId = remoteMessage.data["userId"].toString(),
                 userName = remoteMessage.data["userName"].toString(),
                 missionName = remoteMessage.data["missionName"].toString(),
                 detailMode = DetailMode.INQUIRY,
-                stampInfo = StampInfo(
+                stamp = Stamp("", StampInfo(
                     pictureUrl = remoteMessage.data["pictureUrl"].toString(),
                     comment = remoteMessage.data["comment"].toString()
-                )
+                ))
             )
         )
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)

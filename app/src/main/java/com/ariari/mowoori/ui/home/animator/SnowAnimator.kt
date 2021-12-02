@@ -10,13 +10,12 @@ import android.view.animation.AccelerateInterpolator
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.ariari.mowoori.R
-import com.ariari.mowoori.ui.home.HomeViewModel
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 
 class SnowAnimator(
     private val container: ConstraintLayout,
-    private val homeViewModel: HomeViewModel,
+    private val addAnimator: (Animator) -> Unit,
     private val context: Context
 ) {
 
@@ -62,7 +61,7 @@ class SnowAnimator(
                 }
             })
         }
-        homeViewModel.addSnowAnimator(snowAnimSet)
+        addAnimator(snowAnimSet)
         snowAnimSet.start()
         delay(delayTime)
     }

@@ -7,19 +7,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.StampsRepository
 import com.ariari.mowoori.ui.missions.entity.Mission
+import com.ariari.mowoori.ui.missions.entity.MissionInfo
 import com.ariari.mowoori.ui.stamp.entity.DetailInfo
 import com.ariari.mowoori.ui.stamp.entity.DetailMode
+import com.ariari.mowoori.ui.stamp.entity.Stamp
 import com.ariari.mowoori.ui.stamp.entity.StampInfo
-import com.ariari.mowoori.util.ErrorMessage
 import com.ariari.mowoori.util.Event
-import com.ariari.mowoori.util.LogUtil
 import com.ariari.mowoori.util.getCurrentDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -52,33 +54,17 @@ class StampDetailViewModel @Inject constructor(
     private val _pictureUri = MutableLiveData<Uri>()
     val pictureUri: LiveData<Uri> = _pictureUri
 
-    private val _networkDialogEvent = MutableLiveData<Boolean>()
-    val networkDialogEvent: LiveData<Boolean> get() = _networkDialogEvent
+    private val _isNetworkDialogShowed = MutableLiveData(false)
+    val isNetworkDialogShowed: LiveData<Boolean> get() = _isNetworkDialogShowed
 
-    private val _groupMembersTokenList = MutableLiveData<List<String>>()
-    val groupMembersTokenList: LiveData<List<String>> = _groupMembersTokenList
-
-    private val _isFcmSent = MutableLiveData<Event<Unit>>()
-    val isFcmSent: LiveData<Event<Unit>> = _isFcmSent
-
-    private var _requestCount = 0
-    private val requestCount get() = _requestCount
+    private val _isFcmSent = MutableLiveData<Boolean>()
+    val isFcmSent: LiveData<Boolean> = _isFcmSent
 
     private val _checkCommentValidEvent = MutableLiveData<Event<Unit>>()
     val checkCommentValidEvent: LiveData<Event<Unit>> = _checkCommentValidEvent
 
-    private fun initRequestCount() {
-        _requestCount = 0
-    }
-
-    private fun addRequestCount() {
-        _requestCount++
-    }
-
-    private fun checkRequestCount() {
-        if (requestCount == 1) {
-            setNetworkDialogEvent()
-        }
+    fun resetNetworkDialog() {
+        _isNetworkDialogShowed.value = false
     }
 
     fun setDetailInfo(_detailInfo: DetailInfo) {
@@ -122,118 +108,88 @@ class StampDetailViewModel @Inject constructor(
         _checkCommentValidEvent.postValue(Event(Unit))
     }
 
-    fun postStamp() {
+    fun postStamp() = viewModelScope.launch(Dispatchers.IO) {
+        try {
+            var imageUrl = ""
+            pictureUri.value?.let { uri ->
+                imageUrl = stampsRepository.putCertificationImage(uri,
+                    detailInfo.missionId).getOrThrow()
+            }
+            val missionInfo = stampsRepository.getMissionInfo(detailInfo.missionId).getOrThrow()
+            stampInfo = StampInfo(imageUrl, comment.value!!, getCurrentDate())
+            stampsRepository.postStamp(stampInfo, Mission(detailInfo.missionId, missionInfo))
+            val doneMissionJob = putGroupDoneMission(missionInfo)
+            val stampPostedJob = getGroupMembersFcmToken()
+            joinAll(doneMissionJob, stampPostedJob)
+        } catch (e: NullPointerException) {
+            // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
+        } catch (e: Exception) {
+            checkNetworkDialog()
+        }
+    }
+
+    private fun putGroupDoneMission(missionInfo: MissionInfo) =
         viewModelScope.launch(Dispatchers.IO) {
-            if (pictureUri.value != null) {
-                initRequestCount()
-                stampsRepository.putCertificationImage(pictureUri.value!!, detailInfo.missionId)
-                    .onSuccess { uri ->
-                        postStampInfo(uri)
-                    }
-                    .onFailure {
-                        checkThrowableMessage(it)
-                    }
-            } else {
-                postStampInfo("")
+            try {
+                if (missionInfo.totalStamp - missionInfo.curStamp == 1) {
+                    stampsRepository.putGroupDoneMission().getOrThrow()
+                }
+            } catch (e: NullPointerException) {
+                // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
+            } catch (e: Exception) {
+                // TODO: postStamp 이후 다이얼로그 처리
+//                checkNetworkDialog()
             }
         }
-    }
 
-    private fun getGroupMembersFcmToken() {
-        viewModelScope.launch(Dispatchers.IO) {
-            stampsRepository.getGroupMembersUserId()
-                .onSuccess { idList ->
-                    val deferredMembersUserIdList = idList.map { userId ->
-                        async { stampsRepository.getGroupMembersFcmToken(userId) }
-                    }
-                    _groupMembersTokenList.postValue(
-                        deferredMembersUserIdList.awaitAll().map { result ->
-                            if (result.isSuccess) {
-                                result.getOrNull() ?: ""
-                            } else {
-                                val throwable = result.exceptionOrNull() ?: return@launch
-                                checkThrowableMessage(throwable)
-                                return@launch
-                            }
-                        }
-                    )
-                }.onFailure {
-                    checkThrowableMessage(it)
-                }
+    private fun getGroupMembersFcmToken() = viewModelScope.launch(Dispatchers.IO) {
+        val userIdList = stampsRepository.getGroupMembersUserId().getOrThrow()
+        val deferredFcmTokenList = userIdList.map { userId ->
+            async { stampsRepository.getGroupMembersFcmToken(userId) }
         }
-    }
-
-    fun postFcm() {
-        viewModelScope.launch {
-            groupMembersTokenList.value?.let { tokenList ->
-                tokenList.map { fcmToken ->
-                    initRequestCount()
-                    launch {
-                        stampsRepository.postFcmMessage(
-                            fcmToken,
-                            detailInfo.copy(
-                                detailMode = DetailMode.INQUIRY,
-                                stampInfo = stampInfo
-                            )
-                        ).onSuccess {
-                            LogUtil.log("fcm_success", it.success.toString())
-                            LogUtil.log("fcm_failure", it.failure.toString())
-                        }.onFailure {
-                            checkThrowableMessage(it)
-                            LogUtil.log("fcm_throw_message", it.message.toString())
-                        }
-                    }
-                }.joinAll()
-                setLoadingEvent(false)
-                _isFcmSent.postValue(Event(Unit))
+        val fcmTokenList = deferredFcmTokenList.awaitAll().map { result ->
+            try {
+                result.getOrThrow()
+            } catch (e: NullPointerException) {
+                return@launch
+            } catch (e: Exception) {
+                // TODO: postStamp 이후 다이얼로그 처리
+//                checkNetworkDialog()
+                return@launch
             }
         }
-    }
-
-    private fun postStampInfo(uriString: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            LogUtil.log("stamp", uriString)
-            initRequestCount()
-            stampsRepository.getMissionInfo(detailInfo.missionId)
-                .onSuccess { missionInfo ->
-                    stampInfo = StampInfo(uriString, comment.value!!, getCurrentDate())
-                    initRequestCount()
-                    stampsRepository.postStamp(
-                        stampInfo,
-                        Mission(detailInfo.missionId, missionInfo)
-                    )
-                        .onSuccess {
-                            val doneMissionJob = launch {
-                                if (missionInfo.totalStamp - missionInfo.curStamp == 1) {
-                                    stampsRepository.putGroupDoneMission()
-                                }
-                            }
-                            val stampPostedJob = launch {
-                                getGroupMembersFcmToken()
-                            }
-                            joinAll(doneMissionJob, stampPostedJob)
-                        }.onFailure { throwable ->
-                            checkThrowableMessage(throwable)
-                        }
-                }
-                .onFailure {
-                    checkThrowableMessage(it)
-                }
+        val postMessageJobList = fcmTokenList.map { fcmToken ->
+            postMessage(fcmToken)
+        }.apply { this.joinAll() }
+        postMessageJobList.forEach {
+            if (it.isCancelled) return@launch
         }
-    }
-
-    private fun checkThrowableMessage(throwable: Throwable) {
-        when (throwable.message) {
-            ErrorMessage.Offline.message -> {
-                addRequestCount()
-                checkRequestCount()
-            }
-            else -> setLoadingEvent(false)
-        }
-    }
-
-    private fun setNetworkDialogEvent() {
         setLoadingEvent(false)
-        _networkDialogEvent.postValue(true)
+        _isFcmSent.postValue(true)
+    }
+
+    // retrofit
+    private fun postMessage(fcmToken: String) = viewModelScope.launch {
+        try {
+            stampsRepository.postFcmMessage(fcmToken,
+                detailInfo.copy(detailMode = DetailMode.INQUIRY, stamp = Stamp("", stampInfo)))
+                .getOrThrow()
+        } catch (e: HttpException) {
+            // retrofit exception
+            // TODO: retrofit url error 처리
+        } catch (e: NullPointerException) {
+            this.cancel()
+        } catch (e: Exception) {
+//             TODO: postStamp 이후 다이얼로그 처리
+//            checkNetworkDialog()
+            this.cancel()
+        }
+    }
+
+    private fun checkNetworkDialog() {
+        setLoadingEvent(false)
+        _isNetworkDialogShowed.value?.let {
+            if (!it) _isNetworkDialogShowed.postValue(true)
+        }
     }
 }

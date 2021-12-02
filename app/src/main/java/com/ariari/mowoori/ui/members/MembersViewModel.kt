@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.MembersRepository
 import com.ariari.mowoori.ui.home.entity.Group
 import com.ariari.mowoori.ui.register.entity.User
-import com.ariari.mowoori.util.ErrorMessage
 import com.ariari.mowoori.util.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -32,40 +31,25 @@ class MembersViewModel @Inject constructor(
     private val _membersList = MutableLiveData<List<User>>()
     val membersList: LiveData<List<User>> = _membersList
 
-    private val _networkDialogEvent = MutableLiveData<Event<Boolean>>()
-    val networkDialogEvent: LiveData<Event<Boolean>> get() = _networkDialogEvent
+    private val _isNetworkDialogShowed = MutableLiveData(Event(false))
+    val isNetworkDialogShowed: LiveData<Event<Boolean>> get() = _isNetworkDialogShowed
 
-    private var _requestCount = 0
-    private val requestCount get() = _requestCount
-
-    private fun initRequestCount() {
-        _requestCount = 0
-    }
-
-    private fun addRequestCount() {
-        _requestCount++
-    }
-
-    private fun checkRequestCount() {
-        if (requestCount == 1) {
-            setNetworkDialogEvent()
-        }
+    fun resetNetworkDialog() {
+        _isNetworkDialogShowed.value = Event(false)
     }
 
     fun setLoadingEvent(isLoading: Boolean) {
         _loadingEvent.postValue(Event(isLoading))
     }
 
-    fun fetchGroupInfo() {
-        viewModelScope.launch(Dispatchers.IO) {
-            initRequestCount()
-            membersRepository.getCurrentGroupInfo()
-                .onSuccess {
-                    _currentGroup.postValue(it)
-                }
-                .onFailure {
-                    checkThrowableMessage(it)
-                }
+    fun fetchGroupInfo() = viewModelScope.launch(Dispatchers.IO) {
+        try {
+            val group = membersRepository.getCurrentGroupInfo().getOrThrow()
+            _currentGroup.postValue(group)
+        } catch (e: NullPointerException) {
+            // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
+        } catch (e: Exception) {
+            checkNetworkDialog()
         }
     }
 
@@ -73,39 +57,31 @@ class MembersViewModel @Inject constructor(
         _openInviteDialogEvent.value = Event(currentGroup.value?.groupId)
     }
 
-    fun fetchMemberList() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val deferredMemberList =
-                requireNotNull(currentGroup.value).groupInfo.userList.map { userId ->
-                    async { membersRepository.getUserInfo(userId) }
-                }
-            _membersList.postValue(
-                deferredMemberList.awaitAll().map { result ->
-                    initRequestCount()
-                    if (result.isSuccess) {
-                        result.getOrNull() ?: return@launch
-                    } else {
-                        val throwable = result.exceptionOrNull() ?: return@launch
-                        checkThrowableMessage(throwable)
-                        return@launch
-                    }
-                }
-            )
-        }
-    }
-
-    private fun checkThrowableMessage(throwable: Throwable) {
-        when (throwable.message) {
-            ErrorMessage.Offline.message -> {
-                addRequestCount()
-                checkRequestCount()
+    fun fetchMemberList() = viewModelScope.launch(Dispatchers.IO) {
+        val deferredMemberList =
+            requireNotNull(currentGroup.value).groupInfo.userList.map { userId ->
+                async { membersRepository.getUserInfo(userId) }
             }
-            else -> setLoadingEvent(false)
-        }
+        val tempMemberList = deferredMemberList.awaitAll().map { result ->
+            try {
+                result.getOrThrow()
+            } catch (e: NullPointerException) {
+                return@launch
+            } catch (e: Exception) {
+                checkNetworkDialog()
+                return@launch
+            }
+        }.toMutableList()
+        tempMemberList.removeIf { user -> user.userId == membersRepository.getUserUid() }
+        _membersList.postValue(tempMemberList)
     }
 
-    private fun setNetworkDialogEvent() {
+    private fun checkNetworkDialog() {
         setLoadingEvent(false)
-        _networkDialogEvent.postValue(Event(true))
+        _isNetworkDialogShowed.value?.let {
+            if (!it.peekContent()) {
+                _isNetworkDialogShowed.postValue(Event(true))
+            }
+        }
     }
 }

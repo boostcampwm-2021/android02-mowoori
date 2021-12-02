@@ -15,12 +15,12 @@ import com.ariari.mowoori.R
 import com.ariari.mowoori.databinding.ActivityIntroBinding
 import com.ariari.mowoori.ui.main.MainActivity
 import com.ariari.mowoori.ui.register.RegisterActivity
-import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.util.LogUtil
 import com.ariari.mowoori.util.isNetWorkAvailable
 import com.ariari.mowoori.util.toastMessage
 import com.ariari.mowoori.widget.NetworkDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.joinAll
 import timber.log.Timber
 import kotlin.system.exitProcess
 
@@ -46,23 +46,23 @@ class IntroActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        introViewModel.setFirebaseAuth()
-        autoLogin()
         binding.viewModel = introViewModel
+        introViewModel.setFirebaseAuth()
         introViewModel.initFcmToken()
+        autoLogin()
         setListeners()
         setObservers()
         requestPermissions(permissionList)
 
         //For Test
-        if (BuildConfig.DEBUG) {
-            binding.test.isVisible = true
-            binding.test.setOnClickListener { binding.llTest.isVisible = !binding.llTest.isVisible }
-            binding.test1.setOnClickListener { signInTester(1) }
-            binding.test2.setOnClickListener { signInTester(2) }
-            binding.test3.setOnClickListener { signInTester(3) }
-            binding.test4.setOnClickListener { signInTester(4) }
-        }
+//        if (BuildConfig.DEBUG) {
+//            binding.test.isVisible = true
+//            binding.test.setOnClickListener { binding.llTest.isVisible = !binding.llTest.isVisible }
+//            binding.test1.setOnClickListener { signInTester(1) }
+//            binding.test2.setOnClickListener { signInTester(2) }
+//            binding.test3.setOnClickListener { signInTester(3) }
+//            binding.test4.setOnClickListener { signInTester(4) }
+//        }
     }
 
     private fun setListeners() {
@@ -72,23 +72,24 @@ class IntroActivity : AppCompatActivity() {
     }
 
     private fun setObservers() {
-        introViewModel.isUserRegistered.observe(this, EventObserver {
+        introViewModel.isUserRegistered.observe(this, {
             if (it) {
-                introViewModel.updateFcmServerKey()
-                introViewModel.updateFcmToken()
-                introViewModel.setUserRegistered(true)
-                moveToMain()
+                introViewModel.updateFcmServerKeyAndFcmToken()
             } else {
                 moveToRegister()
             }
         })
 
-        introViewModel.isTestLoginSuccess.observe(this, {
+        introViewModel.isFcmUpdated.observe(this, {
             if (it) {
+                introViewModel.setUserRegistered(true)
                 moveToMain()
-            } else {
-                binding.llTest.isVisible = true
             }
+        })
+
+        introViewModel.isTestLoginSuccess.observe(this, {
+            if (it) moveToMain()
+            else binding.llTest.isVisible = true
         })
         setNetworkDialogObserver()
     }
@@ -175,10 +176,8 @@ class IntroActivity : AppCompatActivity() {
         }
 
     private fun setNetworkDialogObserver() {
-        introViewModel.networkDialogEvent.observe(this, {
-            if (it) {
-                showNetworkDialog()
-            }
+        introViewModel.isNetworkDialogShowed.observe(this, {
+            if (it) showNetworkDialog()
         })
     }
 
@@ -194,6 +193,7 @@ class IntroActivity : AppCompatActivity() {
             override fun onRetryClick(dialog: DialogFragment) {
                 dialog.dismiss()
                 signIn()
+                introViewModel.resetNetworkDialog()
             }
         }).show(supportFragmentManager, "NetworkDialogFragment")
     }

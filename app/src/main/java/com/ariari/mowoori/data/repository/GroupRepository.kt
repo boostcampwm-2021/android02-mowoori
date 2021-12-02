@@ -9,11 +9,15 @@ interface GroupRepository {
 
     suspend fun getGroupNameList(): Result<List<String>>
 
-    fun putGroupInfo(groupNameList: List<String>, groupInfo: GroupInfo, user: User): Result<String>
+    suspend fun putGroupInfo(
+        groupNameList: List<String>,
+        groupInfo: GroupInfo,
+        user: User,
+    ): Result<Boolean>
 
-    suspend fun addUserToGroup(groupId: String, user: User): Result<String>
+    suspend fun addUserToGroup(groupId: String, user: User): Result<Boolean>
 
     suspend fun getUser(): Result<User>
 
-    suspend fun isExistGroupId(groupId: String): Result<Boolean>
+    suspend fun hasExistGroupId(groupId: String): Result<Boolean>
 }

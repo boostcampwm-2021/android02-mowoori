@@ -73,7 +73,7 @@ class MissionsRepositoryImpl @Inject constructor(
         missionInfo: MissionInfo,
         groupId: String,
         missionIdList: List<String>,
-    ) {
+    ): Result<Boolean> = runCatching {
         val missionId = firebaseReference.child("missions").push().key
         missionId?.let {
             val updatedMissionList = missionIdList.toMutableList().apply {
@@ -85,8 +85,8 @@ class MissionsRepositoryImpl @Inject constructor(
                 "groups/$groupId/missionList" to updatedMissionList
             )
             firebaseReference.updateChildren(childUpdates)
-            missionId
         }
+        true
     }
 
     override suspend fun getUserName(userId: String): Result<String> = kotlin.runCatching {

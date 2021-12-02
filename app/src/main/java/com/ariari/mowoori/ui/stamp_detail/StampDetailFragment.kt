@@ -1,6 +1,7 @@
 package com.ariari.mowoori.ui.stamp_detail
 
 import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -11,6 +12,7 @@ import androidx.core.content.FileProvider
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -29,10 +31,15 @@ import com.ariari.mowoori.util.isNetWorkAvailable
 import com.ariari.mowoori.util.toastMessage
 import com.ariari.mowoori.widget.NetworkDialogFragment
 import com.ariari.mowoori.widget.PictureDialogFragment
+import com.ariari.mowoori.widget.PictureDialogFragment.Companion.PICTURE_DIALOG
 import com.ariari.mowoori.widget.ProgressDialogManager
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.jakewharton.rxbinding4.view.clicks
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -74,12 +81,16 @@ class StampDetailFragment :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        sharedElementEnterTransition =
-            TransitionInflater.from(context).inflateTransition(android.R.transition.move)
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        sharedElementEnterTransition =
+            TransitionInflater.from(context).inflateTransition(android.R.transition.move)
+        if (safeArgs.detailInfo.detailMode == DetailMode.INQUIRY) {
+            postponeEnterTransition()
+        }
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = stampDetailViewModel
         stampDetailViewModel.setDetailInfo(safeArgs.detailInfo)
@@ -107,7 +118,6 @@ class StampDetailFragment :
         setCloseBtnClickObserver()
         setIsCertifyObserver()
         setNetworkDialogObserver()
-        setGroupMembersFcmTokenListObserver()
         setIsFcmSentObserver()
         setValidationObserver()
     }
@@ -117,7 +127,7 @@ class StampDetailFragment :
     }
 
     private fun setDetailTransitionName() {
-        binding.ivStampDetail.transitionName = stampDetailViewModel.detailInfo.stampInfo.pictureUrl
+        binding.ivStampDetail.transitionName = stampDetailViewModel.detailInfo.stamp.stampId
     }
 
     private fun setUserName() {
@@ -130,26 +140,40 @@ class StampDetailFragment :
 
     private fun setComment() {
         if (stampDetailViewModel.detailInfo.detailMode == DetailMode.INQUIRY) {
-            stampDetailViewModel.setComment(stampDetailViewModel.detailInfo.stampInfo.comment)
-            binding.etStampDetailComment.setText(stampDetailViewModel.detailInfo.stampInfo.comment)
+            stampDetailViewModel.setComment(stampDetailViewModel.detailInfo.stamp.stampInfo.comment)
+            binding.etStampDetailComment.setText(stampDetailViewModel.detailInfo.stamp.stampInfo.comment)
             binding.etStampDetailComment.hint = "입력한 한줄평이 없어요."
             binding.etStampDetailComment.keyListener = null
         }
     }
 
     private fun setPictureClickListener() {
-        val pictureUrl = stampDetailViewModel.detailInfo.stampInfo.pictureUrl
+        val pictureUrl = stampDetailViewModel.detailInfo.stamp.stampInfo.pictureUrl
         val mode = stampDetailViewModel.detailInfo.detailMode
 
         if (mode == DetailMode.CERTIFY) {
             binding.ivStampDetail.setOnClickListener {
-                PictureDialogFragment(onClick).show(
-                    requireActivity().supportFragmentManager,
+                PictureDialogFragment().show(
+                    parentFragmentManager,
                     "PictureDialogFragment"
                 )
             }
         } else {
             loadPicture(pictureUrl)
+        }
+        setPictureDialogEvent()
+    }
+
+    private fun setPictureDialogEvent() {
+        setFragmentResultListener(PICTURE_DIALOG) { _, result ->
+            result.get(PICTURE_DIALOG)?.let { pictureType ->
+                if(pictureType == PictureType.GALLERY){
+                    activityGalleryLauncher.launch("image/*")
+                }
+                if(pictureType == PictureType.CAMERA){
+                    takePicture(android.Manifest.permission.CAMERA)
+                }
+            }
         }
     }
 
@@ -162,12 +186,56 @@ class StampDetailFragment :
                 .load(R.drawable.ic_stamp)
                 .override(300, 300)
                 .transform(CenterCrop(), RoundedCorners(16))
+                .addListener(object: RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean,
+                    ): Boolean {
+                        startPostponedEnterTransition()
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean,
+                    ): Boolean {
+                        startPostponedEnterTransition()
+                        return false
+                    }
+                })
                 .into(binding.ivStampDetail)
         } else {
             Glide.with(requireContext())
                 .load(pictureUrl)
                 .override(300, 300)
                 .transform(CenterCrop(), RoundedCorners(16))
+                .addListener(object: RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean,
+                    ): Boolean {
+                        startPostponedEnterTransition()
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean,
+                    ): Boolean {
+                        startPostponedEnterTransition()
+                        return false
+                    }
+                })
                 .into(binding.ivStampDetail)
         }
     }
@@ -184,17 +252,6 @@ class StampDetailFragment :
                     showNetworkDialog()
                 }
             }
-    }
-
-    private val onClick: (pictureType: PictureType) -> Unit = {
-        when (it) {
-            PictureType.CAMERA -> {
-                takePicture(android.Manifest.permission.CAMERA)
-            }
-            else -> {
-                activityGalleryLauncher.launch("image/*")
-            }
-        }
     }
 
     private fun takePicture(permission: String) {
@@ -282,7 +339,11 @@ class StampDetailFragment :
 
     private fun setCloseBtnClickObserver() {
         stampDetailViewModel.closeBtnClick.observe(viewLifecycleOwner, {
-            this.findNavController().popBackStack()
+            if (safeArgs.openFromFcm) {
+                findNavController().navigate(R.id.action_stampDetailFragment_to_homeFragment)
+            } else {
+                findNavController().popBackStack()
+            }
         })
     }
 
@@ -304,15 +365,16 @@ class StampDetailFragment :
         })
     }
 
-    private fun setGroupMembersFcmTokenListObserver() {
-        stampDetailViewModel.groupMembersTokenList.observe(viewLifecycleOwner) {
-            stampDetailViewModel.postFcm()
-        }
-    }
-
     private fun setIsFcmSentObserver() {
-        stampDetailViewModel.isFcmSent.observe(viewLifecycleOwner, EventObserver {
-            this.findNavController().popBackStack()
+        stampDetailViewModel.isFcmSent.observe(viewLifecycleOwner, {
+
+            if (it){
+                val detailInfo = stampDetailViewModel.detailInfo
+                this.findNavController()
+                    .navigate(StampDetailFragmentDirections.actionStampDetailFragmentToStampsFragment(
+                        detailInfo.missionId, detailInfo.userId, detailInfo.userName
+                    ))
+            }
         })
     }
 
@@ -326,10 +388,8 @@ class StampDetailFragment :
     }
 
     private fun setNetworkDialogObserver() {
-        stampDetailViewModel.networkDialogEvent.observe(viewLifecycleOwner, {
-            if (it) {
-                showNetworkDialog()
-            }
+        stampDetailViewModel.isNetworkDialogShowed.observe(viewLifecycleOwner, {
+            if (it) showNetworkDialog()
         })
     }
 
@@ -343,6 +403,7 @@ class StampDetailFragment :
             override fun onRetryClick(dialog: DialogFragment) {
                 dialog.dismiss()
                 stampDetailViewModel.postStamp()
+                stampDetailViewModel.resetNetworkDialog()
             }
         }).show(requireActivity().supportFragmentManager, "NetworkDialogFragment")
     }

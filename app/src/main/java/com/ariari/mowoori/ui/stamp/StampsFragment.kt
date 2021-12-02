@@ -2,7 +2,7 @@ package com.ariari.mowoori.ui.stamp
 
 import android.os.Bundle
 import android.view.View
-import android.view.ViewTreeObserver.OnGlobalLayoutListener
+import android.view.ViewTreeObserver.OnPreDrawListener
 import android.widget.ImageView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
@@ -15,11 +15,10 @@ import com.ariari.mowoori.R
 import com.ariari.mowoori.base.BaseFragment
 import com.ariari.mowoori.databinding.FragmentStampsBinding
 import com.ariari.mowoori.ui.missions.entity.Mission
-import com.ariari.mowoori.ui.register.entity.User
 import com.ariari.mowoori.ui.stamp.adapter.StampsAdapter
 import com.ariari.mowoori.ui.stamp.entity.DetailInfo
 import com.ariari.mowoori.ui.stamp.entity.DetailMode
-import com.ariari.mowoori.ui.stamp.entity.StampInfo
+import com.ariari.mowoori.ui.stamp.entity.Stamp
 import com.ariari.mowoori.util.EventObserver
 import com.ariari.mowoori.util.isNetWorkAvailable
 import com.ariari.mowoori.widget.NetworkDialogFragment
@@ -30,7 +29,6 @@ import timber.log.Timber
 @AndroidEntryPoint
 class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_stamps) {
     private val safeArgs: StampsFragmentArgs by navArgs()
-    private val user: User by lazy { safeArgs.user }
     private lateinit var mission: Mission
     private lateinit var adapter: StampsAdapter
     private val viewModel: StampsViewModel by viewModels()
@@ -39,26 +37,32 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
+        postponeEnterTransition()
         setStartEnterTransition()
         setCompleteBtnVisible()
-        loadMissionInfo()
+        if (!hasInitialized) {
+            setSpanCount()
+            loadMissionInfo()
+            hasInitialized = true
+        }
         setAdapter()
-        setSpanCount()
         setCompleteClick()
         setObserver()
     }
 
     private fun setStartEnterTransition() {
         // 리사이클러 뷰가 측정이 완료될 때까지 트랜지션 지연
-        postponeEnterTransition()
-        binding.rvStamps.viewTreeObserver.addOnPreDrawListener {
-            startPostponedEnterTransition()
-            true
-        }
+        binding.rvStamps.viewTreeObserver.addOnPreDrawListener(object: OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                binding.rvStamps.viewTreeObserver.removeOnPreDrawListener(this)
+                startPostponedEnterTransition()
+                return true
+            }
+        })
     }
 
     private fun setCompleteBtnVisible() {
-        viewModel.setIsMyMission(user.userId)
+        viewModel.setIsMyMission(safeArgs.userId)
     }
 
     private fun loadMissionInfo() {
@@ -74,19 +78,20 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
         Timber.d("setAdapter")
         adapter = StampsAdapter(object : StampsAdapter.OnItemClickListener {
             override fun itemClick(position: Int, imageView: ImageView) {
-                val stampInfo = adapter.currentList[position].stampInfo
+                val stamp = adapter.currentList[position]
                 val extras = FragmentNavigatorExtras(
-                    imageView to stampInfo.pictureUrl
+                    imageView to stamp.stampId
                 )
                 this@StampsFragment.findNavController()
                     .navigate(
                         StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
-                            DetailInfo(
-                                user.userInfo.nickname,
+                            detailInfo = DetailInfo(
+                                safeArgs.userId,
+                                safeArgs.userNickname,
                                 mission.missionId,
                                 mission.missionInfo.missionName,
                                 DetailMode.INQUIRY,
-                                stampInfo
+                                stamp
                             )
                         ), extras
                     )
@@ -97,16 +102,17 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
 
     private fun setSpanCount() {
         // 뷰 사이즈 측정 시점을 관찰하는 옵저버
-        binding.rvStamps.viewTreeObserver.addOnGlobalLayoutListener(object :
-            OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
+        binding.rvStamps.viewTreeObserver.addOnPreDrawListener(object : OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
                 // 뷰의 측정이 자주 일어날 경우 중첩된 리스너 등록을 방지하기 위해 콜백 함수가 호출되면 해당 리스너를 제거한다.
-                binding.rvStamps.viewTreeObserver.removeOnGlobalLayoutListener(this)
+
+                binding.rvStamps.viewTreeObserver.removeOnPreDrawListener(this)
                 val resources = requireActivity().resources
                 val recyclerViewWidth = binding.rvStamps.width
                 val itemWidth =
                     resources.getDimension(R.dimen.stamp_width) + resources.getDimension(R.dimen.stamp_padding)
                 viewModel.setSpanCount(recyclerViewWidth / itemWidth)
+                return true
             }
         })
     }
@@ -116,12 +122,13 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
             it.findNavController()
                 .navigate(
                     StampsFragmentDirections.actionStampsFragmentToStampDetailFragment(
-                        DetailInfo(
-                            user.userInfo.nickname,
+                        detailInfo = DetailInfo(
+                            safeArgs.userId,
+                            safeArgs.userNickname,
                             mission.missionId,
                             mission.missionInfo.missionName,
                             DetailMode.CERTIFY,
-                            StampInfo()
+                            Stamp()
                         )
                     )
                 )
@@ -157,24 +164,21 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
     }
 
     private fun setSpanCountObserver() {
-        viewModel.spanCount.observe(viewLifecycleOwner, EventObserver { spanCount ->
+        viewModel.spanCount.observe(viewLifecycleOwner, { spanCount ->
             val gridLayoutManager = GridLayoutManager(requireContext(), spanCount)
             binding.rvStamps.layoutManager = gridLayoutManager
         })
     }
 
     private fun setStampListObserver() {
-        viewModel.stampList.observe(viewLifecycleOwner, EventObserver { stampList ->
-            viewModel.setLoadingEvent(false)
+        viewModel.stampList.observe(viewLifecycleOwner, { stampList ->
             adapter.submitList(stampList)
         })
     }
 
     private fun setNetworkDialogObserver() {
-        viewModel.networkDialogEvent.observe(viewLifecycleOwner, EventObserver {
-            if (it) {
-                showNetworkDialog()
-            }
+        viewModel.isNetworkDialogShowed.observe(viewLifecycleOwner, EventObserver {
+            if (it) showNetworkDialog()
         })
     }
 
@@ -188,6 +192,7 @@ class StampsFragment : BaseFragment<FragmentStampsBinding>(R.layout.fragment_sta
             override fun onRetryClick(dialog: DialogFragment) {
                 dialog.dismiss()
                 loadMissionInfo()
+                viewModel.resetNetworkDialog()
             }
         }).show(requireActivity().supportFragmentManager, "NetworkDialogFragment")
     }

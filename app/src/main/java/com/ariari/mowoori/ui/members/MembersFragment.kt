@@ -32,7 +32,10 @@ class MembersFragment : BaseFragment<FragmentMembersBinding>(R.layout.fragment_m
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = membersViewModel
-        setGroupInfo()
+        if (!hasInitialized) {
+            setGroupInfo()
+            hasInitialized = true
+        }
         setLoadingObserver()
         setOpenDialogEventObserver()
         setCurrentGroupObserver()
@@ -125,10 +128,8 @@ class MembersFragment : BaseFragment<FragmentMembersBinding>(R.layout.fragment_m
     }
 
     private fun setNetworkDialogObserver() {
-        membersViewModel.networkDialogEvent.observe(viewLifecycleOwner, EventObserver {
-            if (it) {
-                showNetworkDialog()
-            }
+        membersViewModel.isNetworkDialogShowed.observe(viewLifecycleOwner, EventObserver {
+            if (it) showNetworkDialog()
         })
     }
 
@@ -142,6 +143,7 @@ class MembersFragment : BaseFragment<FragmentMembersBinding>(R.layout.fragment_m
             override fun onRetryClick(dialog: DialogFragment) {
                 dialog.dismiss()
                 setGroupInfo()
+                membersViewModel.resetNetworkDialog()
             }
         }).show(requireActivity().supportFragmentManager, "NetworkDialogFragment")
     }

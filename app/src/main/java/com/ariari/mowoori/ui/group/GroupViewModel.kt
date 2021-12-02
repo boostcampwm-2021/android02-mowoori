@@ -6,11 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ariari.mowoori.data.repository.GroupRepository
 import com.ariari.mowoori.data.repository.IntroRepository
-import com.ariari.mowoori.util.InvalidMode
 import com.ariari.mowoori.ui.home.entity.GroupInfo
-import com.ariari.mowoori.ui.register.entity.User
-import com.ariari.mowoori.util.ErrorMessage
-import com.ariari.mowoori.util.Event
+import com.ariari.mowoori.util.DuplicatedException
+import com.ariari.mowoori.util.InvalidMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,144 +20,88 @@ class GroupViewModel @Inject constructor(
     private val introRepository: IntroRepository,
 ) : ViewModel() {
 
+    // 그룹 이름, 초대 코드랑 같이 쓰여서 수정 필요
     val groupName = MutableLiveData("")
 
-    private val _addGroupCompleteEvent = MutableLiveData<Event<String>>()
-    val addGroupCompleteEvent: LiveData<Event<String>> = _addGroupCompleteEvent
+    private val _successAddGroup = MutableLiveData<Boolean>()
+    val successAddGroup: LiveData<Boolean> = _successAddGroup
 
     private val _inValidMode = MutableLiveData<InvalidMode>()
     val inValidMode: LiveData<InvalidMode> = _inValidMode
 
-    private val _networkDialogEvent = MutableLiveData<Boolean>()
-    val networkDialogEvent: LiveData<Boolean> get() = _networkDialogEvent
+    private val _isNetworkDialogShowed = MutableLiveData(false)
+    val isNetworkDialogShowed: LiveData<Boolean> get() = _isNetworkDialogShowed
 
-    private var _requestCount = 0
-    private val requestCount get() = _requestCount
-
-    private fun initRequestCount() {
-        _requestCount = 0
+    fun resetNetworkDialog() {
+        _isNetworkDialogShowed.value = false
     }
 
-    private fun addRequestCount() {
-        _requestCount++
-    }
-
-    private fun checkRequestCount() {
-        if (requestCount == 1) {
-            setNetworkDialogEvent()
+    fun setGroupName() = viewModelScope.launch(Dispatchers.IO) {
+        try {
+            val nickname = introRepository.getRandomNickName().getOrThrow()
+            groupName.postValue(nickname + "들")
+        } catch (e: NullPointerException) {
+            // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
+        } catch (e: Exception) {
+            checkNetworkDialog()
         }
     }
 
-    fun setGroupName() {
-        viewModelScope.launch(Dispatchers.IO) {
-            initRequestCount()
-            introRepository.getRandomNickName()
-                .onSuccess { randomName -> groupName.postValue(randomName + "들") }
-                .onFailure {
-                    checkThrowableMessage(it)
-                }
+    fun joinGroup() = viewModelScope.launch(Dispatchers.IO) {
+        try {
+            val code = groupName.value ?: ""
+            if (!checkInviteCodeValidation(code)) return@launch
+            groupRepository.hasExistGroupId(code).getOrThrow()
+            val user = groupRepository.getUser().getOrThrow()
+            val isSuccess = groupRepository.addUserToGroup(code, user).getOrThrow()
+            _successAddGroup.postValue(isSuccess)
+        } catch (e: NullPointerException) {
+            // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
+        } catch (e: Exception) {
+            checkNetworkDialog()
         }
-    }
-
-    fun joinGroup() {
-        val code = groupName.value ?: ""
-        if (!checkInviteCodeValidation(code)) {
-            _inValidMode.postValue(InvalidMode.InValidCode)
-            return
-        }
-        viewModelScope.launch(Dispatchers.IO) {
-            groupRepository.isExistGroupId(code)
-                .onSuccess {
-                    if (it) {
-                        initRequestCount()
-                        groupRepository.getUser()
-                            .onSuccess { user ->
-                                initRequestCount()
-                                groupRepository.addUserToGroup(code, user)
-                                    .onSuccess { newGroupId ->
-                                        _addGroupCompleteEvent.postValue(Event(newGroupId))
-                                    }
-                                    .onFailure { throwable ->
-                                        checkThrowableMessage(throwable)
-                                    }
-                            }.onFailure { throwable ->
-                                checkThrowableMessage(throwable)
-                            }
-                    } else {
-                        _inValidMode.postValue(InvalidMode.InValidCode)
-                    }
-                }
-                .onFailure {
-                    checkThrowableMessage(it)
-                }
-        }
-    }
-
-    fun addNewGroup() {
-        val name = groupName.value ?: ""
-        if (!checkGroupNameValidation(name)) {
-            _inValidMode.postValue(InvalidMode.InValidGroupName)
-            return
-        }
-        viewModelScope.launch(Dispatchers.IO) {
-            initRequestCount()
-            groupRepository.getUser()
-                .onSuccess { user ->
-                    checkGroupNameExist(name, user)
-                }
-                .onFailure {
-                    checkThrowableMessage(it)
-                }
-        }
-    }
-
-    private suspend fun checkGroupNameExist(name: String, user: User) {
-        initRequestCount()
-        groupRepository.getGroupNameList()
-            .onSuccess { groupNameList ->
-                val groupInfo = GroupInfo(0, name, listOf(user.userId))
-                initRequestCount()
-                groupRepository.putGroupInfo(groupNameList, groupInfo, user)
-                    .onSuccess { newGroupId ->
-                        _addGroupCompleteEvent.postValue(Event(newGroupId))
-                    }
-                    .onFailure { throwable ->
-                        checkThrowableMessage(throwable)
-                    }
-            }
-            .onFailure {
-                checkThrowableMessage(it)
-            }
-    }
-
-    private fun checkGroupNameValidation(groupName: String): Boolean {
-        return groupName.length <= 11 && groupName.isNotEmpty()
     }
 
     private fun checkInviteCodeValidation(code: String): Boolean {
-        return code.isNotEmpty()
-    }
-
-    private fun checkThrowableMessage(throwable: Throwable) {
-        when (throwable.message) {
-            ErrorMessage.Offline.message -> {
-                addRequestCount()
-                checkRequestCount()
-            }
-            ErrorMessage.GroupInfo.message -> {
-                _inValidMode.postValue(InvalidMode.InValidCode)
-            }
-            ErrorMessage.DuplicatedGroup.message -> {
-                _inValidMode.postValue(InvalidMode.AlreadyJoin)
-            }
-            ErrorMessage.ExistGroupName.message -> {
-                _inValidMode.postValue(InvalidMode.AlreadyExistGroupName)
-            }
-            else -> Unit
+        return if (code.isNotEmpty()) {
+            true
+        } else {
+            _inValidMode.postValue(InvalidMode.InValidCode)
+            false
         }
     }
 
-    private fun setNetworkDialogEvent() {
-        _networkDialogEvent.postValue(true)
+    fun addNewGroup() = viewModelScope.launch(Dispatchers.IO) {
+        try {
+            val name = groupName.value ?: ""
+            if (!checkGroupNameValidation(name)) return@launch
+            val user = groupRepository.getUser().getOrThrow()
+            val groupNameList = groupRepository.getGroupNameList().getOrThrow()
+            val groupInfo = GroupInfo(0, name, listOf(user.userId))
+            val isSuccess =
+                groupRepository.putGroupInfo(groupNameList, groupInfo, user).getOrThrow()
+            _successAddGroup.postValue(isSuccess)
+        } catch (e: NullPointerException) {
+            // 파이어베이스 구조가 잘 짜여있다면 여기에 도달할 수 없다.
+        } catch (e: DuplicatedException) {
+            _inValidMode.postValue(InvalidMode.AlreadyExistGroupName)
+        } catch (e: Exception) {
+            checkNetworkDialog()
+        }
+    }
+
+    private fun checkGroupNameValidation(groupName: String): Boolean {
+        return if (groupName.length <= 11 && groupName.isNotEmpty()) {
+            true
+        } else {
+            _inValidMode.postValue(InvalidMode.InValidGroupName)
+            false
+        }
+    }
+
+    private fun checkNetworkDialog() {
+        _isNetworkDialogShowed.value?.let {
+            if (!it) _isNetworkDialogShowed.postValue(true)
+        }
     }
 }
